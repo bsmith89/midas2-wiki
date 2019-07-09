@@ -12,6 +12,8 @@ The IGG 2.0 genomes, genome-to-species assignments, and a choice of representati
 
 Numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
 
+Question for Alexandre:   What were the criteria for clustering genomes into species, and for choosing a representative genome for each species?
+
 # Target layout in S3
 
 A table of contents listing all MAGs will be located at [s3://microbiome-igg/2.0/genomes.tsv](http://microbiome-igg.s3.amazonaws.com/2.0/genomes.tsv).  It will look like
