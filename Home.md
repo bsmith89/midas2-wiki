@@ -18,9 +18,11 @@ GUT_GENOME269084    104351       GUT_GENOME269084      1
 with 4644 rows below the headers.
 
 
+Every species has a single representative genome, which could be used to identify the species, if we didn't have the purely numeric 6-digit species ids.  
+
 Column `genome_is_representative` is defined as `genome == representative`.
 
-Every species has a single representative genome, which could be used to identify the species.  We also use purely numeric 6-digit species ids arbitrarily assigned by Jason Shi; see `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.  The rest of this TSV was produced by Chunyu Zhao; see `s3://microbiome-chunyu/midas-iggdb/IGG+/mapfile`; based on the data layout in `s3://jason.shi-bucket/IGGdb2.0/clean_set/`.
+Credits:  The IGG 2.0 genomes, species assignments, and a choice of representative genome for each species, were provided by Alexandre Almeida of EBI and mirrored in S3 by Jason Shi at `s3://jason.shi-bucket/IGGdb2.0/clean_set/`.  Numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
 
 ## Genomes
 
