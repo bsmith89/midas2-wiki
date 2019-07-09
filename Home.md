@@ -6,7 +6,13 @@ This repository contains tools for building a [MIDAS](https://github.com/snayfac
 
 Our project to update [MIDAS for IGGdb 1.0](https://github.com/czbiohub/MIDAS-IGGdb/blob/master/README.md) is on hold.  We will first update MIDAS to run with this new database, directly from S3.
 
-# Data layout in S3
+# Inputs
+
+The IGG 2.0 genomes, genome-to-species assignments, and a choice of representative genome for each species, were provided by [Alexandre Almeida](https://www.ebi.ac.uk/about/people/alexandre-almeida) of EBI and mirrored in S3 by [Jason Shi](http://docpollard.org/people/jason-shi/), whose `s3://jason.shi-bucket/IGGdb2.0/clean_set/` serves as input to the tools in this repository.
+
+Numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
+
+# Target layout in S3
 
 A table of contents listing all MAGs will be located at [s3://microbiome-igg/2.0/genomes.tsv](http://microbiome-igg.s3.amazonaws.com/2.0/genomes.tsv).  It will look like
 ```
@@ -21,8 +27,6 @@ with 4644 rows below the headers.
 Every species has a single representative genome, which could be used to identify the species, if we didn't have the purely numeric 6-digit species ids.  
 
 Column `genome_is_representative` is defined as `genome == representative`.
-
-Credits:  The IGG 2.0 genomes, species assignments, and a choice of representative genome for each species, were provided by Alexandre Almeida of EBI and mirrored in S3 by Jason Shi at `s3://jason.shi-bucket/IGGdb2.0/clean_set/`.  Numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
 
 ## Genomes
 
@@ -46,7 +50,11 @@ The `{YYYYYY}_genes.ffn` for a species is a concatenation of all `GUT_GENOME{XXX
 
   * degenerate genes (with empty sequences or headers containing "|") have been excluded
 
-The temp files are produced by clustering the `genes.ffn` with `vsearch` to 99, 95, ... percent identity, respectively.  The top level `centroids.ffn` file represents the 99 percent identity clusters (the genes at their centers).  The `gene_info.txt` file shows the centroids that every gene from `genes.ffn` belongs to.  For example, in the following excerpt, two 99-pid clusters merge into a single 95-pid cluster containing 5 genes.
+The temp files are produced by clustering `genes.ffn` with `vsearch` to 99, 95, ... percent identity, respectively.
+
+The top level `centroids.ffn` file represents the 99 percent identity clusters -- with each cluster represented by the gene at its center.
+
+For every gene from `genes.ffn`, the centroids of the clusters containing that gene are listed in `gene_info.txt`.  For example, in the following excerpt, we see 5 genes that belong to two different 99-pid clusters, but only to a single 95-pid cluster centered around the gene `GUT_GENOME032486_01058`.
 ```
 gene_id                   centroid_99               centroid_95
 GUT_GENOME032486_01058    GUT_GENOME032486_01058    GUT_GENOME032486_01058
