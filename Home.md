@@ -15,7 +15,7 @@ GUT_GENOME138501    104351       GUT_GENOME269084      0
 GUT_GENOME269084    104351       GUT_GENOME269084      1
 ...
 ```
-with 4644 lines.
+with 4644 rows below the headers.
 
 
 Column `genome_is_representative` is defined as `genome == representative`.
