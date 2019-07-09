@@ -44,7 +44,7 @@ The `{YYYYYY}_genes.ffn` for a species is a concatenation of all `GUT_GENOME{XXX
 
   * degenerate genes (with empty sequences or headers containing "|") have been excluded
 
-The temp files are produced by clustering the `genes.ffn` with `vsearch` to 99, 95, ... percent identity, respectively.  The top level `centroids.ffn` file represents the 99 percent identity clusters (the genes at their centers).  The `gene_info.txt` file shows the centroids that every gene from `genes.ffn` belongs to.  For example, here we see two 99-pid clusters merge at the 95-pid level:
+The temp files are produced by clustering the `genes.ffn` with `vsearch` to 99, 95, ... percent identity, respectively.  The top level `centroids.ffn` file represents the 99 percent identity clusters (the genes at their centers).  The `gene_info.txt` file shows the centroids that every gene from `genes.ffn` belongs to.  For example, in the following excerpt, two 99-pid clusters merge into a single 95-pid cluster containing 5 genes.
 ```
 gene_id                   centroid_99               centroid_95
 GUT_GENOME032486_01058    GUT_GENOME032486_01058    GUT_GENOME032486_01058
