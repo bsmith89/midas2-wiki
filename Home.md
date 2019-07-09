@@ -24,7 +24,7 @@ GUT_GENOME269084    104351       GUT_GENOME269084      1
 with 4644 rows below the headers.
 
 
-Every species has a single representative genome, which could be used to identify the species, if we didn't have the purely numeric 6-digit species ids.  
+Every species has a single representative genome.  
 
 Column `genome_is_representative` is defined as `genome == representative`.
 
