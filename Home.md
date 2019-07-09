@@ -20,6 +20,4 @@ with 4644 rows below the headers.
 
 Column `genome_is_representative` is defined as `genome == representative`.
 
-Every species has a single representative genome, which could be used to identify the species.  While doing so would be elegant, for our purposes here, purely numeric species ids are more convenient.
-
-The 6-digit species ids above were arbitrarily assigned by Jason Shi; see `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
+Every species has a single representative genome, which could be used to identify the species.  We also use purely numeric 6-digit species ids arbitrarily assigned by Jason Shi; see `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
