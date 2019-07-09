@@ -64,3 +64,27 @@ GUT_GENOME122726_01472    GUT_GENOME036826_01544    GUT_GENOME032486_01058
 GUT_GENOME125418_01744    GUT_GENOME036826_01544    GUT_GENOME032486_01058
 GUT_GENOME153817_01616    GUT_GENOME036826_01544    GUT_GENOME032486_01058
 ```
+
+## Marker genes
+```
+s3://igg/2.0/marker_genes/phyeco.fa
+s3://igg/2.0/marker_genes/phyeco.map
+s3://igg/2.0/marker_genes/phyeco.fa.{sa, bwt, sequence}
+```
+The `phyeco.fa.{sa, bwt, sequence}` is the HS-BLASTN index for the `phyeco.fa`.
+
+In order to generate the target files in parallel, we ran HMM search for each genome, and cat all the FA files together:
+
+```
+s3://igg/2.0/marker_genes/temp/GUT_GENOME138501.hmmsearch
+s3://igg/2.0/marker_genes/temp/GUT_GENOME138501.phyeco.fa
+s3://igg/2.0/marker_genes/temp/GUT_GENOME138501.phyeco.map
+```
+The `GUT_GENOME{XXXXXX}.hmmsearch` is the HMMER results of searching reads aligned the 15 phyeco genes. 
+The `GUT_GENOME{XXXXXX}.phyeco.fa` is the FASTA file for the aligned phyeco genes, and `GUT_GENOME{XXXXXX}.phyeco.map` is needed for building the marker genes database.
+
+```
+cat temp/*.fa > phyeco.fa
+cat temp/*.map > phyeco.map #todo: need to add header
+```
+
