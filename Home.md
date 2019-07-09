@@ -39,11 +39,11 @@ The fna file contains a metagenome-assembled genome (MAG) from IGG.  The rest ar
 
 ## Pangenomes
 ```
-s3://igg/2.0/pangenomes/104351/104351_{genes.ffn, centroids.ffn, gene_info.txt}.lz4
-s3://igg/2.0/pangenomes/104351/temp/104351_centroids.{99, 95, 90, 85, 80, 75}.ffn.lz4
-s3://igg/2.0/pangenomes/104351/temp/104351_uclust.{99, 95, 90, 85, 80, 75}.txt.lz4
+s3://igg/2.0/species/104351/104351_{genes.ffn, centroids.ffn, gene_info.txt}.lz4
+s3://igg/2.0/species/104351/temp/104351_centroids.{99, 95, 90, 85, 80, 75}.ffn.lz4
+s3://igg/2.0/species/104351/temp/104351_uclust.{99, 95, 90, 85, 80, 75}.txt.lz4
 ```
-The `{YYYYYY}_genes.ffn` for a species is a concatenation of all `GUT_GENOME{XXXXXX}.ffn` produced by prokka for the genomes in that species, with some minor cleanup: 
+The species pangenome `{YYYYYY}_genes.ffn` is a concatenation of all `GUT_GENOME{XXXXXX}.ffn` produced by prokka for the genomes in that species, with some minor cleanup: 
 
   * extra newlines have been removed from the gene sequences, so that each gene sequence occupies a single line below the gene header
 
