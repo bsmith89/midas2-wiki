@@ -1,6 +1,6 @@
 # Microbiome - Integrated Gut Genome Tools
 
-A collection of 286,997 metagenome-assembled genomes (MAGs) from human gut samples has been clustered into 4,644 species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as IGGdb 2.0, IGG 2.0, IGG+, or sometimes simply IGG.  Perhaps the most important difference with respect to the original IGGdb 1.0 is that this new collection contains only gut genomes.
+A collection of 286,997 metagenome-assembled genomes (MAGs) from human gut samples has been clustered into 4,644 species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as IGGdb 2.0, IGG 2.0, IGG+, or simply IGG.  Perhaps the most important difference with respect to the original IGGdb 1.0 is that this new collection contains only gut genomes.
 
 This repository contains tools for building a [MIDAS](https://github.com/snayfach/MIDAS) database from IGG 2.0, geared to run on [AWS Batch](https://aws.amazon.com/batch/) as described in [PairANI](https://github.com/czbiohub/pairani/wiki).  The resulting database will be located at [s3://microbiome-igg/2.0](http://microbiome-igg.s3.amazonaws.com/2.0/README.TXT).
 
