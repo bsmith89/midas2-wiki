@@ -23,7 +23,7 @@ GUT_GENOME269084    104351       GUT_GENOME269084      1
 ```
 with 286,997 rows below the headers (one per genome) and 4,644 distinct species.
 
-Every species has a single representative genome.  
+Every species has a unique representative genome.
 
 Column `genome_is_representative` is defined as `genome == representative`.
 
