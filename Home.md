@@ -88,3 +88,6 @@ cat temp/*.fa > phyeco.fa
 cat temp/*.map > phyeco.map #todo: need to add header
 ```
 
+# See also
+
+[Operations](https://github.com/czbiohub/iggtools/wiki/Operations)
