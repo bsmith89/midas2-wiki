@@ -34,5 +34,4 @@ aws ecr get-login --region us-west-2 --no-include-email | xargs -Icmd bash -c "c
 docker push 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
 ```
 
-For more information, review the [PairANI instructions for managing container images](https://github.com/czbiohub/pairani/wiki#managing-container-images)
-noting that the ECR repository for this application is called `iggtools`.
+For more background, see the [PairANI instructions for managing container images](https://github.com/czbiohub/pairani/wiki#managing-container-images).
