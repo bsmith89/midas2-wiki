@@ -1,6 +1,8 @@
 # Prerequisites
 
-System has python 3.7 or above.
+Python 3.7 or above (as installed in Dockerfile).
+
+AWS credentials and permissions setup.
 
 
 # System-wide install
