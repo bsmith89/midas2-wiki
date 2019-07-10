@@ -2,7 +2,7 @@
 
 Python 3.7 or above (as installed in Dockerfile).
 
-AWS credentials and permissions setup.
+AWS credentials/roles/permissions configured appropriately for aws cli to be able to access S3, ECR, Batch, etc.
 
 
 # System-wide install
