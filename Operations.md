@@ -25,9 +25,7 @@ python3 -m iggtools --version
 
 # Build and push docker image for batch
 
-Follow the instructions for [managing container images in pairani](https://github.com/czbiohub/pairani/wiki#managing-container-images)
-
-The repository is called `iggtools`.
+Follow the instructions for [managing container images in pairani](https://github.com/czbiohub/pairani/wiki#managing-container-images) noting that the ECR repository for this application is called `iggtools`.  Essential commands to push a docker update:
 
 ```
 docker build .
