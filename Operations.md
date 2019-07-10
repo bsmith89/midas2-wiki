@@ -16,4 +16,4 @@ cd /path/to/iggtools
 
 pylint iggtools
 
-python3 -m iggtools
+python3 -m iggtools --version
