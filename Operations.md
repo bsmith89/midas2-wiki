@@ -25,9 +25,10 @@ python3 -m iggtools --version
 
 # Build and push docker image for batch
 
-Essential commands to push a docker update:
+Essential commands to update the docker container for Batch jobs.
 
 ```
+make changes to Dockerfile as needed
 docker build .
 docker tag <locally_built_image> 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
 aws ecr get-login --region us-west-2 --no-include-email | xargs -Icmd bash -c "cmd"
