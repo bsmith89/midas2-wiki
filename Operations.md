@@ -3,14 +3,14 @@
 assert system has python 3.7 or above
 
 
-# Systemwide (containerwide) install
+# System-wide install
 
 pip3 install 'git+git://github.com/czbiohub/iggtools' --upgrade
 
 iggtools --version
 
 
-# Lint and run locally during development
+# Lint and run locally for development
 
 cd /path/to/iggtools
 
