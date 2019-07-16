@@ -24,5 +24,5 @@
 
 5.  [IN PROGRESS]  [Boris]  Wrap container/instance init code in the python iggtools package.
 
-6.  [IN PROGRESS]  [Boris]  iggtool package subcommands for prokka, vsearch, hmmsearch with appropriate use of S3 and NVME to stage results
+6.  [IN PROGRESS]  [Boris]  iggtools subcommands for prokka, vsearch, hmmsearch with appropriate use of S3 and NVME to stage results
 
