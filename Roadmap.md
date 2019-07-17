@@ -22,7 +22,7 @@
 
 4.  [DONE] [Boris]  Validate local NVME init/sharing from Batch containers.
 
-5.  [IN PROGRESS]  [Boris]  Wrap container/instance init code in the python iggtools package.
+5.  [DONE]  [Boris]  Wrap container/instance init code in the python iggtools package.
 
 6.  [IN PROGRESS]  [Boris]  iggtools subcommands for prokka, vsearch, hmmsearch with appropriate use of S3 and NVME to stage results
 
