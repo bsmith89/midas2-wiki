@@ -94,8 +94,16 @@ s3://microbiome-igg/2.0/phyeco.mapping_cutoffs
 After running HMM and extract the phyeco genes for each genomes, concatenate the FA files for all the representative genomes into `phyeco.fa`; concatenate the phyeco mapping files for all the genomes into `phyeco.map`.
 
 ```
-cat temp/*.fa > phyeco.fa
-cat temp/*.map > phyeco.map #todo: need to add header
+## concatenate the FASTA sequences
+awk '$3 == 1 {print $1 }' mapfile  | xargs -Ixx -P 32 bash -c "cp marker_genes/temp/xx.phyeco.fa marker_genes/phyeco/xx.phyeco.fa"
+cat marker_genes/phyeco/xx.phyeco.fa > marker_genes/phyeco.fa
+
+## concatenate the MAP files
+grep -v "alt" alt_species_ids.tsv | cut -f2 |  xargs -Irep bash -c "echo rep && awk -v pat=rep '\$2 == pat {print}' mapfile | cut -f1 | xargs -Igenome bash -c 'cat temp/genome.phyeco.map' > phyeco/rep.phyeco.map "
+cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
+
+## Add header to MAP files
+echo -e  "species_id\tgenome_id\tgene_id\gene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
 ```
 
 ## Hacks/*.sh
