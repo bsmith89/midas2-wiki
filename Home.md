@@ -104,6 +104,9 @@ cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
 
 ## Add header to MAP files
 echo -e  "species_id\tgenome_id\tgene_id\gene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
+
+## Make hs-blastn index
+hs-blastn index marker_genes/phyeco.fa
 ```
 
 ## Hacks/*.sh
