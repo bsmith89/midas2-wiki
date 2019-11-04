@@ -103,7 +103,7 @@ grep -v "alt" alt_species_ids.tsv | cut -f2 |  xargs -Irep bash -c "awk -v pat=r
 cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
 
 ## Add header to MAP files
-echo -e  "species_id\tgenome_id\tgene_id\gene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
+echo -e  "species_id\tgenome_id\tgene_id\tgene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
 
 ## Make hs-blastn index
 hs-blastn index marker_genes/phyeco.fa
