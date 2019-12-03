@@ -2,7 +2,7 @@
 
 ## 0.5
 
-Build_pangenomes subcommand
+Implement `build_pangenomes` subcommand
 
 
 # See Also
