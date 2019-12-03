@@ -1,6 +1,6 @@
 # Versions
 
-##0.5
+## 0.5
 
 Build_pangenomes subcommand
 
