@@ -117,10 +117,3 @@ Individual bash scripts to call Progidal and generate HMM marker genes database.
 # See Also
 
 [Operations](https://github.com/czbiohub/iggtools/wiki/Operations)
-***
-
-***
-
-***
-
-***
