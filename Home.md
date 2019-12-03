@@ -29,6 +29,11 @@ Every species has a unique representative genome.
 
 Column `genome_is_representative` is defined as `genome == representative`.
 
+In addition, we relocate all inputs under
+```
+s3://microbiome-igg/2.0/cleaned_genomes/<alt_species_id>/<genome_id>.fa.lz4
+```
+
 ## Gene Annotations
 
 ```
