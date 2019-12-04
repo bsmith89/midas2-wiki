@@ -29,10 +29,11 @@ Every species has a unique representative genome.
 
 Column `genome_is_representative` is defined as `genome == representative`.
 
-In addition, we relocate all inputs under
+All inputs would be relocated under
 ```
 s3://microbiome-igg/2.0/cleaned_genomes/<alt_species_id>/<genome_id>.fa.lz4
 ```
+with one important change - contig headers will be replaced with serial numbers of the form `<genome_id>_<contig_number>`.   TODO:  Add sequence hash to headers, for quick identification of duplicates?
 
 ## Gene Annotations
 
