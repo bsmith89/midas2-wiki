@@ -31,9 +31,15 @@ Column `genome_is_representative` is defined as `genome == representative`.
 
 All inputs would be relocated under
 ```
-s3://microbiome-igg/2.0/cleaned_genomes/<alt_species_id>/<genome_id>.fa.lz4
+s3://microbiome-igg/2.0/cleaned_genomes/<species>/<genome>.fa.lz4
 ```
-with one important change - contig headers will be replaced with serial numbers of the form `<genome_id>_<contig_number>`.   TODO:  Add sequence hash to headers, for quick identification of duplicates?
+for instance, to match the earlier example,
+```
+s3://microbiome-igg/2.0/cleaned_genomes/104351/GUT_GENOME138501.fa.lz4
+s3://microbiome-igg/2.0/cleaned_genomes/104351/GUT_GENOME269084.fa.lz4
+...
+```
+In the relocated genomes, all contig headers have been replaced by serially assigned ids of the form `<genome_id>_<contig_number>` where the contig_numbers increment from 1 in each genome.   TODO:  Add sequence hash to headers, for quick identification of duplicates?
 
 ## Gene Annotations
 
