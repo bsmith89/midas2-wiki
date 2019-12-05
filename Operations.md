@@ -31,10 +31,8 @@ Essential commands to update the docker container for Batch jobs.
 make changes to Dockerfile as needed
 docker build .
 docker tag <locally_built_image> 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
-aws ecr get-login --region us-west-2 --no-include-email | xargs -Icmd bash -c "cmd"
+bash -c "`aws ecr get-login --region us-west-2 --no-include-email`"
 docker push 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
 ```
 
 For more background, see the [PairANI instructions for managing container images](https://github.com/czbiohub/pairani/wiki#managing-container-images).
-
-Note:  On Mac OS X, instead of `-I cmd` the `xargs` command needs to be told `-J cmd`.
