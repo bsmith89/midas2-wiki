@@ -36,3 +36,5 @@ docker push 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
 ```
 
 For more background, see the [PairANI instructions for managing container images](https://github.com/czbiohub/pairani/wiki#managing-container-images).
+
+Note:  On Mac OS X, instead of `-I cmd` the `xargs` command needs to be told `-J cmd`.
