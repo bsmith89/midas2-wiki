@@ -43,7 +43,17 @@ For more background, see the [PairANI instructions for managing container images
 ```
 iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s 1:100"
 ```
-will build 1% of pangenomes in AWS.   Operational status updates will appear under 
+will build 1% of pangenomes in AWS, the ones that have IDs equal to 1 module 100.
+
+To build all genomes using 100 parallel jobs:
+```
+for i in {0...99}; do
+    iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s ${i}:100"
+done
+```
+This could be expensive.
+
+Operational status updates will appear under 
 ```
 s3://microbiome-igg/2.0/operations/<utc_date>/<unixtime>__<event_type>__<job_id>.json
 ```
