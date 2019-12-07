@@ -51,7 +51,7 @@ for i in {0...99}; do
     iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s ${i}:100"
 done
 ```
-This could be expensive.
+This could be expensive, so make sure it works on 1% first.
 
 Operational status updates will appear under 
 ```
