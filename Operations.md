@@ -36,3 +36,14 @@ docker push 423543210473.dkr.ecr.us-west-2.amazonaws.com/iggtools:latest
 ```
 
 For more background, see the [PairANI instructions for managing container images](https://github.com/czbiohub/pairani/wiki#managing-container-images).
+
+
+# Submit subcommands to run in AWS Batch
+
+```
+iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s 1:100"
+```
+will build 1% of pangenomes in AWS.   Operational status updates will appear under 
+```
+s3://microbiome-igg/2.0/operations/<utc_date>/<unixtime>__<event_type>__<job_id>.json
+```
