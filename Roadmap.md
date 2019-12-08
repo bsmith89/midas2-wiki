@@ -1,4 +1,4 @@
-# Overall plan of attack:
+# Overall plan of attack
 
  A)  [Boris, Chunyu]   Build a small DB, based on a few important species, using new AWS batch flow.
 
@@ -12,7 +12,7 @@
 
  F)  [Boris]   Build entire DB
 
-#  Task A:  Build a small DB, based on a few important species, using new AWS batch flow.
+#  Task A:  Build a small DB, based on a few important species, using new AWS batch flow
 
 1.  [DONE] [Chunyu]  Document and test MIDAS DB build steps (prokka, vsearch, hmmsearch).
 
@@ -30,10 +30,10 @@
 
 This section is a light-weight form issue tracking.
 
-## Handle degenerate clusters which exclude their own centroids.
+## Handle degenerate clusters which exclude their own centroids
 
 https://github.com/czbiohub/iggtools/issues/16
 
-## Support AWS instance types other than r5.12xlarge.
+## Support AWS instance types other than r5.12xlarge
 
 https://github.com/czbiohub/iggtools/issues/17
