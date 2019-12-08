@@ -26,14 +26,14 @@
 
 6.  [IN PROGRESS]  [Boris]  iggtools subcommands for prokka, vsearch, hmmsearch with appropriate use of S3 and NVME to stage results
 
-#  Technical debt 
+#  Technical debt
 
 This section is a light-weight form issue tracking.
-
-## Support AWS instance types other than r5.12xlarge
-
-This should be easy with the recently released update to aegea.  Involves removing the magic numbers 838 and 1715518 from aws_batch_init.
 
 ## Handle degenerate clusters which exclude their own centroids.
 
 https://github.com/czbiohub/iggtools/issues/16
+
+## Support AWS instance types other than r5.12xlarge
+
+https://github.com/czbiohub/iggtools/issues/17
