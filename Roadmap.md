@@ -1,4 +1,4 @@
-# Overall plan of attack
+# Overall plan of attack:
 
  A)  [Boris, Chunyu]   Build a small DB, based on a few important species, using new AWS batch flow.
 
@@ -34,6 +34,6 @@ This section is a light-weight form issue tracking.
 
 https://github.com/czbiohub/iggtools/issues/16
 
-## Support AWS instance types other than r5.12xlarge
+## Support AWS instance types other than r5.12xlarge.
 
 https://github.com/czbiohub/iggtools/issues/17
