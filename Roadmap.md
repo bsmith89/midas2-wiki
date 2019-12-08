@@ -28,8 +28,6 @@
 
 #  Technical debt
 
-This section is a light-weight form issue tracking
-
 ## Handle degenerate clusters which exclude their own centroids
 
 https://github.com/czbiohub/iggtools/issues/16
