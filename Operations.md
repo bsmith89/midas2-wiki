@@ -45,13 +45,15 @@ iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s 13:100"
 ```
 will build 1% of pangenomes in AWS, those whose species IDs are congruent to 13 modulo 100.
 
-To build all genomes using 100 parallel jobs:
+To build all pangenomes via 100 concurrent jobs:
 ```
 for i in {0...99}; do
     iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s ${i}:100"
 done
 ```
 This could be expensive, so make sure it works on 1% first.
+
+To fully realize 100-way parallelism, the AWS Batch compute environment max_vcpus and EC2 instance limit for r5.12x instances must be raised to 4800 and 100, respectively.
 
 # Tracking operational events
 
