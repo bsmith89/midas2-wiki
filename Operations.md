@@ -55,8 +55,8 @@ This could be expensive, so make sure it works on 1% first.
 
 # Tracking operational events
 
-Submitting a job creates a record under
+Submitting a job creates a unique record under
 ```
 s3://microbiome-igg/2.0/operations/<utc_date>/<unix_time>__<event_type>__<job_id>.json
 ```
-where event_type is `aws_batch_submit`.  The record points to the job's various logs and results.
+where event_type is `aws_batch_submit`.  The record points to the job's various logs and results.  In the above example, where 100 jobs are submitted, there would be 100 distinct records.
