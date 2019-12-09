@@ -41,9 +41,9 @@ For more background, see the [PairANI instructions for managing container images
 # Submit subcommands to run in AWS Batch
 
 ```
-iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s 1:100"
+iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s 13:100"
 ```
-will build 1% of pangenomes in AWS, the ones that have IDs equal to 1 modulo 100.
+will build 1% of pangenomes in AWS, those whose species IDs are congruent to 13 modulo 100.
 
 To build all genomes using 100 parallel jobs:
 ```
