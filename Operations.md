@@ -55,5 +55,5 @@ This could be expensive, so make sure it works on 1% first.
 
 Operational status updates will appear under 
 ```
-s3://microbiome-igg/2.0/operations/<utc_date>/<unixtime>__<event_type>__<job_id>.json
+s3://microbiome-igg/2.0/operations/<utc_date>/<unix_time>__<event_type>__<job_id>.json
 ```
