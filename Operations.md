@@ -53,7 +53,7 @@ done
 ```
 This could be expensive, so make sure it works on 1% first.
 
-To fully realize 100-way parallelism, the AWS Batch compute environment max_vcpus and EC2 instance limit for r5.12x instances must be raised to 4800 and 100, respectively.
+To fully realize 100-way parallelism, the AWS Batch compute environment max_vcpus and EC2 instance limit for r5.12x instances must be raised to 4800 and 100, respectively.  Otherwise, 100 jobs will be queued, but a smaller number (as permitted by those limits) would execute in parallel, with the rest waiting behind.
 
 # Tracking operational events
 
