@@ -53,7 +53,10 @@ done
 ```
 This could be expensive, so make sure it works on 1% first.
 
-Operational status updates will appear under 
+# Tracking operational events
+
+Submitting a job creates a record under
 ```
 s3://microbiome-igg/2.0/operations/<utc_date>/<unix_time>__<event_type>__<job_id>.json
 ```
+where event_type is `aws_batch_submit`.  The record points to the job's various logs and results.
