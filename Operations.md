@@ -63,4 +63,4 @@ Submitting a job creates a unique record under
 ```
 s3://microbiome-igg/2.0/operations/<utc_date>/<unix_time>__<event_type>__<job_id>.json
 ```
-where event_type is `aws_batch_submit`.  The record points to the job's various logs and results.  In the above example, where 100 jobs are submitted, there would be 100 distinct records.
+where event_type is `aws_batch_submit`.  In the above example, where 100 jobs are submitted, there would be 100 distinct records.
