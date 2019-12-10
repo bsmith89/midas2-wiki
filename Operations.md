@@ -47,7 +47,7 @@ will build 1% of pangenomes in AWS, those whose species IDs are congruent to 13 
 
 To build all pangenomes via 100 concurrent jobs:
 ```
-for i in {0...99}; do
+for i in {0..99}; do
     iggtools aws_batch_submit --batch_command "iggtools build_pangenome -s ${i}:100"
 done
 ```
