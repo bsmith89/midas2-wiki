@@ -64,3 +64,27 @@ Submitting a job creates a unique record under
 s3://microbiome-igg/2.0/operations/<utc_date>/<unix_time>__<event_type>__<job_id>.json
 ```
 where event_type is `aws_batch_submit`.  In the above example, where 100 jobs are submitted, there would be 100 distinct records.
+
+
+# Bioinformatics hacks
+
+```
+## concatenate the FASTA sequences
+awk '$3 == 1 {print $1 }' mapfile  | xargs -Ixx -P 32 bash -c "cp marker_genes/temp/xx.phyeco.fa marker_genes/phyeco/xx.phyeco.fa"
+cat marker_genes/phyeco/xx.phyeco.fa > marker_genes/phyeco.fa
+
+## concatenate the MAP files
+grep -v "alt" alt_species_ids.tsv | cut -f2 |  xargs -Irep bash -c "awk -v pat=rep '\$2 == pat {print}' mapfile | cut -f1 | xargs -Igenome bash -c 'cat temp/genome.phyeco.map' > phyeco/rep.phyeco.map "
+cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
+
+## Add header to MAP files
+echo -e  "species_id\tgenome_id\tgene_id\tgene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
+
+## Make hs-blastn index
+hs-blastn index marker_genes/phyeco.fa
+```
+
+## Hacks/*.sh
+
+Individual bash scripts to call Progidal and generate HMM marker genes database. 
+
