@@ -14,6 +14,14 @@ Numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bu
 
 Question for Alexandre:   What were the criteria for clustering genomes into species, and for choosing a representative genome for each species?
 
+
+# Input parameters
+
+```
+s3://microbiome-igg/2.0/marker_gene_models/phyeco/marker_genes.hmm
+s3://microbiome-igg/2.0/marker_gene_models/phyeco/marker_genes.mapping_cutoffs
+```
+
 # Target Layout in S3
 
 A table of contents listing all genomes will be located at [s3://microbiome-igg/2.0/genomes.tsv](http://microbiome-igg.s3.amazonaws.com/2.0/genomes.tsv).  It will look like
@@ -78,53 +86,28 @@ GUT_GENOME153817_01616    GUT_GENOME036826_01544    GUT_GENOME032486_01058
 ```
 
 ## Marker Genes
-```
-s3://microbiome-igg/2.0/marker_genes/phyeco.fa
-s3://microbiome-igg/2.0/marker_genes/phyeco.map
-s3://microbiome-igg/2.0/marker_genes/phyeco.fa.{sa, bwt, sequence}
-```
-The `phyeco.fa.{sa, bwt, sequence}` is the HS-BLASTN index for the `phyeco.fa`.
 
-In order to generate the target files in parallel, we ran HMM search against the protein sequences of the ORFs for each genome:
+Homologs of a specified marker gene set (typically universal single copy genes) are identified for each input genome, cross-referenced, collated, and indexed with hs-blastn to use in species abundance estimation for metagenomic samples.   This involves the following steps.
+
+For each genome, run hmmsearch against a selected marker gene set (typically the phyeco set mentioned above), yielding intermediate results
 
 ```
-s3://microbiome-igg/2.0/marker_genes/temp/GUT_GENOME138501.hmmsearch
-s3://microbiome-igg/2.0/marker_genes/temp/GUT_GENOME138501.phyeco.fa
-s3://microbiome-igg/2.0/marker_genes/temp/GUT_GENOME138501.phyeco.map
+s3://microbiome-igg/2.0/marker_genes/<marker_set>/temp/GUT_GENOME138501.{hmmsearch, markers.fa, markers.map}
 ```
 
-The `GUT_GENOME{XXXXXX}.hmmsearch` is the HMMER results of searching reads aligned the 15 phyeco genes. 
-The `GUT_GENOME{XXXXXX}.phyeco.fa` is the FASTA file for the aligned phyeco genes, and `GUT_GENOME{XXXXXX}.phyeco.map` is needed for building the marker genes database.
+where `GUT_GENOME{XXXXXX}.markers.fa` contains the prokka-annotated genes that map to marker genes, and `GUT_GENOME{XXXXXX}.markers.map` is a TSV map of prokka gene id to marker gene id.
 
-The precomputed HMM model for the 15 phyeco genes and gene-specific cutoffs are available at:
-
-```
-s3://microbiome-igg/2.0/phyeco.hmm
-s3://microbiome-igg/2.0/phyeco.mapping_cutoffs
-```
-
-After running HMM and extract the phyeco genes for each genomes, concatenate the FA files for all the representative genomes into `phyeco.fa`; concatenate the phyeco mapping files for all the genomes into `phyeco.map`.
+These intermediate results are concatenated, across all genomes, into monolithic
 
 ```
-## concatenate the FASTA sequences
-awk '$3 == 1 {print $1 }' mapfile  | xargs -Ixx -P 32 bash -c "cp marker_genes/temp/xx.phyeco.fa marker_genes/phyeco/xx.phyeco.fa"
-cat marker_genes/phyeco/xx.phyeco.fa > marker_genes/phyeco.fa
-
-## concatenate the MAP files
-grep -v "alt" alt_species_ids.tsv | cut -f2 |  xargs -Irep bash -c "awk -v pat=rep '\$2 == pat {print}' mapfile | cut -f1 | xargs -Igenome bash -c 'cat temp/genome.phyeco.map' > phyeco/rep.phyeco.map "
-cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
-
-## Add header to MAP files
-echo -e  "species_id\tgenome_id\tgene_id\tgene_length\tmarker_id" | cat -  phyeco.map > phyeco.temp && mv phyeco.temp phyeco.map
-
-## Make hs-blastn index
-hs-blastn index marker_genes/phyeco.fa
+s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.fa
+s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.map
 ```
 
-## Hacks/*.sh
-
-Individual bash scripts to call Progidal and generate HMM marker genes database. 
-
+Finally, an hs-blastn index is constructed into
+```
+s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.fa.{sa, bwt, sequence}
+```
 
 # See Also
 
