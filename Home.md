@@ -89,22 +89,21 @@ GUT_GENOME153817_01616    GUT_GENOME036826_01544    GUT_GENOME032486_01058
 
 Homologs of a specified marker gene set (typically universal single copy genes) are identified for each input genome, cross-referenced, collated, and indexed with hs-blastn to use in species abundance estimation for metagenomic samples.   This involves the following steps.
 
-For each genome, run hmmsearch against a selected marker gene set (typically the phyeco set mentioned above), yielding intermediate results
+For each genome, run hmmsearch against a selected marker gene set (typically the phyeco set mentioned above), yielding
 
 ```
-s3://microbiome-igg/2.0/marker_genes/<marker_set>/temp/GUT_GENOME138501.{hmmsearch, markers.fa, markers.map}
+s3://microbiome-igg/2.0/marker_genes/<marker_set>/104351/GUT_GENOME138501/GUT_GENOME138501.{hmmsearch, markers.fa, markers.map}
 ```
 
 where `GUT_GENOME{XXXXXX}.markers.fa` contains the prokka-annotated genes that map to marker genes, and `GUT_GENOME{XXXXXX}.markers.map` is a TSV map of prokka gene id to marker gene id.
 
-These intermediate results are concatenated, across all genomes, into monolithic
+These are concatenated, across all genomes, into monolithic
 
 ```
 s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.fa
-s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.map
 ```
 
-Finally, an hs-blastn index is constructed into
+from which hs-blastn index is constructed into
 ```
 s3://microbiome-igg/2.0/marker_genes/<marker_set>/marker_genes.fa.{sa, bwt, sequence}
 ```
