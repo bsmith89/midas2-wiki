@@ -70,11 +70,17 @@ where event_type is `aws_batch_submit`.  In the above example, where 100 jobs ar
 
 ```
 ## concatenate the FASTA sequences
-awk '$3 == 1 {print $1 }' mapfile  | xargs -Ixx -P 32 bash -c "cp marker_genes/temp/xx.phyeco.fa marker_genes/phyeco/xx.phyeco.fa"
+awk '$3 == 1 {print $1 }' mapfile  | \
+  xargs -Ixx -P 32 bash -c "cp marker_genes/temp/xx.phyeco.fa marker_genes/phyeco/xx.phyeco.fa"
+
 cat marker_genes/phyeco/xx.phyeco.fa > marker_genes/phyeco.fa
 
 ## concatenate the MAP files
-grep -v "alt" alt_species_ids.tsv | cut -f2 |  xargs -Irep bash -c "awk -v pat=rep '\$2 == pat {print}' mapfile | cut -f1 | xargs -Igenome bash -c 'cat temp/genome.phyeco.map' > phyeco/rep.phyeco.map "
+grep -v "alt" alt_species_ids.tsv | cut -f2 |  \
+  xargs -Irep bash -c "awk -v pat=rep '\$2 == pat {print}' mapfile | \
+  cut -f1 | \
+  xargs -Igenome bash -c 'cat temp/genome.phyeco.map' > phyeco/rep.phyeco.map "
+
 cat marker_genes/phyeco/*.phyeco.map > marker_genes/phyeco.map
 
 ## Add header to MAP files
