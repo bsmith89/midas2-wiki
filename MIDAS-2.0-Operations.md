@@ -100,20 +100,25 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
    ```
 
+## temp files
 
-## temporary files
+- `{genes_output_dir}/temp_sc.{species_cov}/{species_id}/centroids.ffn: the centroid genes of all the species with `species_cov`> specie_cov.
 
--
+- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.fa`: the collated centroid genes of all the species with `species_cov`> specie_cov.
 
+- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected centroid pan genes
 
+- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to pan genes
 
+# midas_merge_species
 
+## input
 
-## midas_merge_species
+## output file
 
+## temp files
 
+# midas_merge_snps
 
-## midas_merge_snps
-
-## midas_merge_genes
+# midas_merge_genes
 
