@@ -112,11 +112,39 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 # midas_merge_species
 
-## input
+## input files
 
-## output file
+- `{input_files}`: map `sample_name` to its corresponding midas_output_dir
 
-## temp files
+   ```
+   sample_name    midas_output_dir
+   SRS011134      /mnt/chunyu_6TB/iggtools-hmp-test/SRS011134
+   SRS011271      s3://microbiome-chunyu/iggtools-hmp-test/SRS011271
+   ```
+
+- {merged_output_dir}: the output directory of merging MIDAS results
+
+- {sample_depth}: minimum per-sample marker-gene-depth (min_cov) for estimating species prevalence (1.0)
+
+## output files
+
+- `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
+
+   ```
+   species_id   SRS011134   SRS011271
+   102455       0.091       0.130
+   102549       0.025       0.035
+   ```
+
+- `{merged_output_dir}/merged/species/count_reads.tsv`: species-by-samples read counts matrix
+
+- `{merged_output_dir}/merged/species/coverage.tsv`: species-by-samples genome coverage matrix
+
+- `{merged_output_dir}/merged/species/species_prevalence.tsv`: summary statistics for each species across samples
+
+   ```
+   species_id   mean_coverage   median_coverage   mean_abundance   median_abundance   prevalence
+   ```
 
 # midas_merge_snps
 
