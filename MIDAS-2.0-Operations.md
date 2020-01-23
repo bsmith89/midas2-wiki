@@ -35,7 +35,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 - `species_cov`: select species present in the sample with minimal vertical coverage
 
-**todo**: add `species_id` option
+- **todo**: add `species_id` option
 
 ## output files
 
@@ -54,10 +54,9 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 - `{output_dir}/{sample_name}/snps/{output}_sc.{species_cov}/summary.txt`: alignment stats for each species
 
    ```
-   species_id   genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
-   102478       5444912        4526401        38190009     356763         273537        0.831            8.437
+   species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
+   102478      5444912        4526401        38190009     356763         273537        0.831            8.437
    ```
-
 
 ## temp files
 
