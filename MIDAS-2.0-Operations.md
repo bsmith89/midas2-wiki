@@ -39,7 +39,9 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 ## output files
 
-- `{output_dir}/{sample_name}/snps/{output}_sc.{species_cov}/{species_id}.snps.lz4`: per speices pileup results
+- `{snps_output_dir}` := `{output_dir}/{sample_name}/snps`
+
+- `{snps_output_dir}/output_sc.{species_cov}/{species_id}.snps.lz4`: per speices pileup results
 
    ```
    ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
@@ -51,7 +53,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    UHGG143505_C0_L5444.9k_H7fb7ad  44701   C               10      0       10      0       0
    ```
 
-- `{output_dir}/{sample_name}/snps/{output}_sc.{species_cov}/summary.txt`: alignment stats for each species
+- `{snps_output_dir}/output_sc.{species_cov}/summary.txt`: alignment stats for each species
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
@@ -60,9 +62,52 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 ## temp files
 
+- `{snps_output_dir}/temp_sc.{species_cov}/{species_id}/{genome}.fa: the representative genomes of  all the species with `species_cov`> specie_cov.
+
+- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.fa`: the collated representative genome sequences of all the species with `species_cov`> specie_cov.
+
+- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected representative genomes
+
+- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to repgenomes.fa
+
+# midas_run_genes: pan genome profiling
+
+## input files
+
+- `{output_dir}/{sample_name}/species/species_profile.txt`
+
+- `species_cov`: select species present in the sample with minimal vertical coverage
+
+- **todo**: add `species_id` option
+
+## output files
+
+- `{genes_output_dir}` := `{output_dir}/{sample_name}/genes`
+- `{genes_output_dir}/output_sc.{species_cov}/{species_id}.genes.lz4`: 
+
+   ```
+   gene_id              count_reads     coverage        copy_number
+   UHGG239769_04714     22              0.571323        0.000000
+   UHGG050950_03155     7               0.182088        0.000000
+   UHGG221050_00301     7               0.181818        0.000000
+   UHGG175788_02287     3               0.078563        0.000000
+   ```
+
+- `{genes_output_dir}/output_sc.{species_cov}/summary.txt`: alignment stats for each species
+
+   ```
+   species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
+   102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
+   ```
 
 
-## midas_run_genes
+## temporary files
+
+-
+
+
+
+
 
 ## midas_merge_species
 
