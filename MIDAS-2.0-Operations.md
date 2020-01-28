@@ -110,9 +110,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 - `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to pan genes
 
-# midas_merge_species
-
-## input files
+# **merge_interface**
 
 - `{input_files}`: map `sample_name` to its corresponding midas_output_dir
 
@@ -124,11 +122,17 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 - {merged_output_dir}: the output directory of merging MIDAS results
 
-- {sample_depth}: minimum per-sample marker-gene-depth (min_cov) for estimating species prevalence (1.0)
+# midas_merge_species
+
+## input files
+
+- `sample_depth`: minimum per-sample marker-gene-depth (min_cov) for estimating species prevalence (1.0)
 
 ## output files
 
-- `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
+- `merged_species_outdir`:= `{merged_output_dir}/merged/species`
+
+- `{merged_species_outdir}/relative_abundance.tsv`: species-by-sample relative abundance matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -136,7 +140,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       0.011   0.049
    ```
 
-- `{merged_output_dir}/merged/species/count_reads.tsv`: species-by-samples read counts matrix
+- `{merged_species_outdir}/count_reads.tsv`: species-by-samples read counts matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -144,7 +148,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       2           7125
    ```
 
-- `{merged_output_dir}/merged/species/coverage.tsv`: species-by-samples genome coverage matrix
+- `{merged_species_outdir}/coverage.tsv`: species-by-samples genome coverage matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -152,7 +156,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       0.011       62.520
    ```
 
-- `{merged_output_dir}/merged/species/species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
+- `{merged_species_outdir}/species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
 
    ```
    species_id median_abundance mean_abundance median_coverage mean_coverage  prevalence
@@ -210,6 +214,8 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 - `site_maf`: minimum average-minor-allele-frequency of site across samples (0.0)
 
 ## output files
+
+- `merged_species_outdir`:= `{merged_output_dir}/merged/species`
 
 - `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
 
