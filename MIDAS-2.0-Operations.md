@@ -160,7 +160,71 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102181     0.034            0.023          38.567          27.530         2
    ```
 
-# midas_merge_snps
+# midas_merge_snps: pooled-sample core-genome SNP calling
+
+The pipeline can be broken down into the following steps:
+
+- first pass: pool nucleotide variants from the input samples
+- second pass: (based on the pooled data)
+  determine if a genomic site is core: non-zero depth in >= 95% of samples (`site_prevalence`), and further on if the core genomic site is a SNP: major/minor alleles (`allele_frequency`)
+
+## input files
+
+- `{input_files}`: map `sample_name` to its corresponding midas_output_dir
+
+   ```
+   sample_name    midas_output_dir
+   SRS011134      /mnt/chunyu_6TB/iggtools-hmp-test/SRS011134
+   SRS011271      s3://microbiome-chunyu/iggtools-hmp-test/SRS011271
+   ```
+
+- {merged_output_dir}: the output directory of merging MIDAS results
+
+### species filters
+
+- `min_samples`: species with >= MIN_SAMPLES (1)
+
+### sample filters
+
+- `sample_depth`: minimum per-sample average read depth (5X)
+
+- `sample_coverage`: [horizontal_coverage] fraction of reference genome sites covered by at least one read (40%)
+
+- `sample_counts`: (?)
+
+### site filters
+
+- `site_depth`: minimum per-sample number of reads mapped to genomic site (1)
+
+- `site_ratio`: maximum per-sample ratio of site depth over genome depth (2.0)
+
+### SNPs 
+
+- `allele_frequency`: per-sample 
+
+- `snp_type`: (for site > ALLELE_FREQ)
+
+### core presets
+
+- `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
+
+- `site_maf`: minimum average-minor-allele-frequency of site across samples (0.0)
+
+## output files
+
+- `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
+
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       0.091       0.130   0.000
+   102549       0.000       0.011   0.049
+   ```
+
+
+
+
+
+
 
 # midas_merge_genes
 
