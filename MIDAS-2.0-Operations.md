@@ -131,19 +131,33 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 - `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
 
    ```
-   species_id   SRS011134   SRS011271
-   102455       0.091       0.130
-   102549       0.025       0.035
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       0.091       0.130   0.000
+   102549       0.000       0.011   0.049
    ```
 
 - `{merged_output_dir}/merged/species/count_reads.tsv`: species-by-samples read counts matrix
 
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       7352        50348       0.000
+   102549       0.000       2           7125
+   ```
+
 - `{merged_output_dir}/merged/species/coverage.tsv`: species-by-samples genome coverage matrix
+
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       64.208      443.538     0.000
+   102549       0.000       0.011       62.520
+   ```
 
 - `{merged_output_dir}/merged/species/species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
 
    ```
    species_id median_abundance mean_abundance median_coverage mean_coverage  prevalence
+   102293     0.049            0.134          64.208          169.249        2
+   102181     0.034            0.023          38.567          27.530         2
    ```
 
 # midas_merge_snps
