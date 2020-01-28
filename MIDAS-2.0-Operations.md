@@ -70,6 +70,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 - `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to repgenomes.fa
 
+
 # midas_run_genes: pan genome profiling
 
 ## input files
@@ -132,7 +133,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 - `merged_species_outdir`:= `{merged_output_dir}/merged/species`
 
-- `{merged_species_outdir}/relative_abundance.tsv`: species-by-sample relative abundance matrix
+- `relative_abundance.tsv`: species-by-sample relative abundance matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -140,7 +141,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       0.011   0.049
    ```
 
-- `{merged_species_outdir}/count_reads.tsv`: species-by-samples read counts matrix
+- `count_reads.tsv`: species-by-samples read counts matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -148,7 +149,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       2           7125
    ```
 
-- `{merged_species_outdir}/coverage.tsv`: species-by-samples genome coverage matrix
+- coverage.tsv`: species-by-samples genome coverage matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -156,7 +157,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102549       0.000       0.011       62.520
    ```
 
-- `{merged_species_outdir}/species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
+- `species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
 
    ```
    species_id median_abundance mean_abundance median_coverage mean_coverage  prevalence
@@ -174,16 +175,6 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
   determine if a genomic site is core: non-zero depth in >= 95% of samples (`site_prevalence`), and further on if the core genomic site is a SNP: major/minor alleles (`allele_frequency`)
 
 ## input files
-
-- `{input_files}`: map `sample_name` to its corresponding midas_output_dir
-
-   ```
-   sample_name    midas_output_dir
-   SRS011134      /mnt/chunyu_6TB/iggtools-hmp-test/SRS011134
-   SRS011271      s3://microbiome-chunyu/iggtools-hmp-test/SRS011271
-   ```
-
-- {merged_output_dir}: the output directory of merging MIDAS results
 
 ### species filters
 
@@ -215,20 +206,13 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 ## output files
 
-- `merged_species_outdir`:= `{merged_output_dir}/merged/species`
+- `merged_snps_outdir`:= `{merged_output_dir}/merged/snps`
 
-- `{merged_output_dir}/merged/species/relative_abundance.tsv`: species-by-sample relative abundance matrix
+- `snps_freq.tsv`: site-by-sample minor allele frequency matrix
 
-   ```
-   species_id   SRS011271   SRS011061   SRS011134  
-   102455       0.091       0.130   0.000
-   102549       0.000       0.011   0.049
-   ```
+- `snps_depth.tsv`: site-by-sample number of mapped reads 
 
-
-
-
-
+- `snps_log.tsv`: 
 
 
 # midas_merge_genes
