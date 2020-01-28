@@ -183,15 +183,13 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 ### species filters
 
-- `min_samples`: species with >= MIN_SAMPLES (1)
+- `sample_counts`: species with >= MIN_SAMPLES (1)
 
 ### sample filters
 
 - `sample_depth`: minimum per-sample average read depth (5X)
 
 - `sample_coverage`: [horizontal_coverage] fraction of reference genome sites covered by at least one read (40%)
-
-- `sample_counts`: (?)
 
 ### site filters
 
