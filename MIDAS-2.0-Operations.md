@@ -143,7 +143,7 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 - `{merged_output_dir}/merged/species/species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
 
    ```
-   species_id   mean_coverage   median_coverage   mean_abundance   median_abundance   prevalence
+   species_id . median_abundance mean_abundance median_coverage mean_coverage  prevalence
    ```
 
 # midas_merge_snps
