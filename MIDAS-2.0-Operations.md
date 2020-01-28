@@ -160,11 +160,12 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
    102181     0.034            0.023          38.567          27.530         2
    ```
 
-# midas_merge_snps: pooled-sample core-genome SNP calling
+# midas_merge_snps
 
-The pipeline can be broken down into the following steps:
+The pooled-sample core-genome SNP calling pipeline can be broken down into the following steps:
 
 - first pass: pool nucleotide variants from the input samples
+
 - second pass: (based on the pooled data)
   determine if a genomic site is core: non-zero depth in >= 95% of samples (`site_prevalence`), and further on if the core genomic site is a SNP: major/minor alleles (`allele_frequency`)
 
