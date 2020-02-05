@@ -210,7 +210,7 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 - `snps_freq.tsv`: site-by-sample minor allele frequency matrix
 
-- `snps_depth.tsv`: site-by-sample number of mapped reads 
+- `snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
 
 - `snps_log.tsv`: 
 
