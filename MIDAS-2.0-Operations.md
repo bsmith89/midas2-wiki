@@ -176,18 +176,19 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 ## input files
 
-The input TSV file include two columns: lists of samples and the midas_run_snps results path.
+The input TSV file include two columns: list of samples and the midas_run_snps results path.
 
-## species filters
+## Species and sample filters
+
+For each <species, samples> pairs, we select species passing the following horizontal and vertical abundance filters:
+
+- `sample_depth`: [vertical coverage] minimum per-sample average read depth (5X)
+
+- `sample_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
+
+We filter on only keep <species, samples> pairs with more than MIN_SAMPLES sample counts.
 
 - `sample_counts`: species with >= MIN_SAMPLES (1)
-
-## sample filters
-
-- `sample_depth`: minimum per-sample average read depth (5X)
-
-- `sample_coverage`: [horizontal_coverage] fraction of reference genome sites covered by at least one read (40%)
-
 
 ## Site filters
 
