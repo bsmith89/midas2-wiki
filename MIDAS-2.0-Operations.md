@@ -176,33 +176,49 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 ## input files
 
-### species filters
+The input TSV file include two columns: lists of samples and the midas_run_snps results path.
+
+## species filters
 
 - `sample_counts`: species with >= MIN_SAMPLES (1)
 
-### sample filters
+## sample filters
 
 - `sample_depth`: minimum per-sample average read depth (5X)
 
 - `sample_coverage`: [horizontal_coverage] fraction of reference genome sites covered by at least one read (40%)
 
-### site filters
 
-- `site_depth`: minimum per-sample number of reads mapped to genomic site (1)
+## Site filters
 
-- `site_ratio`: maximum per-sample ratio of site depth over genome depth (2.0)
+### Per-sample site filter:
 
-### SNPs 
+For each site of a given species, we only include <site, sample> pairs that passing the following filters:
 
-- `allele_frequency`: per-sample 
+```
+- `site_depth`: minimum number of reads mapped to genomic site (2)
 
-- `snp_type`: (for site > ALLELE_FREQ)
+- `site_ratio`: maximum ratio of site depth over genome depth (5.0)
+```
 
-### core presets
+The number of samples passing the per-sample site filters is reported in `sample_counts` in the output `snps_info.tsv`.
+
+### Across-sample site filters (core presets):
+
+For the pairs of <site, samples passing per sample site filter>, we calculated the prevalence for each site and only report the core sites (defined by the `site_prevalence` cutoff in the report.
 
 - `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
 
-- `site_maf`: minimum average-minor-allele-frequency of site across samples (0.0)
+- `site_maf`: minimum average-minor-allele-frequency of site across samples for calling an allele present (0.1)
+
+- `snp_type`: (for sites > SITE_MAF) specify one or more of the following 
+
+
+
+
+- `allele_frequency`: (I don't think this is needed anymore)
+
+
 
 ## output files
 
@@ -214,6 +230,4 @@ The pooled-sample core-genome SNP calling pipeline can be broken down into the f
 
 - `snps_log.tsv`: 
 
-
-# midas_merge_genes
 
