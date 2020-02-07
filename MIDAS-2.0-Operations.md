@@ -182,6 +182,7 @@ The input TSV file include two columns: list of samples and the midas_run_snps r
 
 For each <species, samples> pairs, we select species passing the following horizontal and vertical abundance filters:
 
+```
 - `genome_depth`: [vertical coverage] minimum per-sample average read depth (5X)
 
 - `genome_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
@@ -189,6 +190,7 @@ For each <species, samples> pairs, we select species passing the following horiz
 We filter on only keep <species, samples> pairs with more than MIN_SAMPLES sample counts.
 
 - `sample_counts`: species with >= MIN_SAMPLES (1)
+```
 
 ## Site filters
 
@@ -208,12 +210,13 @@ The number of samples passing the per-sample site filters is reported in `sample
 
 For the pairs of <site, samples passing per sample site filter>, we calculated the prevalence for each site and only report the core sites (defined by the `site_prevalence` cutoff in the report.
 
+```
 - `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
 
 - `site_maf`: minimum average-minor-allele-frequency of site across samples for calling an allele present (0.1)
 
 - `snp_type`: (for sites > SITE_MAF) specify one or more of the following 
-
+```
 
 
 
