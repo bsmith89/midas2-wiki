@@ -182,9 +182,9 @@ The input TSV file include two columns: list of samples and the midas_run_snps r
 
 For each <species, samples> pairs, we select species passing the following horizontal and vertical abundance filters:
 
-- `sample_depth`: [vertical coverage] minimum per-sample average read depth (5X)
+- `genome_depth`: [vertical coverage] minimum per-sample average read depth (5X)
 
-- `sample_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
+- `genome_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
 
 We filter on only keep <species, samples> pairs with more than MIN_SAMPLES sample counts.
 
