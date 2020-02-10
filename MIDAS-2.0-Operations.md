@@ -167,12 +167,13 @@ MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance an
 
 # midas_merge_snps
 
-The pooled-sample core-genome SNP calling pipeline can be broken down into the following steps:
+The pooled-samples core-genome SNPs calling pipeline can be broken down into the following steps:
 
-- first pass: pool nucleotide variants from the input samples
+- Given list of samples that we are interested in merging the SNPs pileup, we select pairs of <species, sub-sample-list> based on horizontal/vertical pileup coverage, and species prevalence.
 
-- second pass: (based on the pooled data)
-  determine if a genomic site is core: non-zero depth in >= 95% of samples (`site_prevalence`), and further on if the core genomic site is a SNP: major/minor alleles (`allele_frequency`)
+- For each species, accumulate A, C, G, T read counts, compute sample counts, and collect read counts for all the samples
+
+- For the second pass, if a genomic site pass the site filters and snp types, then compute the major/minor allele based on accumulated read counts or sample counts (from previous step).
 
 ## input files
 
@@ -186,10 +187,12 @@ For each <species, samples> pairs, we select species passing the following horiz
 - `genome_depth`: [vertical coverage] minimum per-sample average read depth (5X)
 
 - `genome_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
+```
 
-We filter on only keep <species, samples> pairs with more than MIN_SAMPLES sample counts.
+We further on only keep <species, samples> pairs with more than SAMPLE_COUNTS.
 
-- `sample_counts`: species with >= MIN_SAMPLES (1)
+```
+- `sample_counts`: species with >= SAMPLE_COUNTS (2)
 ```
 
 ## Site filters
@@ -204,7 +207,7 @@ For each site of a given species, we only include <site, sample> pairs that pass
 - `site_ratio`: maximum ratio of site depth over genome depth (5.0)
 ```
 
-The number of samples passing the per-sample site filters is reported in `sample_counts` in the output `snps_info.tsv`.
+The number of samples passing the per-sample site filters is reported in `count_samples` in the output `snps_info.tsv`.
 
 ### Across-sample site filters (core presets):
 
@@ -213,25 +216,49 @@ For the pairs of <site, samples passing per sample site filter>, we calculated t
 ```
 - `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
 
-- `site_maf`: minimum average-minor-allele-frequency of site across samples for calling an allele present (0.1)
+- `site_maf`: minimum pooled minor-allele-frequency of site across samples for calling an allele present (0.1)
 
 - `snp_type`: (for sites > SITE_MAF) specify one or more of the following 
 ```
 
-
-
-- `allele_frequency`: (I don't think this is needed anymore)
-
+- `allele_frequency`: (I don't think this is needed anymore) within sample min_allele_frequency to call a SNP
 
 
 ## output files
 
 - `merged_snps_outdir`:= `{merged_output_dir}/merged/snps`
 
+- 'snps_summary.tsv': 
+
+```
+species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered 
+ mean_coverage
+102293  SRS011271  3612475  2110215  770004185  14515249  9417166  0.584  364.894
+102293  SRS011134  3612475  2706546  209982386  3175007  2683395  0.749  77.583
+```
+
+For each species, we generate three files:
+
+- `snps_info.tsv`
+
+```
+site_id major_allele    minor_allele    sample_counts   snp_type        rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
+UHGG047905_C0_L562.0k_H31cf56|139|C     C       T       2       bi      0       25      0       20      0       1       0       1
+UHGG047905_C0_L562.0k_H31cf56|162|C     C       A       2       bi      1       41      0       0       1       2       0       0
+```
+
 - `snps_freq.tsv`: site-by-sample minor allele frequency matrix
+
+```
+site_id SRS011271       SRS011134
+UHGG047905_C0_L562.0k_H31cf56|139|C     1.000   0.000
+UHGG047905_C0_L562.0k_H31cf56|162|C     0.000   0.043
+```
 
 - `snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
 
-- `snps_log.tsv`: 
-
-
+```
+site_id SRS011271       SRS011134
+UHGG047905_C0_L562.0k_H31cf56|139|C     20      25
+UHGG047905_C0_L562.0k_H31cf56|162|C     19      23
+```
