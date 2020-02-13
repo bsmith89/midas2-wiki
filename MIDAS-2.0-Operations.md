@@ -262,3 +262,28 @@ site_id SRS011271       SRS011134
 UHGG047905_C0_L562.0k_H31cf56|139|C     20      25
 UHGG047905_C0_L562.0k_H31cf56|162|C     19      23
 ```
+
+# midas_merge_genes
+
+## Input files
+
+- `sample_counts`
+- `min_copy`
+- `cluster_pid`
+
+## Output files
+
+- genes_summary.tsv.lz4
+
+```
+sample_id species_id pangenome_size covered_genes fraction_covered mean_coverage marker_coverage
+```
+
+For each species (passing the species and sample filter), there are three gene_id-by-sample matrices
+
+- {species_id}/genes_copynum.tsv
+- {species_id}/genes_preabs.tsv
+- {species_id}/genes_coverage.tsv
+
+
+- {sa
