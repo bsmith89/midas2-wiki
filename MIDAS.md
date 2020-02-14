@@ -224,15 +224,14 @@ The input TSV file include two columns: list of samples and the midas_run_snps r
 
 Restrict to species that are covered sufficiently well in sufficiently many samples.
 
-A species is covered "sufficiently well" by a sample when both of the following criteria are satisfied
+A species is covered "sufficiently well" by a sample when the per-sample average read depth over the species is at least `genome_depth` *and* the fraction of reference genome sites covered by at least one read is at least `genome_coverage`.
+
+Parameters:
 
 ```
-- `genome_depth`: [vertical coverage]  per-sample average read depth (5X)
+- `genome_depth`: [vertical coverage]  min per-sample average read depth (5X)
 
-- `genome_coverage`: [horizontal coverage] fraction of reference genome sites covered by at least one read (40%)
-```
-
-```
+- `genome_coverage`: [horizontal coverage] min fraction of reference genome sites covered by at least one read (40%)
 - `sample_counts`: "sufficiently many" samples
 ```
 
