@@ -222,9 +222,9 @@ The input TSV file include two columns: list of samples and the midas_run_snps r
 
 ## Species and sample filters
 
-Restrict to species that are covered sufficiently well in sufficiently many samples.
-
 A species is covered "sufficiently well" by a sample when the per-sample average read depth over the species is at least `genome_depth` *and* the fraction of reference genome sites covered by at least one read is at least `genome_coverage`.
+
+The analysis restricts attention to species that are covered sufficiently well in sufficiently many samples.  Let's call that the "relevant" set of species.  In addition, for each relevant species, the analysis only includes data from samples that cover that species sufficiently well.   
 
 Parameters:
 
