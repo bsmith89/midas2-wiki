@@ -6,7 +6,7 @@ The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of th
 
 Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place.  This construction step for IGGTOOLS and the UHGG dataset is documented [here](https://github.com/czbiohub/iggtools/wiki).  It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  This page is focused specifically on the analysis steps, not the database construction steps.
 
-# Result layout
+# Single-sample result layout
 
 For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
 
@@ -25,6 +25,16 @@ Each sample analysis subcommand operates on a single sample.   It takes as a par
 - `{output_dir}`: output directory unique for the sample, i.e., `{output_root}/{sample_name}`
 
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
+
+
+# Pooled samples result layout
+
+Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
+
+...
+
+All merge subcommands take a list of single-sample output dirs as input.
+
 
 # midas_run_species: species abundance estimation
 
