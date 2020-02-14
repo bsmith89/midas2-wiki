@@ -4,15 +4,35 @@ The original [MIDAS tool](https://github.com/snayfach/MIDAS) is an integrated pi
 
 The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive UHGG dataset, which consists of 4,644 gut-only species extracted from 286,997 genomes.
 
-Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place.  This construction step for IGGTOOLS and the UHGG dataset is documented [here](https://github.com/czbiohub/iggtools/wiki).  It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  The commands used to perform the build are also part of the IGGTOOLS package, but this page is focused specifically on the analysis steps, not the database construction steps.
+Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place.  This construction step for IGGTOOLS and the UHGG dataset is documented [here](https://github.com/czbiohub/iggtools/wiki).  It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  This page is focused specifically on the analysis steps, not the database construction steps.
+
+# Result layout
+
+For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
+
+```
+Output                                             Producer             Meaning
+------------------------------------------------------------------------------------------------------------
+{sample_name}/species/species_profile.tsv          midas_run_species    List of abundant species in sample
+{sample_name}/snps/output/{species_id}.snps.lz4    midas_run_snps       Pileup results for each species_id
+{sample_name}/snps/output/summary.txt              midas_run_snps       Summary of the SNPs analysis results
+{sample_name}/genes/output/{species_id}.genes.lz4  midas_run_genes      Gene coverage per species_id
+{sample_name}/genes/output/summary.txt             midas_run_genes      Pangenome alignment stats
+```
+
+Each sample analysis subcommand operates on a single sample.   It takes as a parameter the path to a unique output directory for that sample, which is the root of the layout above.
+
+- `{output_dir}`: output directory unique for the sample, i.e., `{output_root}/{sample_name}`
+
+The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
 # midas_run_species: species abundance estimation
 
-## input parameters
+## required parameters
 
-- `sample_name`: unique identifier for each each sample
+-  one or two input fastqs for a single sample
 
-- `{output_dir}/{sample_name}`: the base output directory of MIDAS 2.0 results
+- `{output_dir}`: output directory unique for the sample, i.e., `{output_root}/{sample_name}`;  this will be created if it does not exist
 
 ## output files
 
@@ -33,19 +53,26 @@ Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a 
 
 # midas_run_snps: single nucleotide polymorphism prediction
 
-## input parameters
+## required parameters
 
-- `{output_dir}/{sample_name}/species/species_profile.txt`
+--  one or two input fastqs for a single sample
 
-- `species_cov`: select species present in the sample with minimal vertical coverage
+-- `{output_dir}`: must match the argument to run_midas_species for the same sample
 
-- **todo**: add `species_id` option
+
+## optional parameters
+
+-- `species_cov`: select species present in the sample with minimal vertical coverage
+
+-- `species_id`: limit analysys to a single species  **todo**
+
+## inputs
+
+- `{output_dir}/{sample_name}/species/species_profile.txt` --- as produced by run_midas_species
 
 ## output files
 
-- `{snps_output_dir}` := `{output_dir}/{sample_name}/snps`
-
-- `{snps_output_dir}/output_sc.{species_cov}/{species_id}.snps.lz4`: per speices pileup results
+- `{sample_name}/snps/output/{species_id}.snps.lz4`: per species pileup results
 
    ```
    ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
@@ -57,7 +84,7 @@ Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a 
    UHGG143505_C0_L5444.9k_H7fb7ad  44701   C               10      0       10      0       0
    ```
 
-- `{snps_output_dir}/output_sc.{species_cov}/summary.txt`: alignment stats for each species
+- `{sample_name}/snps/output/summary.txt`: alignment stats for each species
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
@@ -66,13 +93,13 @@ Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a 
 
 ## temp files
 
-- `{snps_output_dir}/temp_sc.{species_cov}/{species_id}/{genome}.fa: the representative genomes of  all the species with `species_cov`> specie_cov.
+- `{sample_name}/snps/output/temp_sc.{species_cov}/{species_id}/{genome}.fa: the representative genomes of  all the species with `species_cov`> specie_cov.
 
-- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.fa`: the collated representative genome sequences of all the species with `species_cov`> specie_cov.
+- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.fa`: the collated representative genome sequences of all the species with `species_cov`> specie_cov.
 
-- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected representative genomes
+- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected representative genomes
 
-- `{snps_output_dir}/temp_sc.{species_cov}/repgenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to repgenomes.fa
+- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to repgenomes.fa
 
 
 # midas_run_genes: pan genome profiling
