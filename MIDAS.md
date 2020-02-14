@@ -1,6 +1,10 @@
-# Metagenomic Intra-Species Diversity Analysis System 2.0 
+# Metagenomic Intra-Species Diversity Analysis Subcommands
 
-MIDAS 2.0 is an integrated pipeline that estimate bacterial species abundance and strain-level genomic variation, including pan-gene content and SNPs analysis, using the UHGG dataset.
+The original [MIDAS tool](https://github.com/snayfach/MIDAS) is an integrated pipeline for estimating bacterial species abundance and strain-level genomic variation, including pan-gene content and SNPs analysis.   Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes.
+
+The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive UHGG dataset, which consists of 4,644 gut-only species extracted from 286,997 genomes.
+
+Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place.  This construction step for IGGTOOLS and the UHGG dataset is documented [here](https://github.com/czbiohub/iggtools/wiki).  It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  The commands used to perform the build are also part of the IGGTOOLS package, but this page is focused specifically on the analysis steps, not the database construction steps.
 
 # midas_run_species: species abundance estimation
 
