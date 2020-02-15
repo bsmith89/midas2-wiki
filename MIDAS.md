@@ -230,7 +230,6 @@ Parameters:
 
 ```
 - `genome_depth`: [vertical coverage]  min per-sample average read depth (5X)
-
 - `genome_coverage`: [horizontal coverage] min fraction of reference genome sites covered by at least one read (40%)
 - `sample_counts`: "sufficiently many" samples
 ```
@@ -239,30 +238,27 @@ Parameters:
 
 ### Per-sample site filter:
 
-For each site of a given species, we only include <site, sample> pairs that passing the following filters:
-
+A sample is considered relevant for a given genomic site when the read depth at that site in that sample falls between the parameters `site_depth` and `site_ratio * genome_depth`.
 ```
 - `site_depth`: minimum number of reads mapped to genomic site (2)
-
 - `site_ratio`: maximum ratio of site depth over genome depth (5.0)
 ```
-
-The number of samples passing the per-sample site filters is reported in `count_samples` in the output `snps_info.tsv`.
+For each site, we compute the number of samples where that site is relevant.  This is the `count_samples` column in output `snps_info.tsv`.
 
 ### Across-sample site filters (core presets):
 
-For the pairs of <site, samples passing per sample site filter>, we calculated the prevalence for each site and only report the core sites (defined by the `site_prevalence` cutoff in the report.
-
+A site is considered relevant for the given set of samples when sufficiently many of the samples are considered relevant for the site.
 ```
 - `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
-
-- `site_maf`: minimum pooled minor-allele-frequency of site across samples for calling an allele present (0.1)
-
-- `snp_type`: (for sites > SITE_MAF) specify one or more of the following 
 ```
+For each relevant site, we determine the set of alleles present for that site across all relevant samples. For each allele A, C, G, T we count the samples that are relevant for the site and contain that allele, and total that allele's depths across those samples.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `pool_method` argument.
 
-- `allele_frequency`: (I don't think this is needed anymore) within sample min_allele_frequency to call a SNP
+We determine whether a site is bi-allelic or tri-allelic based on a threshold of the allele frequencies.
 
+```
+- `site_maf`: minimum pooled minor-allele-frequency of site across samples for calling an allele present (0.1)
+- `snp_type`: count alleles for the site with frequency >= SITE_MAF 
+```
 
 ## output files
 
