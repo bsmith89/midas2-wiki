@@ -11,13 +11,13 @@ Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a 
 For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
 
 ```
-Output                                             Producer             Meaning
+Output                                               Producer             Meaning
 ------------------------------------------------------------------------------------------------------------
-{sample_name}/species/species_profile.tsv          midas_run_species    List of abundant species in sample
-{sample_name}/snps/output/{species_id}.snps.lz4    midas_run_snps       Pileup results for each species_id
-{sample_name}/snps/output/summary.txt              midas_run_snps       Summary of the SNPs analysis results
-{sample_name}/genes/output/{species_id}.genes.lz4  midas_run_genes      Gene coverage per species_id
-{sample_name}/genes/output/summary.txt             midas_run_genes      Pangenome alignment stats
+{sample_name}/species/species_profile.tsv              midas_run_species  List of abundant species in sample
+{sample_name}/snps/output/{species_id}.snps.tsv.lz4    midas_run_snps     Pileup results for each species_id
+{sample_name}/snps/output/summary.tsv                  midas_run_snps     Summary of the SNPs analysis results
+{sample_name}/genes/output/{species_id}.genes.tsv.lz4  midas_run_genes    Gene coverage per species_id
+{sample_name}/genes/output/summary.tsv                 midas_run_genes    Pangenome alignment stats
 ```
 
 Each sample analysis subcommand operates on a single sample.   It takes as a parameter the path to a unique output directory for that sample, which is the root of the layout above.
@@ -31,9 +31,22 @@ The first subcommand to run for the sample is `midas_run_species`, and it will c
 
 Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
 
-...
+```
+Output                                                    Producer             Meaning
+------------------------------------------------------------------------------------------------------------species/species_prevalence.tsv                            midas_merge_species  Species prevalence across samples
+snps/output/snps_summary.tsv                              midas_merge_snps     Pileup results summary
+snps/output/{species_id}/{species_id}_snps_info.tsv       midas_merge_snps     SNPs info
+snps/output/{species_id}/{species_id}_snps_freqs.tsv      midas_merge_snps     Minor allele frequency matrix
+snps/output/{species_id}/{species_id}_snps_depth.tsv      midas_merge_snps     Site-by-sample read depth matrix
+genes/output/{species_id}/{species_id}_genes_presabs.tsv  midas_merge_genes    Presence/Absence matirx
+genes/output/{species_id}/{species_id}_genes_copynum.tsv  midas_merge_genes    Copy number matrix
+genes/output/{species_id}/{species_id}_genes_depth.tsv    midas_merge_genes    Read depth matrix
+genes/output/summary.tsv                                  midas_run_genes      Alignment results summary
+```
 
-All merge subcommands take a list of single-sample output dirs as input.
+- `{output_dir}`: output directory is provided by the user.
+
+All merge subcommands take a `samples_list` of single-sample output dirs as input.
 
 
 # midas_run_species: species abundance estimation
