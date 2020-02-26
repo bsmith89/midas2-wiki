@@ -41,10 +41,10 @@ snps/output/{species_id}/{species_id}.snps_info.tsv       midas_merge_snps     S
 snps/output/{species_id}/{species_id}.snps_freqs.tsv      midas_merge_snps     Minor allele frequency matrix
 snps/output/{species_id}/{species_id}.snps_depth.tsv      midas_merge_snps     Site-by-sample read depth matrix
 
+genes/output/summary.tsv                                  midas_run_genes      Alignment results summary
 genes/output/{species_id}/{species_id}.genes_presabs.tsv  midas_merge_genes    Presence/Absence matirx
 genes/output/{species_id}/{species_id}.genes_copynum.tsv  midas_merge_genes    Copy number matrix
 genes/output/{species_id}/{species_id}.genes_depth.tsv    midas_merge_genes    Read depth matrix
-genes/output/summary.tsv                                  midas_run_genes      Alignment results summary
 ```
 
 - `{output_dir}`: output directory is provided by the user.
