@@ -35,12 +35,12 @@ Results for multiple samples can be pooled using the corresponding subcommands `
 Output                                                    Producer             Meaning
 ------------------------------------------------------------------------------------------------------------species/species_prevalence.tsv                            midas_merge_species  Species prevalence across samples
 snps/output/snps_summary.tsv                              midas_merge_snps     Pileup results summary
-snps/output/{species_id}/{species_id}_snps_info.tsv       midas_merge_snps     SNPs info
-snps/output/{species_id}/{species_id}_snps_freqs.tsv      midas_merge_snps     Minor allele frequency matrix
-snps/output/{species_id}/{species_id}_snps_depth.tsv      midas_merge_snps     Site-by-sample read depth matrix
-genes/output/{species_id}/{species_id}_genes_presabs.tsv  midas_merge_genes    Presence/Absence matirx
-genes/output/{species_id}/{species_id}_genes_copynum.tsv  midas_merge_genes    Copy number matrix
-genes/output/{species_id}/{species_id}_genes_depth.tsv    midas_merge_genes    Read depth matrix
+snps/output/{species_id}/{species_id}.snps_info.tsv       midas_merge_snps     SNPs info
+snps/output/{species_id}/{species_id}.snps_freqs.tsv      midas_merge_snps     Minor allele frequency matrix
+snps/output/{species_id}/{species_id}.snps_depth.tsv      midas_merge_snps     Site-by-sample read depth matrix
+genes/output/{species_id}/{species_id}.genes_presabs.tsv  midas_merge_genes    Presence/Absence matirx
+genes/output/{species_id}/{species_id}.genes_copynum.tsv  midas_merge_genes    Copy number matrix
+genes/output/{species_id}/{species_id}.genes_depth.tsv    midas_merge_genes    Read depth matrix
 genes/output/summary.tsv                                  midas_run_genes      Alignment results summary
 ```
 
