@@ -33,7 +33,8 @@ Results for multiple samples can be pooled using the corresponding subcommands `
 
 ```
 Output                                                    Producer             Meaning
-------------------------------------------------------------------------------------------------------------species/species_prevalence.tsv                            midas_merge_species  Species prevalence across samples
+-----------------------------------------------------------------------------------------------------------
+species/species_prevalence.tsv                            midas_merge_species  Species prevalence across samples
 
 snps/output/snps_summary.tsv                              midas_merge_snps     Pileup results summary
 snps/output/{species_id}/{species_id}.snps_info.tsv       midas_merge_snps     SNPs info
