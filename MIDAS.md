@@ -14,10 +14,12 @@ For each sample, the analysis begins with a species profiling step.  The identif
 Output                                               Producer             Meaning
 ------------------------------------------------------------------------------------------------------------
 {sample_name}/species/species_profile.tsv              midas_run_species  List of abundant species in sample
-{sample_name}/snps/output/{species_id}.snps.tsv.lz4    midas_run_snps     Pileup results for each species_id
+
 {sample_name}/snps/output/summary.tsv                  midas_run_snps     Summary of the SNPs analysis results
-{sample_name}/genes/output/{species_id}.genes.tsv.lz4  midas_run_genes    Gene coverage per species_id
+{sample_name}/snps/output/{species_id}.snps.tsv.lz4    midas_run_snps     Pileup results for each species_id
+
 {sample_name}/genes/output/summary.tsv                 midas_run_genes    Pangenome alignment stats
+{sample_name}/genes/output/{species_id}.genes.tsv.lz4  midas_run_genes    Gene coverage per species_id
 ```
 
 Each sample analysis subcommand operates on a single sample.   It takes as a parameter the path to a unique output directory for that sample, which is the root of the layout above.
