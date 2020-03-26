@@ -38,10 +38,11 @@ The first subcommand to run for the sample is `midas_run_species`, and it will c
   |- snps
   |- genes
  |- temp
-  |- snps
+  |- snps/repgenomes.bam
+  |- genes/pangenome.bam
  |- bowtie2_indexes
-  |- snps/repgenomes
-  |- genes/pangenomes
+  |- snps/repgenomes.*
+  |- genes/pangenomes.*
 ```
 
 # Pooled samples result layout
@@ -74,6 +75,19 @@ genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species ge
 All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
 
 
+```
+outputs
+ |- species
+ |- snps
+ |- genes
+ |- dbs: could mirror S3 UHGG structures 
+  |- species
+  |- snps
+  |- genes
+ |- temp
+  |- snps
+ |- [bowtie2_indexes]
+```
 
 # midas_run_species: species abundance estimation
 
