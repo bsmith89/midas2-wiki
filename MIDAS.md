@@ -28,6 +28,21 @@ Each sample analysis subcommand operates on a single sample. It takes as a param
 
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
+```
+{sample_name}
+ |- species
+ |- snps
+ |- genes
+ |- dbs: could mirror S3 UHGG structures 
+  |- species
+  |- snps
+  |- genes
+ |- temp
+  |- snps
+ |- bowtie2_indexes
+  |- snps/repgenomes
+  |- genes/pangenomes
+```
 
 # Pooled samples result layout
 
@@ -57,6 +72,8 @@ genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species ge
 - `{output_dir}`: output directory is provided by the user, which is the root of the layout above.
 
 All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
+
+
 
 # midas_run_species: species abundance estimation
 
