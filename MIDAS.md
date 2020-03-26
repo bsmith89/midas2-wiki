@@ -8,23 +8,23 @@ Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a 
 
 # Single-sample result layout
 
-For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
+For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and representative genome SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
 
 ```
-Output                                               Producer             Meaning
+Output                                          Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
-{sample_name}/species/species_profile.tsv              midas_run_species  List of abundant species in sample
+{sample_name}/species/species_profile.tsv       midas_run_species   List of abundant species in sample
 
-{sample_name}/snps/summary.tsv                  midas_run_snps     Summary of the SNPs analysis results
-{sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps     Pileup results for each species_id
+{sample_name}/snps/summary.tsv                  midas_run_snps      Summary of the SNPs analysis results
+{sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Pileup results for each species_id
 
-{sample_name}/genes/summary.tsv                 midas_run_genes    Pangenome alignment stats
-{sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes    Gene coverage per species_id
+{sample_name}/genes/summary.tsv                 midas_run_genes     Pangenome alignment stats
+{sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Gene coverage per species_id
 ```
 
-Each sample analysis subcommand operates on a single sample.   It takes as a parameter the path to a unique output directory for that sample, which is the root of the layout above.
+Each sample analysis subcommand operates on a single sample. It takes as a parameter the path to MIDAS results root directory and a parameter for the sample name; together constitute the unique output directory for that sample.
 
-- `{output_dir}`: output directory unique for the sample, i.e., `{output_root}/{sample_name}`
+- `{output_dir}`: output directory unique for the sample, i.e., `{midas_outdir}/{sample_name}`
 
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
