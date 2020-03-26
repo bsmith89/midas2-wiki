@@ -28,22 +28,6 @@ Each sample analysis subcommand operates on a single sample. It takes as a param
 
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
-```
-{output_dir}
- |- species
- |- snps
- |- genes
- |- dbs: could mirror S3 UHGG structures 
- |  |- species
- |  |- snps
- |  |- genes
- |- temp
- |  |- snps/repgenomes.bam
- |  |- genes/pangenome.bam
- |- bowtie2_indexes
- |  |- snps/repgenomes.*
- |  |- genes/pangenomes.*
-```
 
 # Pooled samples result layout
 
@@ -74,8 +58,13 @@ genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species ge
 
 All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
 
+
+# Single-sample analysis
+
+Multiple steps analysis happen for each sample, which usually happen in the following order.
+
 ```
-outputs
+{output_dir}
  |- species
  |- snps
  |- genes
@@ -84,13 +73,12 @@ outputs
  |  |- snps
  |  |- genes
  |- temp
- |  |- snps
- |- [bowtie2_indexes]
+ |  |- snps/repgenomes.bam
+ |  |- genes/pangenome.bam
+ |- bowtie2_indexes
+ |  |- snps/repgenomes.*
+ |  |- genes/pangenomes.*
 ```
-
-# Single-sample analysis
-
-Multiple steps analysis happen for each sample, which usually happen in the following order.
 
 ## midas_run_species
 
@@ -128,8 +116,6 @@ To explore within-species variations for the species present in the sample data,
    UHGG143505_C0_L5444.9k_H7fb7ad  44696   A               9       9       0       0       0
    UHGG143505_C0_L5444.9k_H7fb7ad  44697   A               9       9       0       0       0
    UHGG143505_C0_L5444.9k_H7fb7ad  44698   G               10      0       0       10      0
-   UHGG143505_C0_L5444.9k_H7fb7ad  44699   A               10      10      0       0       0
-   UHGG143505_C0_L5444.9k_H7fb7ad  44700   A               10      10      0       0       0
    ```
 
 - `summary.tsv`
@@ -164,54 +150,39 @@ Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 datab
 
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
+# Pool samples analysis
 
-# **merge_interface**
+To merge MIDAS results across multiple samples, users need to provide a 
 
-- `{input_files}`: map `sample_name` to its corresponding midas_output_dir
-
-   ```
-   sample_name    midas_output_dir
-   SRS011134      /mnt/chunyu_6TB/iggtools-hmp-test/SRS011134
-   SRS011271      s3://microbiome-chunyu/iggtools-hmp-test/SRS011271
-   ```
-
-- {merged_output_dir}: the output directory of merging MIDAS results
-
-# midas_merge_species
-
-## input files
-
-- `sample_depth`: minimum per-sample marker-gene-depth (min_cov) for estimating species prevalence (1.0)
-
-## output files
-
-- `merged_species_outdir`:= `{merged_output_dir}/merged/species`
-
-- `relative_abundance.tsv`: species-by-sample relative abundance matrix
+- `samples_list` tsv file, specifying the `sample_name` and the `midas_outdir`:
 
    ```
-   species_id   SRS011271   SRS011061   SRS011134  
-   102455       0.091       0.130   0.000
-   102549       0.000       0.011   0.049
+   sample_name    midas_outdir
+   SRS011134      /mnt/chunyu_6TB/iggtools-hmp-test
+   SRS011271      s3://microbiome-chunyu/iggtools-hmp-test
    ```
 
-- `count_reads.tsv`: species-by-samples read counts matrix
+- `outdir`:
 
    ```
-   species_id   SRS011271   SRS011061   SRS011134  
-   102455       7352        50348       0.000
-   102549       0.000       2           7125
+   outputs
+    |- species
+    |- snps
+    |- genes
+    |- dbs: could mirror S3 UHGG structures 
+    |  |- species
+    |  |- snps
+    |  |- genes
+    |- temp
+    |  |- snps
+    |- [bowtie2_indexes]
    ```
 
-- coverage.tsv`: species-by-samples genome coverage matrix
+## midas_merge_species
 
-   ```
-   species_id   SRS011271   SRS011061   SRS011134  
-   102455       64.208      443.538     0.000
-   102549       0.000       0.011       62.520
-   ```
+User can chose to build `local_bowtie2_indexes` given the merged species profile across samples.
 
-- `species_prevalence.tsv`: summary statistics for each species across samples; species are sorted by descending orders of median_abundance
+- `species_prevalence.tsv`: summary statistics for each species across samples
 
    ```
    species_id median_abundance mean_abundance median_coverage mean_coverage  prevalence
@@ -219,120 +190,116 @@ Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/M
    102181     0.034            0.023          38.567          27.530         2
    ```
 
-# midas_merge_snps
+- `species_rel_abundance.tsv`
 
-The pooled-samples core-genome SNPs calling pipeline can be broken down into the following steps:
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       0.091       0.130   0.000
+   102549       0.000       0.011   0.049
+   ```
 
-- Given list of samples that we are interested in merging the SNPs pileup, we select pairs of <species, sub-sample-list> based on horizontal/vertical pileup coverage, and species prevalence.
+- `species_read_counts.tsv`: species-by-samples read counts matrix
 
-- For each species, accumulate A, C, G, T read counts, compute sample counts, and collect read counts for all the samples
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       7352        50348       0.000
+   102549       0.000       2           7125
+   ```
 
-- For the second pass, if a genomic site pass the site filters and snp types, then compute the major/minor allele based on accumulated read counts or sample counts (from previous step).
+- `species_coverage.tsv`: species-by-samples genome coverage matrix
 
-## input files
+   ```
+   species_id   SRS011271   SRS011061   SRS011134  
+   102455       64.208      443.538     0.000
+   102549       0.000       0.011       62.520
+   ```
 
-The input TSV file include two columns: list of samples and the midas_run_snps results path.
+Refer to [MIDAS's merge species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/merge_species.md) for more details.
 
-## Species and sample filters
+## midas_merge_snps
 
-A species is covered "sufficiently well" by a sample when the per-sample average read depth over the species is at least `genome_depth` *and* the fraction of reference genome sites covered by at least one read is at least `genome_coverage`.
+To compute the across-samples pooled-SNPs for each genomic site in the representative genome, read_counts and sample_counts of A,C,G,T are accumulated across all samples. Then we can compute the pooled-major-alleles for each site, following by collecting the corresponding read depth and allele frequency for each sample. 
 
-The analysis restricts attention to species that are covered sufficiently well in sufficiently many samples.  Let's call that the "relevant" set of species.  In addition, for each relevant species, the analysis only includes data from samples that cover that species sufficiently well.   
+For each relevant site, we determine the set of alleles present for that site across all relevant samples. For each allele A, C, G, T we count the samples that are relevant for the site and contain that allele, and sum that allele's depths across those samples.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `pool_method` argument.
 
-Parameters:
+- ** pipeline details **
 
-```
-- `genome_depth`: [vertical coverage]  min per-sample average read depth (5X)
-- `genome_coverage`: [horizontal coverage] min fraction of reference genome sites covered by at least one read (40%)
-- `sample_counts`: "sufficiently many" samples
-```
+  1. <species, sub-sample-lists> selection: the analysis restricts attention to "sufficiently well" covered species in sufficiently many samples. (`genome_depth`, `genome_coverage`, and `sample_counts`).
 
-## Site filters
+  2. **relevant sample**: per-site sample filters: a sample is considered relevant for a given genomic site when the read depth at that site in that sample falls between the parameters `site_depth` and `site_ratio * genome_depth`. Otherwise, we won't include that sample for the compute of the pooled-SNPs for that site.
 
-### Per-sample site filter:
-
-A sample is considered relevant for a given genomic site when the read depth at that site in that sample falls between the parameters `site_depth` and `site_ratio * genome_depth`.
-```
-- `site_depth`: minimum number of reads mapped to genomic site (2)
-- `site_ratio`: maximum ratio of site depth over genome depth (5.0)
-```
-For each site, we compute the number of samples where that site is relevant.  This is the `count_samples` column in output `snps_info.tsv`.
-
-### Across-sample site filters (core presets):
-
-A site is considered relevant for the given set of samples when sufficiently many of the samples are considered relevant for the site.
-```
-- `site_prevalence`: minimum fraction of samples where a genomic site pass the *site filters*
-```
-For each relevant site, we determine the set of alleles present for that site across all relevant samples. For each allele A, C, G, T we count the samples that are relevant for the site and contain that allele, and total that allele's depths across those samples.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `pool_method` argument.
-
-We determine whether a site is bi-allelic or tri-allelic based on a threshold of the allele frequencies.
-
-```
-- `site_maf`: minimum pooled minor-allele-frequency of site across samples for calling an allele present (0.1)
-- `snp_type`: count alleles for the site with frequency >= SITE_MAF 
-```
+  3. **relevant site** across-samples site filters (core presets)
 
 ## output files
 
-- `merged_snps_outdir`:= `{merged_output_dir}/merged/snps`
 
-- 'snps_summary.tsv': 
+- `snps_summary.tsv`: 
 
-```
-species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered 
+   ```
+   species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered 
  mean_coverage
-102293  SRS011271  3612475  2110215  770004185  14515249  9417166  0.584  364.894
+   102293  SRS011271  3612475  2110215  770004185  14515249  9417166  0.584  364.894
 102293  SRS011134  3612475  2706546  209982386  3175007  2683395  0.749  77.583
-```
+   ```
 
-For each species, we generate three files:
+- `{species_id}/snps_info.tsv`
 
-- `snps_info.tsv`
+   ```
+   site_id major_allele    minor_allele    sample_counts   snp_type        rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
+   UHGG047905_C0_L562.0k_H31cf56|139|C     C       T       2       bi      0       25      0       20      0       1       0       1
+   UHGG047905_C0_L562.0k_H31cf56|162|C     C       A       2       bi      1       41      0       0       1       2       0       0
+   ```
 
-```
-site_id major_allele    minor_allele    sample_counts   snp_type        rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
-UHGG047905_C0_L562.0k_H31cf56|139|C     C       T       2       bi      0       25      0       20      0       1       0       1
-UHGG047905_C0_L562.0k_H31cf56|162|C     C       A       2       bi      1       41      0       0       1       2       0       0
-```
+- `{species_id}/snps_freq.tsv`
 
-- `snps_freq.tsv`: site-by-sample minor allele frequency matrix
-
-```
-site_id SRS011271       SRS011134
-UHGG047905_C0_L562.0k_H31cf56|139|C     1.000   0.000
-UHGG047905_C0_L562.0k_H31cf56|162|C     0.000   0.043
-```
+  ```
+  site_id SRS011271       SRS011134
+  UHGG047905_C0_L562.0k_H31cf56|139|C     1.000   0.000
+  UHGG047905_C0_L562.0k_H31cf56|162|C     0.000   0.043
+  ```
 
 - `snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
 
-```
-site_id SRS011271       SRS011134
-UHGG047905_C0_L562.0k_H31cf56|139|C     20      25
-UHGG047905_C0_L562.0k_H31cf56|162|C     19      23
-```
+  ```
+  site_id SRS011271       SRS011134
+  UHGG047905_C0_L562.0k_H31cf56|139|C     20      25
+  UHGG047905_C0_L562.0k_H31cf56|162|C     19      23
+  ```
 
-# midas_merge_genes
+Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs/merge_snvs.md) for more details.
 
-## Input files
+## midas_merge_genes
 
-- `sample_counts`
-- `min_copy`
-- `cluster_pid`
+Considering the number of pan-genome genes is relatively smaller than the genome size, we merge results from pan-genome profiling across samples for all genes per species.
 
-## Output files
+- `genes_summary.tsv`
 
-- genes_summary.tsv.lz4
+  ```
+  species_id	sample_name	pangenome_size	covered_genes	fraction_covered	mean_coverage	aligned_reads	mapped_reads  marker_depth
+  102478	SRS011061	704500	241525	0.343	3.738	8590041	7841889	0.000
+  102478	SRS011134	704500	312336	0.443	2.144	6255805	5203378	0.000
+  ```
+- `{species_id}.genes_copynum.tsv.lz4`
 
-```
-sample_id species_id pangenome_size covered_genes fraction_covered mean_coverage marker_coverage
-```
+  ```
+  gene_id	SRS011061	SRS011134	SRS011271
+  UHGG000186_01791	0.000	0.000	0.000
+  UHGG120544_00344	0.000	0.000	0.000
+  ```
 
-For each species (passing the species and sample filter), there are three gene_id-by-sample matrices
+- `{species_id}.genes_preabs.tsv.lz4`
+ 
+  ```
+  gene_id	SRS011061	SRS011134	SRS011271
+  UHGG000186_01791	0	0	0
+  UHGG120544_00344	0	0	0
+  ```
 
-- {species_id}/genes_copynum.tsv
-- {species_id}/genes_preabs.tsv
-- {species_id}/genes_coverage.tsv
+- `{species_id}.genes_coverage.tsv.lz4`
 
-
-- {sa
+  ```
+  gene_id	SRS011061	SRS011134	SRS011271
+  UHGG000186_01791	8.854	0.000	5.692
+  UHGG120544_00344	26.730	12.037	20.230
+  ```
+Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
