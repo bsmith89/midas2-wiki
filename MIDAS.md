@@ -38,45 +38,25 @@ Output                                      Producer             Meaning
 -----------------------------------------------------------------------------------------------------------
 species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
 species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
-species/species_coverage.tsv                midas_merge_species. Species-by-sample genome coverage matrix
+species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
 species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
 
 
-snps/snps_summary.tsv                        midas_merge_snps     Pileup results summary
-snps/{sp_id}/{sp_id}.snps_info.tsv                            SNPs info
-snps/{sp_id}/{sp_id}.snps_freqs.tsv                           Minor allele frequency matrix
-snps/{sp_id}/{sp_id}.snps_depth.tsv                           Site-by-sample read depth matrix
-
-genes/summary.tsv                            midas_run_genes      Alignment results summary
-genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4                 Presence/Absence matirx
-genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4      Copy number matrix
-genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4       Read depth matrix
+snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
+snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
+snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
+snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
 
 
-
-
-            # snps
-            "snps_summary":          f"snps/snps_summary.tsv",
-            "snps_info":             f"snps/{species_id}/{species_id}.snps_info.tsv",
-            "snps_freq":             f"snps/{species_id}/{species_id}.snps_freqs.tsv",
-            "snps_depth":            f"snps/{species_id}/{species_id}.snps_depth.tsv",
-            "snps_info_by_chunk":    f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_info.tsv",
-            "snps_freq_by_chunk":    f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_freqs.tsv",
-            "snps_depth_by_chunk":   f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_depth.tsv",
-
-            # genes
-            "genes_summary":         f"genes/summary.tsv",
-            "genes_presabs":         f"genes/{species_id}/{species_id}.genes_presabs.tsv",
-            "genes_copynum":         f"genes/{species_id}/{species_id}.genes_copynum.tsv",
-            "genes_depth":           f"genes/{species_id}/{species_id}.genes_depth.tsv",
-
-
+genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
+genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
+genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
+genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
 ```
 
-- `{output_dir}`: output directory is provided by the user.
+- `{output_dir}`: output directory is provided by the user, which is the root of the layout above.
 
-All merge subcommands take a `samples_list` of single-sample output dirs as input.
-
+All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
 
 # midas_run_species: species abundance estimation
 
