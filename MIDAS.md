@@ -34,19 +34,43 @@ The first subcommand to run for the sample is `midas_run_species`, and it will c
 Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
 
 ```
-Output                                                    Producer             Meaning
+Output                                      Producer             Meaning
 -----------------------------------------------------------------------------------------------------------
-species/species_prevalence.tsv                            midas_merge_species  Species prevalence across samples
+species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
+species/species_read_counts.tsv                                  Species-by-sample read counts matrix
+species/species_coverage.tsv                                     Species-by-sample genome coverage matrix
+species/species_rel_abundance.tsv                                Species-by-sample relative abundance matrix
 
-snps/output/snps_summary.tsv                              midas_merge_snps     Pileup results summary
-snps/output/{species_id}/{species_id}.snps_info.tsv       midas_merge_snps     SNPs info
-snps/output/{species_id}/{species_id}.snps_freqs.tsv      midas_merge_snps     Minor allele frequency matrix
-snps/output/{species_id}/{species_id}.snps_depth.tsv      midas_merge_snps     Site-by-sample read depth matrix
 
-genes/output/summary.tsv                                  midas_run_genes      Alignment results summary
-genes/output/{species_id}/{species_id}.genes_presabs.tsv  midas_merge_genes    Presence/Absence matirx
-genes/output/{species_id}/{species_id}.genes_copynum.tsv  midas_merge_genes    Copy number matrix
-genes/output/{species_id}/{species_id}.genes_depth.tsv    midas_merge_genes    Read depth matrix
+snps/snps_summary.tsv                        midas_merge_snps     Pileup results summary
+snps/{sp_id}/{sp_id}.snps_info.tsv                            SNPs info
+snps/{sp_id}/{sp_id}.snps_freqs.tsv                           Minor allele frequency matrix
+snps/{sp_id}/{sp_id}.snps_depth.tsv                           Site-by-sample read depth matrix
+
+genes/summary.tsv                            midas_run_genes      Alignment results summary
+genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4                 Presence/Absence matirx
+genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4      Copy number matrix
+genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4       Read depth matrix
+
+
+
+
+            # snps
+            "snps_summary":          f"snps/snps_summary.tsv",
+            "snps_info":             f"snps/{species_id}/{species_id}.snps_info.tsv",
+            "snps_freq":             f"snps/{species_id}/{species_id}.snps_freqs.tsv",
+            "snps_depth":            f"snps/{species_id}/{species_id}.snps_depth.tsv",
+            "snps_info_by_chunk":    f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_info.tsv",
+            "snps_freq_by_chunk":    f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_freqs.tsv",
+            "snps_depth_by_chunk":   f"temp/{dbtype}/{species_id}/cid.{chunk_id}_snps_depth.tsv",
+
+            # genes
+            "genes_summary":         f"genes/summary.tsv",
+            "genes_presabs":         f"genes/{species_id}/{species_id}.genes_presabs.tsv",
+            "genes_copynum":         f"genes/{species_id}/{species_id}.genes_copynum.tsv",
+            "genes_depth":           f"genes/{species_id}/{species_id}.genes_depth.tsv",
+
+
 ```
 
 - `{output_dir}`: output directory is provided by the user.
