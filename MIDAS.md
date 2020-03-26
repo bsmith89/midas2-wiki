@@ -29,20 +29,20 @@ Each sample analysis subcommand operates on a single sample. It takes as a param
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
 ```
-{sample_name}
+{output_dir}
  |- species
  |- snps
  |- genes
  |- dbs: could mirror S3 UHGG structures 
-  |- species
-  |- snps
-  |- genes
+ |  |- species
+ |  |- snps
+ |  |- genes
  |- temp
-  |- snps/repgenomes.bam
-  |- genes/pangenome.bam
+ |  |- snps/repgenomes.bam
+ |  |- genes/pangenome.bam
  |- bowtie2_indexes
-  |- snps/repgenomes.*
-  |- genes/pangenomes.*
+ |  |- snps/repgenomes.*
+ |  |- genes/pangenomes.*
 ```
 
 # Pooled samples result layout
@@ -74,68 +74,54 @@ genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species ge
 
 All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
 
-
 ```
 outputs
  |- species
  |- snps
  |- genes
  |- dbs: could mirror S3 UHGG structures 
-  |- species
-  |- snps
-  |- genes
+ |  |- species
+ |  |- snps
+ |  |- genes
  |- temp
-  |- snps
+ |  |- snps
  |- [bowtie2_indexes]
 ```
 
-# midas_run_species: species abundance estimation
+# Single-sample analysis
 
-## required parameters
+Multiple steps analysis happen for each sample, which usually happen in the following order.
 
--  one or two input fastqs for a single sample
+## midas_run_species
 
-- `{output_dir}`: output directory unique for the sample, i.e., `{output_root}/{sample_name}`;  this will be created if it does not exist
-
-## output files
-
-- **`{output_dir}/{sample_name}/species/species_profile.txt`**: tab-delimited with header, contains all the species with `species_cov` > 0, sorted by decreasing relative abundance.
+- `species_profile.tsv`: one species per row with coverage > 0, sorted in decreasing relative abundance.
 
    ```
-   species_id    count_reads     coverage        relative_abundance
+   species_id    read_counts     coverage        rel_abundance
    102455        15053           137.635         0.130
    100044        10797           96.509          0.091
-   101640        10688           84.354          0.080
-   100089        9835            86.637          0.082
-   102478        8603            78.545          0.074
    ```
+Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for details.
 
-## temp files
+## midas_run_snps
 
-- `{output_dir}/{sample_name}/temp/alignment.m8`: alignment files of mapping reads to marker genes using hs-blastn
+To explore within-species variations for the species present in the sample data, mNGS reads were aligned to a Bowtie2 indexes of a collection of representative genomes; nucleotide variation for each genomic site was quantify via pileup and alleles count. 
 
-# midas_run_snps: single nucleotide polymorphism prediction
+- **Bowtie2 indexes options**
 
-## required parameters
+  In addition to the original MIDAS's approach of on-the-fly build the Bowtie2 database for species in the restricted species profile, uses can also provide a prebuilt Bowtie2 indexes, e.g. one Bowtie2 database for all the samples in one study. Given the following three considerations:
 
---  one or two input fastqs for a single sample
+    1. Despite the limitation to only abundant species to each sample, build bowtie2 indexes still takes significant amount of CPU time.
+    2. For samples from the same study, the microbiome compositions are more or less similar.
+    3. Given the multi-mapped reads issues between similar genomes in the Bowtie2 database, per-sample Bowtie2 indexes may cause bias for the pooled-sample core-genome SNP calling.
 
--- `{output_dir}`: must match the argument to run_midas_species for the same sample
+ Note: we still parse the pileup for abundance species present in each sample, selected by `genome_coverage`.
 
+- **Chunk-of-sites** 
 
-## optional parameters
+  One chunk-of-sites is indexed by `species_id, chunk_id`, represents `contig_end - contig_start` number of sites for one `contig_id`. For each chunk, pileup counts, mapped reads and aligned reads were computed independently. Chunks were computed in parallel. When all chunks from the same species are processed, the per-chunk pileup results are merged into one pileup file per species (`{species_id}.snps.tsv.lz4`) which avoid the explosion of intermediate files.
 
--- `species_cov`: select species present in the sample with minimal vertical coverage
-
--- `species_id`: limit analysys to a single species  **todo**
-
-## inputs
-
-- `{output_dir}/{sample_name}/species/species_profile.txt` --- as produced by run_midas_species
-
-## output files
-
-- `{sample_name}/snps/output/{species_id}.snps.lz4`: per species pileup results
+- {species_id}.snps.tsv.lz4
 
    ```
    ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
@@ -144,66 +130,40 @@ outputs
    UHGG143505_C0_L5444.9k_H7fb7ad  44698   G               10      0       0       10      0
    UHGG143505_C0_L5444.9k_H7fb7ad  44699   A               10      10      0       0       0
    UHGG143505_C0_L5444.9k_H7fb7ad  44700   A               10      10      0       0       0
-   UHGG143505_C0_L5444.9k_H7fb7ad  44701   C               10      0       10      0       0
    ```
 
-- `{sample_name}/snps/output/summary.txt`: alignment stats for each species
+- `summary.tsv`
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
    102478      5444912        4526401        38190009     356763         273537        0.831            8.437
    ```
 
-## temp files
+Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
-- `{sample_name}/snps/output/temp_sc.{species_cov}/{species_id}/{genome}.fa: the representative genomes of  all the species with `species_cov`> specie_cov.
+## midas_run_genes
 
-- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.fa`: the collated representative genome sequences of all the species with `species_cov`> specie_cov.
+To quantify the pangenome genes presence/absence for the species(es) of interest in the mNGS data, reads were aligned to the all the centroids genes per species, and gene copy number are estimated.
 
-- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected representative genomes
+Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) for each gene, aligned reads, mapped reads, read depths and gene length are computed; (2) (after collecting reads alignment information) for all the genes for one species, compute the read depths of the 15 single copy marker genes; (3) for each gene, compute the copy number. 
 
-- `{sample_name}/snps/output/temp_sc.{species_cov}/repgenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to repgenomes.fa
-
-
-# midas_run_genes: pan genome profiling
-
-## input files
-
-- `{output_dir}/{sample_name}/species/species_profile.txt`
-
-- `species_cov`: select species present in the sample with minimal vertical coverage
-
-- **todo**: add `species_id` option
-
-## output files
-
-- `{genes_output_dir}` := `{output_dir}/{sample_name}/genes`
-- `{genes_output_dir}/output_sc.{species_cov}/{species_id}.genes.lz4`: 
+- `{species_id}.genes.tsv.lz4`: 
 
    ```
    gene_id              count_reads     coverage        copy_number
    UHGG239769_04714     22              0.571323        0.000000
    UHGG050950_03155     7               0.182088        0.000000
-   UHGG221050_00301     7               0.181818        0.000000
-   UHGG175788_02287     3               0.078563        0.000000
    ```
 
-- `{genes_output_dir}/output_sc.{species_cov}/summary.txt`: alignment stats for each species
+- `summary.tsv`
 
    ```
    species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
    102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
    ```
 
-## temp files
+Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
-- `{genes_output_dir}/temp_sc.{species_cov}/{species_id}/centroids.ffn: the centroid genes of all the species with `species_cov`> specie_cov.
-
-- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.fa`: the collated centroid genes of all the species with `species_cov`> specie_cov.
-
-- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.{1..4, rev.1..2}.bt2`: the Bowtie2 index of the collected centroid pan genes
-
-- `{genes_output_dir}/temp_sc.{species_cov}/pangenomes.{bam, bam.bai}`: the Bowtie2 alignment files of mapping reads to pan genes
 
 # **merge_interface**
 
