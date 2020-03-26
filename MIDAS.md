@@ -37,9 +37,9 @@ Results for multiple samples can be pooled using the corresponding subcommands `
 Output                                      Producer             Meaning
 -----------------------------------------------------------------------------------------------------------
 species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
-species/species_read_counts.tsv                                  Species-by-sample read counts matrix
-species/species_coverage.tsv                                     Species-by-sample genome coverage matrix
-species/species_rel_abundance.tsv                                Species-by-sample relative abundance matrix
+species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
+species/species_coverage.tsv                midas_merge_species. Species-by-sample genome coverage matrix
+species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
 
 
 snps/snps_summary.tsv                        midas_merge_snps     Pileup results summary
