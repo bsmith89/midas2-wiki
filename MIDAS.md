@@ -13,6 +13,8 @@ For each sample, the analysis begins with a species profiling step.  The identif
 ```
 Output                                          Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
+midas_iggdb                                     DB-related files    Mirror s3://miocriombe-igg/2.0/
+
 {sample_name}/species/species_profile.tsv       midas_run_species   List of abundant species in sample
 
 {sample_name}/snps/summary.tsv                  midas_run_snps      Summary of the SNPs analysis results
@@ -68,21 +70,28 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
  |- species
  |- snps
  |- genes
- |- dbs: could mirror S3 UHGG structures 
- |  |- species
- |  |- snps
- |  |- genes
  |- temp
  |  |- snps/repgenomes.bam
  |  |- genes/pangenome.bam
- |- bowtie2_indexes
+ |- bt2_indexes
  |  |- snps/repgenomes.*
  |  |- genes/pangenomes.*
 ```
 
-## midas_run_species
+## Species abundance estimation
 
-- `species_profile.tsv`: one species per row with coverage > 0, sorted in decreasing relative abundance.
+### example command
+
+  ```
+  python -m iggtools midas_run_species \
+         --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
+         --midas_iggdb /path/to/local/midas/iggdb --num_cores 4 --debug \
+         $midas_outdir
+  ```
+
+### target output files
+
+- `species_profile.tsv`: species present in the sample (`coverage` > 0), sorted in decreasing relative abundance. 
 
    ```
    species_id    read_counts     coverage        rel_abundance
@@ -303,3 +312,10 @@ Considering the number of pan-genome genes is relatively smaller than the genome
   UHGG120544_00344	26.730	12.037	20.230
   ```
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
+
+
+When provide midas_run_snps and midas_run_genes with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), MIDAS also needs to know what species were being included during the database build step (`--prebuilt_bowtie2_species`). 
+Users can also provide species we want to perform Pileup (`--species_list`), by providing comma separated species ids. 
+MIDAS will only perform pileup on abundant species that passing the `--genome_coverage`. When the provided species of interest (`--species_list`) don't pass the genome_coverage filter, or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform pileup analysis on those species, even if it is provided by `--species_list`.
+
+
