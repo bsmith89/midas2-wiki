@@ -30,37 +30,6 @@ Each sample analysis subcommand operates on a single sample. It takes as a param
 
 The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
 
-
-# Pooled samples result layout
-
-Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
-
-```
-Output                                      Producer             Meaning
------------------------------------------------------------------------------------------------------------
-species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
-species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
-species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
-species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
-
-
-snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
-snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
-snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
-snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
-
-
-genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
-genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
-genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
-genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
-```
-
-- `{output_dir}`: output directory is provided by the user, which is the root of the layout above.
-
-All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
-
-
 # Single-sample analysis
 
 Multiple steps analysis happen for each sample, which usually happen in the following order.
@@ -80,7 +49,7 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
 
 ## Species abundance estimation
 
-### example command
+### Example command
 
   ```
   python -m iggtools midas_run_species \
@@ -89,7 +58,7 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
          $midas_outdir
   ```
 
-### target output files
+### Target output files
 
 - `species_profile.tsv`: species present in the sample (`coverage` > 0), sorted in decreasing relative abundance. 
 
@@ -100,6 +69,7 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
    ```
 
 Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for details.
+
 
 ## Call single nucleotide polymorphisms
 
@@ -147,25 +117,25 @@ To explore within-species variations for the species present in the sample data,
 
   Then provide the ${mock_midas_iggdb} to midas_run_snps by --midas_iggdb.  
   
-### example command
+### Example command
 
 - Perform Pileup for all the species with mean vertical genome coverage higher than 10X (need to run midas_run_species before). The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`genome_coverage` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
 
    ```
-    python -m iggtools midas_run_snps --sample_name ${sample_name} \
-           -1 $R1 -2 $R2 --genome_coverage 10 \
-           /path/to/midas/output
+   python -m iggtools midas_run_snps --sample_name ${sample_name} \
+          -1 $R1 -2 $R2 --genome_coverage 10 --num_cores 8 \
+          /path/to/midas/output
    ```
 
 - Perform Pileup for all the species with mean vertical genome coverage higher than 10X, and using existing Bowtie2 databases.
 
   ```
-    python -m iggtools midas_run_snps --sample_name ${sample_name} \
-           -1 $R1 -2 $R2 \
-           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
-           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-           --genome_coverage 10 \
-           /path/to/midas/output
+  python -m iggtools midas_run_snps --sample_name ${sample_name} \
+         -1 $R1 -2 $R2 \
+         --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
+         --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
+         --genome_coverage 10 --num_cores 8 \
+         /path/to/midas/output
    ```
 
 - Special usage of `genome_coverage`
@@ -182,11 +152,11 @@ To explore within-species variations for the species present in the sample data,
           --midas_iggdb /path/to/mock/midas/iggdb \
           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-          --genome_coverage=-1 \
+          --genome_coverage=-1 --num_cores 8 \
           /path/to/midas/output
    ``` 
 
-### target output files
+### Target output files
 
 - `snps_summary.tsv`
 
@@ -206,11 +176,32 @@ To explore within-species variations for the species present in the sample data,
 
 Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
-## midas_run_genes
 
-To quantify the pangenome genes presence/absence for the species(es) of interest in the mNGS data, reads were aligned to the all the centroids genes per species, and gene copy number are estimated.
+## Pangenome profiling
 
-Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) for each gene, aligned reads, mapped reads, read depths and gene length are computed; (2) (after collecting reads alignment information) for all the genes for one species, compute the read depths of the 15 single copy marker genes; (3) for each gene, compute the copy number. 
+To quantify the pangenome genes presence/absence for the species(es) of interest in the mNGS data, reads were aligned to the all the centroid_99 genes per species, and gene copy number are estimated.
+
+Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) for each gene, aligned reads, mapped reads, read depths and gene length are computed; (2) (after collecting reads alignment information) for all the genes for one species, compute the read depths of the 15 single copy marker genes; (3) for each gene, infer the copy number. 
+
+### Example command
+
+- Profile pangenome for given species, if their mean vertical genome coverage higher than 10X (need to run midas_run_species before). 
+
+   ```
+   python -m iggtools midas_run_genes --sample_name ${sample_name} \
+          -1 $R1 -2 $R2 --genome_coverage 10 --num_cores 8 \
+          --species_list 100044,101302,102478 \
+          /path/to/midas/output
+   ```
+
+### Target output files
+
+- `genes_summary.tsv`
+
+   ```
+   species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
+   102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
+   ```
 
 - `{species_id}.genes.tsv.lz4`: 
 
@@ -220,14 +211,8 @@ Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 datab
    UHGG050950_03155     7               0.182088        0.000000
    ```
 
-- `summary.tsv`
-
-   ```
-   species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
-   102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
-   ```
-
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
+
 
 # Pool samples analysis
 
@@ -256,6 +241,38 @@ To merge MIDAS results across multiple samples, users need to provide a
     |  |- snps
     |- [bowtie2_indexes]
    ```
+
+
+# Pooled samples result layout
+
+Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
+
+```
+Output                                      Producer             Meaning
+-----------------------------------------------------------------------------------------------------------
+species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
+species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
+species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
+species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
+
+
+snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
+snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
+snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
+snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
+
+
+genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
+genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
+genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
+genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
+```
+
+- `{output_dir}`: output directory is provided by the user, which is the root of the layout above.
+
+All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
+
+
 
 ## midas_merge_species
 
