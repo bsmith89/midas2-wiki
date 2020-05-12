@@ -17,10 +17,10 @@ midas_iggdb                                     DB-related files    Mirror s3://
 
 {sample_name}/species/species_profile.tsv       midas_run_species   List of abundant species in sample
 
-{sample_name}/snps/summary.tsv                  midas_run_snps      Summary of the SNPs analysis results
+{sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of the SNPs analysis results
 {sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Pileup results for each species_id
 
-{sample_name}/genes/summary.tsv                 midas_run_genes     Pangenome alignment stats
+{sample_name}/genes/genes_summary.tsv           midas_run_genes     Pangenome alignment stats
 {sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Gene coverage per species_id
 ```
 
@@ -98,11 +98,12 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
    102455        15053           137.635         0.130
    100044        10797           96.509          0.091
    ```
+
 Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for details.
 
-## midas_run_snps
+## Call single nucleotide polymorphisms
 
-To explore within-species variations for the species present in the sample data, mNGS reads were aligned to a Bowtie2 indexes of a collection of representative genomes; nucleotide variation for each genomic site was quantify via pileup and alleles count. 
+To explore within-species variations for the species present in the sample data, metagenomics shotgun reads were aligned to a Bowtie2 indexes of a collection of representative genomes; nucleotide variation for each genomic site was quantify via pileup and alleles count. 
 
 - **Bowtie2 indexes options**
 
@@ -118,20 +119,89 @@ To explore within-species variations for the species present in the sample data,
 
   One chunk-of-sites is indexed by `species_id, chunk_id`, represents `contig_end - contig_start` number of sites for one `contig_id`. For each chunk, pileup counts, mapped reads and aligned reads were computed independently. Chunks were computed in parallel. When all chunks from the same species are processed, the per-chunk pileup results are merged into one pileup file per species (`{species_id}.snps.tsv.lz4`) which avoid the explosion of intermediate files.
 
-- {species_id}.snps.tsv.lz4
+- **Q & A**
+
+  1. What if I want to choose a different set representative genomes for given species.
+     Ans: you can modify the table-of-content `genomes.tsv` accordingly.
+
+  2. Can I do variant calling for genomes/species not in the UHGG, using the `midas_run_snps`script?
+     Ans: Yes. User can build a `mock-midas-iggdb` by following the same file structures. For example, given a set of genomes that you want to perform SNP calling. 
+
+  First, generate the `${mock_midas_iggdb}/genomes.tsv` in the desired format:
+
+  ```
+  genome            species representative          genome_is_representative
+  GUT_GENOME091053  100001  GUT_GENOME091053        1
+  GUT_GENOME212267  100002  GUT_GENOME212267        1
+  GUT_GENOME178957  100003  GUT_GENOME178957        1
+  ```
+
+  Secondly, set up the representative genomes in the following structure:
+
+  ```
+  # cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
+  ${mock_midas_iggdb}/cleaned_imports/100001/GUT_GENOME091053/GUT_GENOME091053.fna.lz4
+  ${mock_midas_iggdb}/cleaned_imports/100002/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
+  ${mock_midas_iggdb}/cleaned_imports/100003/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
+  ```
+
+  Then provide the ${mock_midas_iggdb} to midas_run_snps by --midas_iggdb.  
+  
+### example command
+
+- Perform Pileup for all the species with mean vertical genome coverage higher than 10X (need to run midas_run_species before). The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`genome_coverage` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
+
+   ```
+    python -m iggtools midas_run_snps --sample_name ${sample_name} \
+           -1 $R1 -2 $R2 --genome_coverage 10 \
+           /path/to/midas/output
+   ```
+
+- Perform Pileup for all the species with mean vertical genome coverage higher than 10X, and using existing Bowtie2 databases.
+
+  ```
+    python -m iggtools midas_run_snps --sample_name ${sample_name} \
+           -1 $R1 -2 $R2 \
+           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
+           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
+           --genome_coverage 10 \
+           /path/to/midas/output
+   ```
+
+- Special usage of `genome_coverage`
+
+  1. `--genome_coverage=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes; use with caution, only when you know exactly what you want to do. Can be used with 
+
+  2. `--genome_coverage 0`: perform pileup for all the species present in the given sample
+
+- Variant calling for custom mock-midas-iggdb
+
+   ```
+   python -m iggtools midas_run_snps --sample_name ${sample_name} \
+          -1 $R1 -2 $R2 \
+          --midas_iggdb /path/to/mock/midas/iggdb \
+          --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
+          --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
+          --genome_coverage=-1 \
+          /path/to/midas/output
+   ``` 
+
+### target output files
+
+- `snps_summary.tsv`
+
+   ```
+   species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
+   102478      5444912        4526401        38190009     356763         273537        0.831            8.437
+   ```
+
+- `{species_id}.snps.tsv.lz4`: per-species pileup results
 
    ```
    ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
    UHGG143505_C0_L5444.9k_H7fb7ad  44696   A               9       9       0       0       0
    UHGG143505_C0_L5444.9k_H7fb7ad  44697   A               9       9       0       0       0
    UHGG143505_C0_L5444.9k_H7fb7ad  44698   G               10      0       0       10      0
-   ```
-
-- `summary.tsv`
-
-   ```
-   species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
-   102478      5444912        4526401        38190009     356763         273537        0.831            8.437
    ```
 
 Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
