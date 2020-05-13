@@ -115,15 +115,19 @@ To explore within-species variations for the species present in the sample data,
   ${mock_midas_iggdb}/cleaned_imports/100003/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
   ```
 
-  Then provide the ${mock_midas_iggdb} to midas_run_snps by --midas_iggdb.  
+  Then provide the `${mock_midas_iggdb}` to midas_run_snps by --midas_iggdb.  
+
+  3. When provide midas_run_snps and midas_run_genes with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), MIDAS also needs to know what species were being included during the database build step (`--prebuilt_bowtie2_species`).  
+MIDAS will only perform pileup on abundant species that passing the `--marker_depth`. When the provided species of interest (`--species_list`) don't pass the marker_depth filter, or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform pileup analysis on those species, even if it is provided by `--species_list`.
+
   
 ### Example command
 
-- Perform Pileup for all the species with mean vertical genome coverage higher than 10X (need to run midas_run_species before). The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`genome_coverage` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
+- Perform Pileup for all the species with mean vertical genome coverage higher than 10X (need to run midas_run_species before). The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`marker_depth` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
 
    ```
    python -m iggtools midas_run_snps --sample_name ${sample_name} \
-          -1 $R1 -2 $R2 --genome_coverage 10 --num_cores 8 \
+          -1 $R1 -2 $R2 --marker_depth 10 --num_cores 8 \
           /path/to/midas/output
    ```
 
@@ -134,15 +138,15 @@ To explore within-species variations for the species present in the sample data,
          -1 $R1 -2 $R2 \
          --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
          --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-         --genome_coverage 10 --num_cores 8 \
+         --marker_depth 10 --num_cores 8 \
          /path/to/midas/output
    ```
 
-- Special usage of `genome_coverage`
+- Special usage of `marker_depth`
 
-  1. `--genome_coverage=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes; use with caution, only when you know exactly what you want to do. Can be used with 
+  1. `--marker_depth=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes; use with caution, only when you know exactly what you want to do. Can be used with 
 
-  2. `--genome_coverage 0`: perform pileup for all the species present in the given sample
+  2. `--marker_depth 0`: perform pileup for all the species present in the given sample
 
 - Variant calling for custom mock-midas-iggdb
 
@@ -152,7 +156,7 @@ To explore within-species variations for the species present in the sample data,
           --midas_iggdb /path/to/mock/midas/iggdb \
           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-          --genome_coverage=-1 --num_cores 8 \
+          --marker_depth=-1 --num_cores 8 \
           /path/to/midas/output
    ``` 
 
@@ -189,7 +193,7 @@ Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 datab
 
    ```
    python -m iggtools midas_run_genes --sample_name ${sample_name} \
-          -1 $R1 -2 $R2 --genome_coverage 10 --num_cores 8 \
+          -1 $R1 -2 $R2 --marker_depth 10 --num_cores 8 \
           --species_list 100044,101302,102478 \
           /path/to/midas/output
    ```
@@ -214,11 +218,9 @@ Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 datab
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
 
-# Pool samples analysis
+# Pooled samples analysis
 
-To merge MIDAS results across multiple samples, users need to provide a 
-
-- `samples_list` tsv file, specifying the `sample_name` and the `midas_outdir`:
+To merge MIDAS single sample results across multiple samples, e.g. generate species abundance matrix across samples, or perform pooled-samples core-genome SNPs calling, or merge pan-genome profiling results across samples, users need to provide a `--samples_list` TSV file, which specifies the `sample_name` and `midas_outdir`:
 
    ```
    sample_name    midas_outdir
@@ -226,24 +228,22 @@ To merge MIDAS results across multiple samples, users need to provide a
    SRS011271      s3://microbiome-chunyu/iggtools-hmp-test
    ```
 
-- `outdir`:
+For example, MIDAS expects to locate `/mnt/chunyu_6TB/iggtools-hmp-test/SRS011134/species/species_profile.tsv`, generated from single-sample species flow. The merged output files are structured as following:
 
    ```
-   outputs
+   ${midas_outdir}
     |- species
     |- snps
     |- genes
-    |- dbs: could mirror S3 UHGG structures 
-    |  |- species
-    |  |- snps
-    |  |- genes
     |- temp
     |  |- snps
-    |- [bowtie2_indexes]
+    |- [bt2_indexes]
    ```
 
+- `{midas_outdir}`: output directory is provided by the user, which is the root of the layout above and below.
 
-# Pooled samples result layout
+
+# Pooled samples results layout
 
 Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
 
@@ -268,15 +268,20 @@ genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species ge
 genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
 ```
 
-- `{output_dir}`: output directory is provided by the user, which is the root of the layout above.
-
 All merge subcommands take a `samples_list` input argument, which is a TSV file with sample name and single-sample unique output directory.
 
 
+## Merge species abundance profile
 
-## midas_merge_species
+## Example command
 
 User can chose to build `local_bowtie2_indexes` given the merged species profile across samples.
+
+   ```
+   python -m iggtools midas_merge_species --samples_list /path/to/sample/lists ${midas_outdir}
+   ```
+
+### Target output files
 
 - `species_prevalence.tsv`: summary statistics for each species across samples
 
@@ -312,13 +317,27 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
 
 Refer to [MIDAS's merge species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/merge_species.md) for more details.
 
-## midas_merge_snps
 
-To compute the across-samples pooled-SNPs for each genomic site in the representative genome, read_counts and sample_counts of A,C,G,T are accumulated across all samples. Then we can compute the pooled-major-alleles for each site, following by collecting the corresponding read depth and allele frequency for each sample. 
+## Build Bowtie2 indexes with merged species profile
+
+When the microbiome composition for a collection of samples are similar, it is more efficient to build one Bowtie2 indexes with species which are either prevalent (`saample_counts`) or abundant (`mean_coverage`), after running `midas_merge_species`.
+
+Example command to build Bowtie2 database with species present in at least 2 sample:
+
+   ```
+   python -m iggtools build_bowtie2_indexes --midas_iggdb /path/to/local/midas/iggdb \
+          --species_profile ${merged_midas_outdir}/species/species_prevalence.tsv \
+          --select_by sample_counts --select_threshold 2 \
+          --num_cores 8 /path/to/bt2_indexes
+   ```
+
+## Pooled-samples core-genome SNPs calling
+
+To compute the across-samples pooled-SNPs for each genomic site in the representative genome, `read_counts` and `sample_counts` of A,C,G,T are accumulated across all samples. Then we can compute the across-samples-major-alleles for each site, following by collecting the corresponding read depth and allele frequency for each sample. 
 
 For each relevant site, we determine the set of alleles present for that site across all relevant samples. For each allele A, C, G, T we count the samples that are relevant for the site and contain that allele, and sum that allele's depths across those samples.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `pool_method` argument.
 
-- ** pipeline details **
+- **pipeline details**
 
   1. <species, sub-sample-lists> selection: the analysis restricts attention to "sufficiently well" covered species in sufficiently many samples. (`genome_depth`, `genome_coverage`, and `sample_counts`).
 
@@ -326,8 +345,19 @@ For each relevant site, we determine the set of alleles present for that site ac
 
   3. **relevant site** across-samples site filters (core presets)
 
-## output files
+### Example commands
 
+- Default parameters
+
+   ```
+   python -m iggtools midas_merge_snps --samples_list /path/to/tsv --num_cores 8 \
+                      --genome_depth 5.0 --genome_coverage 0.4 --sample_counts 2 \
+                      --site_depth 2 --site_ratio 10 --site_type common \
+                      --snp_pooled_method prevalence --snp_maf 0.05 --snp_type mo,bi \
+                      /path/to/merged/midas/outdir
+   ```
+
+### Target output files
 
 - `snps_summary.tsv`: 
 
@@ -364,9 +394,15 @@ For each relevant site, we determine the set of alleles present for that site ac
 
 Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs/merge_snvs.md) for more details.
 
-## midas_merge_genes
+
+## Merge results from pangenome profiling
 
 Considering the number of pan-genome genes is relatively smaller than the genome size, we merge results from pan-genome profiling across samples for all genes per species.
+
+### Example command
+
+
+### Target output files
 
 - `genes_summary.tsv`
 
@@ -375,6 +411,7 @@ Considering the number of pan-genome genes is relatively smaller than the genome
   102478	SRS011061	704500	241525	0.343	3.738	8590041	7841889	0.000
   102478	SRS011134	704500	312336	0.443	2.144	6255805	5203378	0.000
   ```
+
 - `{species_id}.genes_copynum.tsv.lz4`
 
   ```
@@ -398,11 +435,5 @@ Considering the number of pan-genome genes is relatively smaller than the genome
   UHGG000186_01791	8.854	0.000	5.692
   UHGG120544_00344	26.730	12.037	20.230
   ```
+
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
-
-
-When provide midas_run_snps and midas_run_genes with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), MIDAS also needs to know what species were being included during the database build step (`--prebuilt_bowtie2_species`). 
-Users can also provide species we want to perform Pileup (`--species_list`), by providing comma separated species ids. 
-MIDAS will only perform pileup on abundant species that passing the `--genome_coverage`. When the provided species of interest (`--species_list`) don't pass the genome_coverage filter, or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform pileup analysis on those species, even if it is provided by `--species_list`.
-
-
