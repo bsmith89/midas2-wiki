@@ -350,11 +350,7 @@ For each relevant site, we determine the set of alleles present for that site ac
 - Default parameters
 
    ```
-   python -m iggtools midas_merge_snps --samples_list /path/to/tsv --num_cores 8 \
-                      --genome_depth 5.0 --genome_coverage 0.4 --sample_counts 2 \
-                      --site_depth 2 --site_ratio 10 --site_type common \
-                      --snp_pooled_method prevalence --snp_maf 0.05 --snp_type mo,bi \
-                      /path/to/merged/midas/outdir
+   python -m iggtools midas_merge_snps --samples_list /path/to/tsv --num_cores 8 path/to/merged/midas/outdir
    ```
 
 ### Target output files
@@ -401,6 +397,9 @@ Considering the number of pan-genome genes is relatively smaller than the genome
 
 ### Example command
 
+   ```
+   python -m iggtools midas_merge_genes --samples_list /path/to/tsv --num_cores 8 /path/to/merged/midas/outdir
+   ```
 
 ### Target output files
 
