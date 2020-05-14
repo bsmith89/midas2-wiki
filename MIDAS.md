@@ -358,33 +358,33 @@ For each relevant site, we determine the set of alleles present for that site ac
 - `snps_summary.tsv`
 
    ```
-   species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered  mean_coverage
-   102293  SRS011271  3612475  2110215  770004185  14515249  9417166  0.584  364.894
-102293  SRS011134  3612475  2706546  209982386  3175007  2683395  0.749  77.583
+   species_id sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered  mean_coverage
+   102293     SRS011271  3612475        2110215        770004185    14515249       9417166       0.584             364.894
+   102293     SRS011134  3612475        2706546        209982386    3175007        2683395       0.749             77.583
    ```
 
 - `{species_id}/snps_info.tsv`
 
    ```
-   site_id major_allele    minor_allele    sample_counts   snp_type        rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
-   UHGG047905_C0_L562.0k_H31cf56|139|C     C       T       2       bi      0       25      0       20      0       1       0       1
-   UHGG047905_C0_L562.0k_H31cf56|162|C     C       A       2       bi      1       41      0       0       1       2       0       0
+   site_id                              major_allele  minor_allele sample_counts snp_type  rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
+   UHGG047905_C0_L562.0k_H31cf56|139|C  C             T            2             bi        0       25      0       20      0       1       0       1
+   UHGG047905_C0_L562.0k_H31cf56|162|C  C             A            2             bi        1       41      0       0       1       2       0       0
    ```
 
 - `{species_id}/snps_freq.tsv`
 
   ```
-  site_id SRS011271       SRS011134
-  UHGG047905_C0_L562.0k_H31cf56|139|C     1.000   0.000
-  UHGG047905_C0_L562.0k_H31cf56|162|C     0.000   0.043
+  site_id                                 SRS011271   SRS011134
+  UHGG047905_C0_L562.0k_H31cf56|139|C     1.000       0.000
+  UHGG047905_C0_L562.0k_H31cf56|162|C     0.000       0.043
   ```
 
 - `snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
 
   ```
-  site_id SRS011271       SRS011134
-  UHGG047905_C0_L562.0k_H31cf56|139|C     20      25
-  UHGG047905_C0_L562.0k_H31cf56|162|C     19      23
+  site_id                                 SRS011271   SRS011134
+  UHGG047905_C0_L562.0k_H31cf56|139|C     20          25
+  UHGG047905_C0_L562.0k_H31cf56|162|C     19          23
   ```
 
 Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs/merge_snvs.md) for more details.
@@ -405,33 +405,35 @@ Considering the number of pan-genome genes is relatively smaller than the genome
 - `genes_summary.tsv`
 
   ```
-  species_id	sample_name	pangenome_size	covered_genes	fraction_covered	mean_coverage	aligned_reads	mapped_reads  marker_depth
-  102478	SRS011061	704500	241525	0.343	3.738	8590041	7841889	0.000
-  102478	SRS011134	704500	312336	0.443	2.144	6255805	5203378	0.000
+  species_id	sample_name	pangenome_size	covered_genes	fraction_covered  mean_coverage	aligned_reads	mapped_reads  marker_depth
+  102478	SRS011061	704500	        241525	        0.343	          3.738	        8590041	  
+   7841889	0.000
+  102478	SRS011134	704500	        312336	        0.443	          2.144	        6255805	  
+  5203378	0.000
   ```
 
 - `{species_id}.genes_copynum.tsv.lz4`
 
   ```
-  gene_id	SRS011061	SRS011134	SRS011271
-  UHGG000186_01791	0.000	0.000	0.000
-  UHGG120544_00344	0.000	0.000	0.000
+  gene_id	        SRS011061  SRS011134
+  UHGG000186_01791	1.099	   1.099
+  UHGG120544_00344	0.425	   0.638
   ```
 
 - `{species_id}.genes_preabs.tsv.lz4`
  
   ```
-  gene_id	SRS011061	SRS011134	SRS011271
-  UHGG000186_01791	0	0	0
-  UHGG120544_00344	0	0	0
+  gene_id	        SRS011061  SRS011134
+  UHGG000186_01791	1	   1
+  UHGG120544_00344	0	   1
   ```
 
 - `{species_id}.genes_coverage.tsv.lz4`
 
   ```
-  gene_id	SRS011061	SRS011134	SRS011271
-  UHGG000186_01791	8.854	0.000	5.692
-  UHGG120544_00344	26.730	12.037	20.230
+  gene_id	        SRS011061  SRS011134
+  UHGG000186_01791	8.854	   0.000
+  UHGG120544_00344	26.730	   12.037
   ```
 
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
