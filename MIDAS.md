@@ -286,9 +286,9 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
 - `species_prevalence.tsv`: summary statistics for each species across samples
 
    ```
-   species_id median_abundance mean_abundance median_coverage mean_coverage  prevalence
-   102293     0.049            0.134          64.208          169.249        2
-   102181     0.034            0.023          38.567          27.530         2
+   species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  prevalence
+   102293      0.049             0.134           64.208           169.249        2
+   102181      0.034             0.023           38.567           27.530         2
    ```
 
 - `species_rel_abundance.tsv`
