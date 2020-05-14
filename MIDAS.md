@@ -404,36 +404,34 @@ Considering the number of pan-genome genes is relatively smaller than the genome
 
 - `genes_summary.tsv`
 
-  ```
-  species_id	sample_name	pangenome_size	covered_genes	fraction_covered  mean_coverage	aligned_reads	mapped_reads  marker_depth
-  102478	SRS011061	704500	        241525	        0.343	          3.738	        8590041	  
-   7841889	0.000
-  102478	SRS011134	704500	        312336	        0.443	          2.144	        6255805	  
-  5203378	0.000
-  ```
+   ```
+   species_id  sample_name  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads mapped_reads marker_depth
+   102478      SRS011061    704500          241525         0.343             3.738          8590041       7841889      0.000
+   102478      SRS011134    704500          312336         0.443             2.144          6255805       5203378      0.000
+   ```
 
 - `{species_id}.genes_copynum.tsv.lz4`
 
   ```
-  gene_id	        SRS011061  SRS011134
-  UHGG000186_01791	1.099	   1.099
-  UHGG120544_00344	0.425	   0.638
+  gene_id            SRS011061  SRS011134
+  UHGG000186_01791   1.099      1.099
+  UHGG120544_00344   0.425      0.638
   ```
 
 - `{species_id}.genes_preabs.tsv.lz4`
  
   ```
-  gene_id	        SRS011061  SRS011134
-  UHGG000186_01791	1	   1
-  UHGG120544_00344	0	   1
+  gene_id             SRS011061  SRS011134
+  UHGG000186_01791    1          1
+  UHGG120544_00344    0          1
   ```
 
 - `{species_id}.genes_coverage.tsv.lz4`
 
   ```
-  gene_id	        SRS011061  SRS011134
-  UHGG000186_01791	8.854	   0.000
-  UHGG120544_00344	26.730	   12.037
+  gene_id            SRS011061  SRS011134
+  UHGG000186_01791   8.854      0.000
+  UHGG120544_00344   26.730     12.037
   ```
 
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
