@@ -345,6 +345,8 @@ For each relevant site, we determine the set of alleles present for that site ac
 
   3. **relevant site** across-samples site filters (core presets)
 
+More details about the compute can be found at [Cross-Sample SNP Analysis Tools (xsnp)](https://github.com/czbiohub/xsnp/wiki/Data-Schema-And-Computation)
+
 ### Example commands
 
 - Default parameters
