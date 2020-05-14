@@ -355,11 +355,10 @@ For each relevant site, we determine the set of alleles present for that site ac
 
 ### Target output files
 
-- `snps_summary.tsv`: 
+- `snps_summary.tsv`
 
    ```
-   species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered 
- mean_coverage
+   species_id  sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered  mean_coverage
    102293  SRS011271  3612475  2110215  770004185  14515249  9417166  0.584  364.894
 102293  SRS011134  3612475  2706546  209982386  3175007  2683395  0.749  77.583
    ```
