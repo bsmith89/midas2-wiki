@@ -58,9 +58,9 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
          $midas_outdir
   ```
 
-### Target output files
+### Species flow output files
 
-- `species_profile.tsv`: species present in the sample (`coverage` > 0), sorted in decreasing relative abundance. 
+- `species/species_profile.tsv`: species present in the sample (`coverage` > 0), sorted in decreasing relative abundance. 
 
    ```
    species_id    read_counts     coverage        rel_abundance
@@ -126,53 +126,57 @@ To explore within-species variations for the species present in the sample data,
   
 ### Example command
 
-- Perform Pileup for all the species with mean vertical genome coverage higher than 10X (need to run midas_run_species before). The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`marker_depth` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
+- Perform Pileup for all the species with average vertical genome coverage (todo a more accurate way should be average sgc marker gene vertical coverage) higher than 10X (need to run `midas_run_species beforehand`). 
 
+   ```
+   python -m iggtools midas_run_species --sample_name ${sample_name} \
+          -1 ${R1} -2 ${R2} --num_cores 4 ${midas_outdir}
+
+   python -m iggtools midas_run_snps --sample_name ${sample_name} \
+          -1 ${R1} -2 ${R2} --marker_depth 10 --num_cores 8 ${midas_outdir}
+   ```
+
+   The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`marker_depth` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
+
+
+- Perform Pileup for all the species with average vertical genome coverage higher than 10X, and using existing Bowtie2 databases.
+   
    ```
    python -m iggtools midas_run_snps --sample_name ${sample_name} \
-          -1 $R1 -2 $R2 --marker_depth 10 --num_cores 8 \
-          /path/to/midas/output
-   ```
-
-- Perform Pileup for all the species with mean vertical genome coverage higher than 10X, and using existing Bowtie2 databases.
-
-  ```
-  python -m iggtools midas_run_snps --sample_name ${sample_name} \
-         -1 $R1 -2 $R2 \
-         --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
-         --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-         --marker_depth 10 --num_cores 8 \
-         /path/to/midas/output
-   ```
+          -1 ${R1} -2 ${R2} --num_cores 8 --marker_depth 10 \
+          --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
+          --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
+          ${midas_outdir}
+    ```
 
 - Special usage of `marker_depth`
 
-  1. `--marker_depth=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes; use with caution, only when you know exactly what you want to do. Can be used with 
+  1. `--marker_depth=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes. Use with caution, only when you know exactly what you want to do.  
 
-  2. `--marker_depth 0`: perform pileup for all the species present in the given sample
+  2. `--marker_depth 0`: perform pileup for all the species present in the given sample, computed from the `midas_run_species` flow.
 
-- Variant calling for custom mock-midas-iggdb
+
+- Variant calling for custom-midas-iggdb
 
    ```
    python -m iggtools midas_run_snps --sample_name ${sample_name} \
           -1 $R1 -2 $R2 \
-          --midas_iggdb /path/to/mock/midas/iggdb \
+          --midas_iggdb ${custom_midas_iggdb} \
           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-          --marker_depth=-1 --num_cores 8 \
-          /path/to/midas/output
+          --marker_depth=-1 --num_cores 8 ${midas_outdir}
    ``` 
 
-### Target output files
+### SNPs flow output files
 
-- `snps_summary.tsv`
+- Pileup summary: `snps/snps_summary.tsv`
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
    102478      5444912        4526401        38190009     356763         273537        0.831            8.437
    ```
 
-- `{species_id}.snps.tsv.lz4`: per-species pileup results
+- Per-species pileup results: `snps/{species_id}.snps.tsv.lz4`
 
    ```
    ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
@@ -186,36 +190,36 @@ Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayf
 
 ## Pangenome profiling
 
-To quantify the pangenome genes presence/absence for the species(es) of interest in the mNGS data, reads were aligned to the all the centroid_99 genes per species, and gene copy number are estimated.
+To quantify the pangenome genes presence/absence for the species of interest in the shotgun metagenomics sequencing data, reads were aligned to all the centroid_99 genes per species, and gene copy number are estimated.
 
-Similar to above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) for each gene, aligned reads, mapped reads, read depths and gene length are computed; (2) (after collecting reads alignment information) for all the genes for one species, compute the read depths of the 15 single copy marker genes; (3) for each gene, infer the copy number. 
+Similar to the above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) For each gene, collect read alignments based metrics, such as `aligned_reads`, `mapped_reads`, `read_depths` and `gene_length` were computed; (2) For all the genes for given species, compute the average read depths of the 15 single copy marker genes; (3) For each gene, infer the copy number compared to the SGC marker gene vertical coverage. 
 
 ### Example command
 
-- Profile pangenome for given species, if their mean vertical genome coverage higher than 10X (need to run midas_run_species before). 
+- Profile pangenome for given species, if their average vertical genome coverage higher than 10X (need to run midas_run_species beforehand). 
 
    ```
    python -m iggtools midas_run_genes --sample_name ${sample_name} \
-          -1 $R1 -2 $R2 --marker_depth 10 --num_cores 8 \
+          -1 ${R1} -2 ${R2} --marker_depth 10 --num_cores 8 \
           --species_list 100044,101302,102478 \
-          /path/to/midas/output
+          ${midas_outdir}
    ```
 
-### Target output files
+### Genes flow output files
 
-- `genes_summary.tsv`
+- `genes/genes_summary.tsv`
 
    ```
    species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
    102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
    ```
 
-- `{species_id}.genes.tsv.lz4`: 
+- `genes/{species_id}.genes.tsv.lz4`: 
 
    ```
    gene_id              count_reads     coverage        copy_number
    UHGG239769_04714     22              0.571323        0.000000
-   UHGG050950_03155     7               0.182088        0.000000
+   UHGG050950_03155     7               0.182088        0.100000
    ```
 
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
