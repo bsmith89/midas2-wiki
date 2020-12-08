@@ -77,7 +77,7 @@ To explore within-species variations for the species present in the sample data,
 
 - **Bowtie2 indexes options**
 
-  In addition to the original MIDAS's approach of on-the-fly build the Bowtie2 database for species in the restricted species profile, uses can also provide a prebuilt Bowtie2 indexes, e.g. one Bowtie2 database for all the samples in one study. Given the following three considerations:
+  In addition to the original MIDAS's approach of on-the-fly build the Bowtie2 database for species in the restricted species profile, uses can also provide a prebuilt Bowtie2 indexes, e.g. one Bowtie2 database for all the samples in one study, or a Bowtie2 database for one particular species across samples. Given the following three considerations:
 
     1. Despite the limitation to only abundant species to each sample, build bowtie2 indexes still takes significant amount of CPU time.
     2. For samples from the same study, the microbiome compositions are more or less similar.
