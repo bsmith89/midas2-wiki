@@ -92,33 +92,36 @@ To explore within-species variations for the species present in the sample data,
 - **Q & A**
 
   1. What if I want to choose a different set representative genomes for given species.
+     
      Ans: you can modify the table-of-content `genomes.tsv` accordingly.
 
   2. Can I do variant calling for genomes/species not in the UHGG, using the `midas_run_snps`script?
-     Ans: Yes. User can build a `mock-midas-iggdb` by following the same file structures. For example, given a set of genomes that you want to perform SNP calling. 
+     
+     Ans: Yes. User can build a `custom_midas_iggdb` by following the same file structures. For example, given a set of genomes that you want to perform SNP calling. 
 
-  First, generate the `${mock_midas_iggdb}/genomes.tsv` in the desired format:
+     First, generate the `${custom_midas_iggdb}/genomes.tsv` in the desired format:
 
-  ```
-  genome            species representative          genome_is_representative
-  GUT_GENOME091053  100001  GUT_GENOME091053        1
-  GUT_GENOME212267  100002  GUT_GENOME212267        1
-  GUT_GENOME178957  100003  GUT_GENOME178957        1
-  ```
+     ```
+     genome            species representative          genome_is_representative
+     GUT_GENOME091053  100001  GUT_GENOME091053        1
+     GUT_GENOME212267  100002  GUT_GENOME212267        1
+     GUT_GENOME178957  100003  GUT_GENOME178957        1
+     ```
 
-  Secondly, set up the representative genomes in the following structure:
+     Secondly, set up the representative genomes in the following structure:
 
-  ```
-  # cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
-  ${mock_midas_iggdb}/cleaned_imports/100001/GUT_GENOME091053/GUT_GENOME091053.fna.lz4
-  ${mock_midas_iggdb}/cleaned_imports/100002/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
-  ${mock_midas_iggdb}/cleaned_imports/100003/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
-  ```
+     ```
+     ${custom_midas_iggdb}/cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
+     ${custom_midas_iggdb}/cleaned_imports/100001/GUT_GENOME091053/GUT_GENOME091053.fna.lz4
+     ${custom_midas_iggdb}/cleaned_imports/100002/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
+     ${custom_midas_iggdb}/cleaned_imports/100003/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
+     ```
 
-  Then provide the `${mock_midas_iggdb}` to midas_run_snps by --midas_iggdb.  
+     Then provide the `${custom_midas_iggdb}` to `midas_run_snps` by `--midas_iggdb`.  
 
-  3. When provide midas_run_snps and midas_run_genes with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), MIDAS also needs to know what species were being included during the database build step (`--prebuilt_bowtie2_species`).  
-MIDAS will only perform pileup on abundant species that passing the `--marker_depth`. When the provided species of interest (`--species_list`) don't pass the marker_depth filter, or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform pileup analysis on those species, even if it is provided by `--species_list`.
+  3. When provide `midas_run_snps` and `midas_run_genes` with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), users also need to provide `--prebuilt_bowtie2_species` to specify what species were being included during the database build step.  
+
+  4. MIDAS only perform pileup-based variant calling on abundant species that passing the `--marker_depth`. When the provided species of interest (`--species_list`) don't pass the marker_depth filter, and / or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform SNPs calling on those species.
 
   
 ### Example command
