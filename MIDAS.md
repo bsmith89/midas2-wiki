@@ -83,7 +83,7 @@ To explore within-species variations for the species present in the sample data,
     2. For samples from the same study, the microbiome compositions are more or less similar.
     3. Given the multi-mapped reads issues between similar genomes in the Bowtie2 database, per-sample Bowtie2 indexes may cause bias for the pooled-sample core-genome SNP calling.
 
- Note: we still parse the pileup for abundance species present in each sample, selected by `genome_coverage`.
+  Despite the species present in varying Bowtie2 database, we only parse the Pileup results for abundant species in the sample, selected by `genome_coverage`.
 
 - **Chunk-of-sites** 
 
