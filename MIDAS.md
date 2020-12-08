@@ -71,7 +71,7 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
 Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for details.
 
 
-## Call single nucleotide polymorphisms
+## Single nucleotide polymorphisms calling
 
 To explore within-species variations for the species present in the sample data, metagenomics shotgun reads were aligned to a Bowtie2 indexes of a collection of representative genomes; nucleotide variation for each genomic site was quantify via pileup and alleles count. 
 
