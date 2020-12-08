@@ -24,11 +24,11 @@ midas_iggdb                                     DB-related files    Mirror s3://
 {sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Gene coverage per species_id
 ```
 
-Each sample analysis subcommand operates on a single sample. It takes as a parameter the path to MIDAS results root directory and a parameter for the sample name; together constitute the unique output directory for that sample.
+Each sample analysis subcommand operates on a single sample. It takes as a parameter the path to MIDAS results root directory (`midas_outdir`) and a parameter for the sample name (`sample_name`); together constitute the unique output directory for that sample.
 
 - `{output_dir}`: output directory unique for the sample, i.e., `{midas_outdir}/{sample_name}`
 
-The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory if it does not exist.  All subsequent analysis steps operate within that directory.
+The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory `output_dir` if it does not exist.  All subsequent analysis steps operate within that directory.
 
 # Single-sample analysis
 
