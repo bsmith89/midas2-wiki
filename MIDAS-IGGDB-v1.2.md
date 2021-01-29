@@ -16,10 +16,10 @@ Need to create `marker_centroids` under the `marker_genes` folder, inside which 
 
 ## Representative Genomes Database
 
-Rename the FASTA file into `{species_id}/{genome_id}/{genome_id}.fna`
+Rename the FASTA file into `{species_id}/{genome_id}/{genome_id}.fna`. Generate the `{genome_id}.ffn` for all the genes per rep genome.
 
 ## Pan Genomes Database
 
-We need `centorids.ffn` and `gene_info.txt`. 
+We need `centorids.ffn` and `gene_info.txt`.
 
 
