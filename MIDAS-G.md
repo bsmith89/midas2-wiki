@@ -15,8 +15,8 @@ Output                                          Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
 midas_iggdb                                     DB-related files    Mirror s3://miocriombe-igg/2.0/
 
-{sample_name}/species/species_profile.tsv       midas_run_species   List of abundant species in sample
-{sample_name}/species/markers_profile.tsv       midas_run_species   List of abundant species in sample
+{sample_name}/species/species_profile.tsv       midas_run_species   List of species present in sample
+{sample_name}/species/markers_profile.tsv       midas_run_species   Marker abundance for each species_id
 
 {sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of the SNPs analysis results
 {sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Pileup results for each species_id
@@ -29,7 +29,8 @@ Each sample analysis subcommand operates on a single sample. It takes as a param
 
 - `{output_dir}`: output directory unique for the sample, i.e., `{midas_outdir}/{sample_name}`
 
-The first subcommand to run for the sample is `midas_run_species`, and it will create that output directory `output_dir` if it does not exist.  All subsequent analysis steps operate within that directory.
+The first subcommand to run for the sample is `midas_run_species`, to report species present in the sample that we can genotype in the `midas_run_snps` flow.. This command will create the output directory `output_dir` if it does not exist.  All subsequent analysis steps operate within that directory.
+
 
 # Single-sample analysis
 
@@ -39,13 +40,21 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
 {output_dir}
  |- species
  |- snps
+    |- snps_summary.tsv 
+    |- {species_id}.snps.tsv.lz4
  |- genes
+    |- genes_summary.tsv 
+    |- {species_id}.genes.tsv.lz4
  |- temp
- |  |- snps/repgenomes.bam
- |  |- genes/pangenome.bam
+    |- snps
+       |- repgenomes.bam
+       |- {species_id}/snps_XX.tsv
+    |- genes
+       |- pangenome.bam
+       |- {species_id}/genes_XX.tsv
  |- bt2_indexes
- |  |- snps/repgenomes.*
- |  |- genes/pangenomes.*
+    |- snps/repgenomes.*
+    |- genes/pangenomes.*
 ```
 
 ## Species abundance estimation
@@ -54,22 +63,32 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
 
   ```
   python -m iggtools midas_run_species \
-         --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-         --midas_iggdb /path/to/local/midas/iggdb --num_cores 4 --debug \
-         $midas_outdir
+         --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
+         --midas_iggdb /path/to/local/midas/iggdb --num_cores 8 --debug \
+         ${midas_outdir}
   ```
 
 ### Species flow output files
 
-- `species/species_profile.tsv`: species present in the sample (`coverage` > 0), sorted in decreasing relative abundance. 
+The goal of the species flow is to detect abundant species present in the sample, which can be genotyped later. We mapped the raw reads to 15 single copy Phyeco marker genes using `hs-blastn`. We computed the uniquely mapped read counts for each marker genes, and probabilistically assign the ambiguous reads to marker genes. The coverage of each marker gene is computed as the total alignment length over the marker gene length. Only species with more than marker genes covered by more than two reads are reported. We further call a species is **present** in the sample if the `median_marker_coverage` > 0.
+
+- `species_profile.tsv`: sorted in decreasing order of `median_coverage`. 
 
    ```
-   species_id    read_counts     coverage        rel_abundance
-   102455        15053           137.635         0.130
-   100044        10797           96.509          0.091
+   species_id  read_counts  median_coverage  coverage  relative_abundance total_covered_marker  unique_covered_marker  ambiguous_covered_marker  total_marker_length
+   102455      15053        120.05           137.635    0.130             15                    14                     14                        14
+   100044      10797        91.20            96.509     0.091             14                    14                     12
    ```
 
-Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for details.
+- `markers_profile.tsv`: species-by-marker 
+
+
+   ```
+   species_id  marker_id  marker_length  gene_id          total_reads  total_alnbps  coverage  uniq_reads  ambi_reads   uniq_alnbps     ambi_alnbps
+   102455      B000032    1052           195103.peg.1451  1680         2000          11.4      8200        1800         9680            2320
+   ```
+
+Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for more details.
 
 
 ## Single nucleotide polymorphisms calling
