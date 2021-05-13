@@ -16,6 +16,7 @@ Output                                          Producer            Meaning
 midas_iggdb                                     DB-related files    Mirror s3://miocriombe-igg/2.0/
 
 {sample_name}/species/species_profile.tsv       midas_run_species   List of abundant species in sample
+{sample_name}/species/markers_profile.tsv       midas_run_species   List of abundant species in sample
 
 {sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of the SNPs analysis results
 {sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Pileup results for each species_id
