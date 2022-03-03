@@ -13,6 +13,15 @@ The IGG 2.0 genomes, genome-to-species assignments, and a choice of representati
 Six-digit numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`.
 
 
+# Local Layout
+
+```
+Output                                          Producer            Meaning
+------------------------------------------------------------------------------------------------------------
+midas_iggdb                                     DB-related files    Mirror s3://miocriombe-igg/2.0/
+```
+
+
 # Target Layout in S3
 
 A table of contents listing all genomes will be located at [s3://microbiome-igg/2.0/genomes.tsv](http://microbiome-igg.s3.amazonaws.com/2.0/genomes.tsv).  It will look like
