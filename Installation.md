@@ -1,7 +1,5 @@
 
-# Installation
-
-## Install with Conda
+# Install with Conda
 
 
 Add proper channel order in the `.condarc` file, when downloading [Miniconda3](https://docs.conda.io/en/latest/miniconda.html) for the first time.
