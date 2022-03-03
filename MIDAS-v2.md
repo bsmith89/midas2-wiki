@@ -1,6 +1,6 @@
 # Metagenomic Intra-Species Diversity Analysis Subcommands
 
-The original [MIDAS tool](https://github.com/snayfach/MIDAS) is an integrated pipeline for estimating bacterial species abundance and strain-level genomic variation, including pan-gene content and SNPs analysis.   Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes.
+[MIDAS](https://genome.cshlp.org/content/26/11/1612) is an integrated pipeline for profiling strain-level genomic and functional variation for metagenomics data. Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes (MIDAS DB v1.2).
 
 The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive UHGG dataset, which consists of 4,644 gut-only species extracted from 286,997 genomes.
 
