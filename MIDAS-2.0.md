@@ -1,6 +1,6 @@
 # Metagenomic Intra-Species Diversity Analysis Subcommands
 
-[MIDAS](https://genome.cshlp.org/content/26/11/1612) is an integrated pipeline for profiling strain-level genomic and functional variation for metagenomics data. Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes (MIDAS DB v1.2).
+[MIDAS](https://genome.cshlp.org/content/26/11/1612) is an integrated pipeline for profiling strain-level genomic and functional variation for metagenomic data. Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes (MIDAS DB v1.2).
 
 The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive MIDAS DB, in a fast and scalable manner.
 
@@ -8,63 +8,95 @@ The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of th
 Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place. The construction step for the [UHGG1.0 catalogue](https://www.ebi.ac.uk/metagenomics/genome-catalogues/human-gut-v2-0), which consists of 4,644 gut-only species extracted from 286,997 genomes, is documented [here](https://github.com/czbiohub/iggtools/wiki). It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  This page is focused specifically on the analysis steps, not the database construction steps.  MIDAS users can build custom databases for any collections of genomes.
 
 
-# Recap of MIDAS
+# MIDAS Results Layout
 
-There are three modules of MIDAS pipeline: Species, SNPs, Genes. Each module have two workflows: single-sample and across-samples. 
+MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its scope ranges from building custom MIDAS databases, species profiling, reads alignment, post-alignment filter, to strain-level metagenotyping and pan-gene abundance profiling. There are three modules of MIDAS pipeline: Species, SNPs, Genes. Each module have two workflows: single-sample and across-samples. 
 
+[insert a figure here.]
 
-# Single-sample result layout
+## Single-sample Results Layout
 
-For each sample, the analysis begins with a species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and representative genome SNP analysis.  The results of all three steps are laid out in the local filesystem as follows.
+Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile functional abundance in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory.
+
 
 ```
 Output                                          Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
-midas_iggdb                                     DB-related files    Mirror s3://miocriombe-igg/2.0/
+{sample_name}/species/species_profile.tsv       midas_run_species   Summary of species coverage
+{sample_name}/species/markers_profile.tsv       midas_run_species   Per species marker coverage
 
-{sample_name}/species/species_profile.tsv       midas_run_species   List of species present in sample
-{sample_name}/species/markers_profile.tsv       midas_run_species   Marker abundance for each species_id
 
-{sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of the SNPs analysis results
-{sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Pileup results for each species_id
+{sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of reads mapping to rep-genome
+{sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Per species pileups
 
-{sample_name}/genes/genes_summary.tsv           midas_run_genes     Pangenome alignment stats
-{sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Gene coverage per species_id
+
+{sample_name}/genes/genes_summary.tsv           midas_run_genes     Summary of reads mapping to pan-geneme
+{sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Per species pan-gene coverage
 ```
 
-Each sample analysis subcommand operates on a single sample. It takes as a parameter the path to MIDAS results root directory (`midas_outdir`) and a parameter for the sample name (`sample_name`); together constitute the unique output directory for that sample.
+## Across-samples Results Layout
 
-- `{output_dir}`: output directory unique for the sample, i.e., `{midas_outdir}/{sample_name}`
+For a collection of samples, population SNPs and functional abundance can be computed using the corresponding subcommands `midas_merge_snps` and `midas_merge_genes`.  The result layout for those looks as follows:
 
-The first subcommand to run for the sample is `midas_run_species`, to report species present in the sample that we can genotype in the `midas_run_snps` flow.. This command will create the output directory `output_dir` if it does not exist.  All subsequent analysis steps operate within that directory.
+```
+Output                                      Producer             Meaning
+-----------------------------------------------------------------------------------------------------------
+species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
+species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
+species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
+species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
 
+
+snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
+snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
+snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
+snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
+
+
+genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
+genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
+genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
+genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
+```
+
+
+
+### Example Output Directory
+
+Here is an example of layout of the results of all three single-sample modules in the local filesystem.
+
+```
+{midas_output/sample1}
+  |- species
+     |- species_profile.tsv
+     |- markers_profile.tsv
+  |- snps
+     |- snps_summary.tsv 
+     |- {species_id}.snps.tsv.lz4
+  |- genes
+     |- genes_summary.tsv 
+     |- {species_id}.genes.tsv.lz4
+  |- temp
+     |- snps
+        |- repgenomes.bam
+        |- {species_id}/snps_XX.tsv.lz4
+     |- genes
+        |- pangenome.bam
+        |- {species_id}/genes_XX.tsv.lz4
+  |- bt2_indexes
+     |- snps/repgenomes.*
+     |- genes/pangenomes.*
+```
 
 # Single-sample analysis
 
-Multiple steps analysis happen for each sample, which usually happen in the following order.
-
-```
-{output_dir}
- |- species
- |- snps
-    |- snps_summary.tsv 
-    |- {species_id}.snps.tsv.lz4
- |- genes
-    |- genes_summary.tsv 
-    |- {species_id}.genes.tsv.lz4
- |- temp
-    |- snps
-       |- repgenomes.bam
-       |- {species_id}/snps_XX.tsv
-    |- genes
-       |- pangenome.bam
-       |- {species_id}/genes_XX.tsv
- |- bt2_indexes
-    |- snps/repgenomes.*
-    |- genes/pangenomes.*
-```
-
 ## Species abundance estimation
+
+For each sample, the analysis begins with a simple species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and representative genome SNP analysis.  
+
+
+The goal of the species flow is to detect abundant species present in the sample, which can be genotyped later. 
+
 
 ### Example command
 
@@ -77,7 +109,7 @@ Multiple steps analysis happen for each sample, which usually happen in the foll
 
 ### Species flow output files
 
-The goal of the species flow is to detect abundant species present in the sample, which can be genotyped later. We mapped the raw reads to 15 single copy Phyeco marker genes using `hs-blastn`. We computed the uniquely mapped read counts for each marker genes, and probabilistically assign the ambiguous reads to marker genes. The coverage of each marker gene is computed as the total alignment length over the marker gene length. Only species with more than marker genes covered by more than two reads are reported. We further call a species is **present** in the sample if the `median_marker_coverage` > 0.
+We mapped the raw reads to 15 single copy Phyeco marker genes using `hs-blastn`. We computed the uniquely mapped read counts for each marker genes, and probabilistically assign the ambiguous reads to marker genes. The coverage of each marker gene is computed as the total alignment length over the marker gene length. Only species with more than marker genes covered by more than two reads are reported. We further call a species is **present** in the sample if the `median_marker_coverage` > 0.
 
 - `species_profile.tsv`: sorted in decreasing order of `median_coverage`. 
 
@@ -281,28 +313,6 @@ The merged output files are structured as following:
 
 # Pooled samples results layout
 
-Results for multiple samples can be pooled using the corresponding subcommands `midas_merge_species`, `midas_merge_genes`, and `midas_merge_snps`.  The result layout for those looks as follows:
-
-```
-Output                                      Producer             Meaning
------------------------------------------------------------------------------------------------------------
-species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
-species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
-species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
-species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
-
-
-snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
-snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
-snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
-snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
-
-
-genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
-genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
-genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
-genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
-```
 
 
 ## Merge species abundance profile
