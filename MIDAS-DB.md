@@ -1,3 +1,7 @@
+This page is still under development
+
+***
+
 # Integrated Gut Genome Tools
 
 A collection of 286,997 genomes assembled from metagenomes, isolates and single cells from human stool samples has been clustered into 4,644 species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as [IGGdb 2.0](http://ftp.ebi.ac.uk/pub/databases/metagenomics/mgnify_genomes/human-gut/v1.0/), IGG 2.0, IGG+, or simply IGG.  Perhaps the most important difference with respect to the original IGGdb 1.0 is that this new collection contains only gut genomes.
