@@ -16,22 +16,32 @@ MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its sc
 
 ## Single-sample Results Layout
 
-Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile functional abundance in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory.
-
+Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile functional abundance in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory. Here is an example of layout of the results of all three single-sample modules in the local filesystem.
 
 ```
 Output                                          Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
-{sample_name}/species/species_profile.tsv       midas_run_species   Summary of species coverage
-{sample_name}/species/markers_profile.tsv       midas_run_species   Per species marker coverage
-
-
-{sample_name}/snps/snps_summary.tsv             midas_run_snps      Summary of reads mapping to rep-genome
-{sample_name}/snps/{species_id}.snps.tsv.lz4    midas_run_snps      Per species pileups
-
-
-{sample_name}/genes/genes_summary.tsv           midas_run_genes     Summary of reads mapping to pan-geneme
-{sample_name}/genes/{species_id}.genes.tsv.lz4  midas_run_genes     Per species pan-gene coverage
+{midas_output}/{sample_name}
+  |- species
+     |- species_profile.tsv                     midas_run_species   Summary of species coverage
+     |- markers_profile.tsv                     midas_run_species   Per species marker coverage
+  |- snps
+     |- snps_summary.tsv                        midas_run_snps      Summary of reads mapping to rep-genome
+     |- {species}.snps.tsv.lz4                  midas_run_snps      Per species pileups
+  |- genes 
+     |- genes_summary.tsv                       midas_run_genes     Summary of reads mapping to pan-geneme
+     |- {species}.genes.tsv.lz4                 midas_run_genes     Per species pan-gene coverage
+ 
+ |- temp                                                            Temporary Files
+     |- snps
+        |- repgenomes.bam
+        |- {species}/snps_XX.tsv.lz4
+     |- genes
+        |- pangenome.bam
+        |- {species}/genes_XX.tsv.lz4
+  |- bt2_indexes                                                    Sample-specific genome database
+     |- snps/repgenomes.*
+     |- genes/pangenomes.*
 ```
 
 ## Across-samples Results Layout
@@ -39,84 +49,62 @@ Output                                          Producer            Meaning
 For a collection of samples, population SNPs and functional abundance can be computed using the corresponding subcommands `midas_merge_snps` and `midas_merge_genes`.  The result layout for those looks as follows:
 
 ```
-Output                                      Producer             Meaning
+Output                                          Producer             Meaning
 -----------------------------------------------------------------------------------------------------------
-species/species_prevalence.tsv              midas_merge_species  Summary statistics per species across samples
-species/species_read_counts.tsv             midas_merge_species  Species-by-sample read counts matrix
-species/species_coverage.tsv                midas_merge_species  Species-by-sample genome coverage matrix
-species/species_rel_abundance.tsv           midas_merge_species  Species-by-sample relative abundance matrix
+species
+  |- species_prevalence.tsv                     midas_merge_species  Per species summary statistics across samples
+  |- species/species_read_counts.tsv            midas_merge_species  Species-by-sample read counts matrix
+  |- species/species_coverage.tsv               midas_merge_species  Species-by-sample marker coverage matrix
+  |- species/species_rel_abundance.tsv          midas_merge_species  Species-by-sample relative abundance matrix
 
 
-snps/snps_summary.tsv                        midas_merge_snps     Alignment summary statistics per sample
-snps/{sp_id}/{sp_id}.snps_info.tsv.lz4       midas_merge_snps     Per species metadata for genomic sites.
-snps/{sp_id}/{sp_id}.snps_freqs.tsv.lz4      midas_merge_snps     Per species site-by-sample MAF matrix
-snps/{sp_id}/{sp_id}.snps_depth.tsv.lz4      midas_merge_snps     Per species site-by-sample read depth matrix
+snps
+  |- snps_summary.tsv                           midas_merge_snps     Alignment summary statistics per sample
+  |- {species}/{species}.snps_info.tsv.lz4      midas_merge_snps     Per species metadata for genomic sites.
+  |- {species}/{species}.snps_freqs.tsv.lz4     midas_merge_snps     Per species site-by-sample MAF matrix
+  |- {species}/{species}.snps_depth.tsv.lz4     midas_merge_snps     Per species site-by-sample read depth matrix
 
 
-genes/genes_summary.tsv                      midas_run_genes      Alignment summary statistics per sample
-genes/{sp_id}/{sp_id}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
-genes/{sp_id}/{sp_id}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
-genes/{sp_id}/{sp_id}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
+genes
+  |- genes_summary.tsv                          midas_run_genes      Alignment summary statistics per sample
+  |- {species}/{species}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
+  |- {species}/{species}.genes_copynum.tsv.lz4  midas_run_genes      Per species gene-by-sample copy number matrix
+  |- {species}/{species}.genes_depth.tsv.lz4    midas_run_genes      Per species gene-by-sample read depth matrix
 ```
 
 
+# Single-sample Analysis
 
-### Example Output Directory
+## Species Abundance Estimation
 
-Here is an example of layout of the results of all three single-sample modules in the local filesystem.
+For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). 
 
-```
-{midas_output/sample1}
-  |- species
-     |- species_profile.tsv
-     |- markers_profile.tsv
-  |- snps
-     |- snps_summary.tsv 
-     |- {species_id}.snps.tsv.lz4
-  |- genes
-     |- genes_summary.tsv 
-     |- {species_id}.genes.tsv.lz4
-  |- temp
-     |- snps
-        |- repgenomes.bam
-        |- {species_id}/snps_XX.tsv.lz4
-     |- genes
-        |- pangenome.bam
-        |- {species_id}/genes_XX.tsv.lz4
-  |- bt2_indexes
-     |- snps/repgenomes.*
-     |- genes/pangenomes.*
-```
-
-# Single-sample analysis
-
-## Species abundance estimation
-
-For each sample, the analysis begins with a simple species profiling step.  The identified set of species that are abundant in the sample is then used to perform pan-genome analysis and representative genome SNP analysis.  
-
-
-The goal of the species flow is to detect abundant species present in the sample, which can be genotyped later. 
-
+We mapped the raw metagenomic reads to 15 universal single copy genes (SCGs). We computed the uniquely mapped read counts for each marker gene, and probabilistically assigned the ambiguous reads to marker genes. The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. Users can all a species **present* in the sample based on `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5.
 
 ### Example command
 
   ```
   python -m iggtools midas_run_species \
          --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
-         --midas_iggdb /path/to/local/midas/iggdb --num_cores 8 --debug \
-         ${midas_outdir}
+         --midasdb_name uhgg --midasdb_dir /path/to/local/midas_db \
+         --num_cores 8 --debug ${midas_outdir}
   ```
 
-### Species flow output files
-
-We mapped the raw reads to 15 single copy Phyeco marker genes using `hs-blastn`. We computed the uniquely mapped read counts for each marker genes, and probabilistically assign the ambiguous reads to marker genes. The coverage of each marker gene is computed as the total alignment length over the marker gene length. Only species with more than marker genes covered by more than two reads are reported. We further call a species is **present** in the sample if the `median_marker_coverage` > 0.
+### Output files
 
 - `species_profile.tsv`: sorted in decreasing order of `median_coverage`. 
 
    ```
-   species_id  read_counts  median_coverage  coverage  relative_abundance total_covered_marker  unique_covered_marker  ambiguous_covered_marker  total_marker_length
-   102455      15053        120.05           137.635    0.130             15                    14                     14                        14
-   100044      10797        91.20            96.509     0.091             14                    14                     12
+   species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_relative_abundance total_covered_marker  unique_covered_marker  ambiguous_covered_marker  total_marker_counts  unique_fraction_covered  total_marker_length
+   102470      329                 3.53                    4.16             0.54                      15                    15                     515                        1.00.      9870     
+   100039      199                 3.45                    2.45             0.32                      11                    11                     15.   0.733333.    10095
+
+
+
+species_id	marker_read_counts	median_marker_coverage	marker_coverage marker_relative_abundance	total_covered_marker	unique_covered_marker	ambiguous_covered_marker	total_marker_counts	unique_fraction_covered	total_marker_length
+102470	329	3.532847	4.160993	0.538860	15	15	515	1.000000	9870
+100039	199	3.455367	2.445567	0.316707	11	11	15	0.733333	10095
+
    ```
 
 - `markers_profile.tsv`: species-by-marker 
