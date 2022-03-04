@@ -8,6 +8,9 @@ The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of th
 Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place. The construction step for the [UHGG1.0 catalogue](https://www.ebi.ac.uk/metagenomics/genome-catalogues/human-gut-v2-0), which consists of 4,644 gut-only species extracted from 286,997 genomes, is documented [here](https://github.com/czbiohub/iggtools/wiki). It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  This page is focused specifically on the analysis steps, not the database construction steps.  MIDAS users can build custom databases for any collections of genomes.
 
 
+
+***
+
 # MIDAS Results Layout
 
 MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its scope ranges from building custom MIDAS databases, species profiling, reads alignment, post-alignment filter, to strain-level metagenotyping and pan-gene abundance profiling. There are three modules of MIDAS pipeline: Species, SNPs, Genes. Each module have two workflows: single-sample and across-samples. 
@@ -69,18 +72,20 @@ genes
 ```
 
 
+***
+
 # Single-sample Analysis
 
 ## Species Abundance Estimation
 
-For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). Raw metagenomic reads were mapped to the 15 universal single copy genes (SCGs). And for each marker gene, uniquely mapped read counts were computed, and ambiguous reads were probabilistically assigned.  The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. Users can all a species **present* in the sample based on `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5.
+For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). Raw metagenomic reads were mapped to the 15 universal single copy genes (SCGs). And for each marker gene, uniquely mapped read counts were computed, and ambiguous reads were probabilistically assigned.  The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. 
 
 ### Example command
 
   ```
   python -m iggtools midas_run_species \
          --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midas_db \
+         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
          --num_cores 8 --debug ${midas_outdir}
   ```
 
@@ -94,7 +99,7 @@ For each sample, the analysis begins with a simple species profiling. The goal o
    100039      199                 3.45                    2.45             0.32                       11                    11                     0                         15                   0.73                     10095
    ```
 
-- `markers_profile.tsv`: species-by-marker 
+- `markers_profile.tsv`: species-by-marker coverage matrix
 
 
    ```
@@ -106,124 +111,102 @@ For each sample, the analysis begins with a simple species profiling. The goal o
 Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for more details.
 
 
-## Single nucleotide polymorphisms calling
+## Single Nucleotide Polymorphisms (SNPs) calling
 
-To explore within-species variations for the species present in the sample data, metagenomics shotgun reads were aligned to a Bowtie2 indexes of a collection of representative genomes; nucleotide variation for each genomic site was quantify via pileup and alleles count. 
+Only species passing the user specific filter based on the above mentioned Species module would be genotyped. The default species selection filter parameter is set to detect abundant species in the sample. Users can select the parameters to suit the purpose of their research: if the purpose to genotype low abundant species, we suggested loosen the parameters to `median_marker_coverage` > 0. 
 
-- **Bowtie2 indexes options**
+To explore within-species variations for the species present in the sample data, raw metagenomic reads were aligned to the sample-specific genome databases. Nucleotide variation for each genomic site was then quantified via pileup and alleles count. Reads mapping summary for all the species in the rep-genome database were reported in the per-sample snps summary file. MIDAS doesn't apply any more filters based on the reads mapping at this stage.
 
-  In addition to the original MIDAS's approach of on-the-fly build the Bowtie2 database for species in the restricted species profile, uses can also provide a prebuilt Bowtie2 indexes, e.g. one Bowtie2 database for all the samples in one study, or a Bowtie2 database for one particular species across samples. Given the following three considerations:
 
-    1. Despite the limitation to only abundant species to each sample, build bowtie2 indexes still takes significant amount of CPU time.
-    2. For samples from the same study, the microbiome compositions are more or less similar.
-    3. Given the multi-mapped reads issues between similar genomes in the Bowtie2 database, per-sample Bowtie2 indexes may cause bias for the pooled-sample core-genome SNP calling.
-
-  Despite the species present in varying Bowtie2 database, we only parse the Pileup results for abundant species in the sample, selected by `genome_coverage`.
-
-- **Chunk-of-sites** 
-
-  One chunk-of-sites is indexed by `species_id, chunk_id`, represents `contig_end - contig_start` number of sites for one `contig_id`. For each chunk, pileup counts, mapped reads and aligned reads were computed independently. Chunks were computed in parallel. When all chunks from the same species are processed, the per-chunk pileup results are merged into one pileup file per species (`{species_id}.snps.tsv.lz4`) which avoid the explosion of intermediate files.
-
-- **Q & A**
-
-  1. What if I want to choose a different set representative genomes for given species.
-     
-     Ans: you can modify the table-of-content `genomes.tsv` accordingly.
-
-  2. Can I do variant calling for genomes/species not in the UHGG, using the `midas_run_snps`script?
-     
-     Ans: Yes. User can build a `custom_midas_iggdb` by following the same file structures. For example, given a set of genomes that you want to perform SNP calling. 
-
-     First, generate the `${custom_midas_iggdb}/genomes.tsv` in the desired format:
-
-     ```
-     genome            species representative          genome_is_representative
-     GUT_GENOME091053  100001  GUT_GENOME091053        1
-     GUT_GENOME212267  100002  GUT_GENOME212267        1
-     GUT_GENOME178957  100003  GUT_GENOME178957        1
-     ```
-
-     Secondly, set up the representative genomes in the following structure:
-
-     ```
-     ${custom_midas_iggdb}/cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
-     ${custom_midas_iggdb}/cleaned_imports/100001/GUT_GENOME091053/GUT_GENOME091053.fna.lz4
-     ${custom_midas_iggdb}/cleaned_imports/100002/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
-     ${custom_midas_iggdb}/cleaned_imports/100003/GUT_GENOME212267/GUT_GENOME212267.fna.lz4
-     ```
-
-     Then provide the `${custom_midas_iggdb}` to `midas_run_snps` by `--midas_iggdb`.  
-
-  3. When provide `midas_run_snps` and `midas_run_genes` with existing Bowtie2 indexes (`--prebuilt_bowtie2_indexes`), users also need to provide `--prebuilt_bowtie2_species` to specify what species were being included during the database build step.  
-
-  4. MIDAS only perform pileup-based variant calling on abundant species that passing the `--marker_depth`. When the provided species of interest (`--species_list`) don't pass the marker_depth filter, and / or not present in the prebuilt_bowtie2_indexes, then MIDAS won't perform SNPs calling on those species.
-
-  
 ### Example command
 
-- Perform Pileup for all the species with average vertical genome coverage (todo a more accurate way should be average sgc marker gene vertical coverage) higher than 10X (need to run `midas_run_species beforehand`). 
 
-   ```
-   python -m iggtools midas_run_species --sample_name ${sample_name} \
-          -1 ${R1} -2 ${R2} --num_cores 4 ${midas_outdir}
-
-   python -m iggtools midas_run_snps --sample_name ${sample_name} \
-          -1 ${R1} -2 ${R2} --marker_depth 10 --num_cores 8 ${midas_outdir}
-   ```
-
-   The following would happen: (1) build per-sample Bowtie2 indexes with all the species (`marker_depth` > 10) (2) align reads to per-sample Bowtie2 indexes (3) pileup and SNPs calling
-
-
-- Perform Pileup for all the species with average vertical genome coverage higher than 10X, and using existing Bowtie2 databases.
+- Perform Pileup for all the species in the restricted species profile: `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5
    
    ```
    python -m iggtools midas_run_snps --sample_name ${sample_name} \
           -1 ${R1} -2 ${R2} --num_cores 8 --marker_depth 10 \
-          --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
-          --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
+         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
+         --num_cores 12 \
+         --select_by median_marker_coverage,unique_fraction_covered \
+         --select_threshold=2,0.5 \
+         --fragment_length 1000 \
           ${midas_outdir}
     ```
 
-- Special usage of `marker_depth`
+- Genotyping with Prebuilt Genome Database
 
-  1. `--marker_depth=-1`: skip running species flow and perform pileup for all the species in the Bowtie2 indexes. Use with caution, only when you know exactly what you want to do.  
-
-  2. `--marker_depth 0`: perform pileup for all the species present in the given sample, computed from the `midas_run_species` flow.
-
-
-- Variant calling for custom-midas-iggdb
+  `--select_threshold=-1`: skip the Species module and pileup for all the species in a prebuilt Bowtie2 genome databases. Use with caution, only when you know exactly what you want to do.  
 
    ```
    python -m iggtools midas_run_snps --sample_name ${sample_name} \
           -1 $R1 -2 $R2 \
-          --midas_iggdb ${custom_midas_iggdb} \
+          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-          --marker_depth=-1 --num_cores 8 ${midas_outdir}
+          --select_threshold=-1 --num_cores 8 ${midas_outdir}
    ``` 
 
-### SNPs flow output files
 
-- Pileup summary: `snps/snps_summary.tsv`
+### Output files
+
+- Reads mapping and Pileup summary: `snps_summary.tsv`
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered mean_coverage
-   102478      5444912        4526401        38190009     356763         273537        0.831            8.437
+   102470      5774847        4379800        23295116     213486         202365        0.758            5.319
+   100039      2852528        1764680        25765375     225417         224630        0.619            14.601
    ```
 
-- Per-species pileup results: `snps/{species_id}.snps.tsv.lz4`
+- Per-species Pileup results: `{species}.snps.tsv.lz4`
 
    ```
-   ref_id                          ref_pos ref_allele      depth   count_a count_c count_g count_t
-   UHGG143505_C0_L5444.9k_H7fb7ad  44696   A               9       9       0       0       0
-   UHGG143505_C0_L5444.9k_H7fb7ad  44697   A               9       9       0       0       0
-   UHGG143505_C0_L5444.9k_H7fb7ad  44698   G               10      0       0       10      0
+   ref_id                    ref_pos   ref_allele  depth  count_a  count_c  count_g  count_t  major_allele  minor_allele  major_allele_freq  minor_allele_freq  allele_counts
+   gnl|Prokka|UHGG143484_2   531422    C           5       0        5       0        0        C              C            1.000              1.000              1
+   gnl|Prokka|UHGG143484_2   531423    T           6       2        0       0        4        T              A            0.667              0.333              2
+   gnl|Prokka|UHGG143484_2   531424    A           6       6        0       0        0        A              A            1.000              1.000              1
    ```
+
+### New Features
+
+- Chunkified Pileup
+
+  Single-sample Pileup was parallelized on the unit of chunk of sites, which is indexed by `species_id, chunk_id`. When all chunks from the same species finished processed, chunk-level Pileup results were then merged into species-level Pileup file (`{species}.snps.tsv.lz4`).
+
+
+- Reassign Representative Genome
+
+  Users can re-select representative genome by modifying the table of content `genomes.tsv` accordingly.
+
+- Custom MIDAS DB
+
+  This new infrastructure of MIDAS 2.0 dramatically simplifies the prior knowledge needed to build a custom MIDAS database. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species.
+
+  First, generate the `{custom_midasdb}/genomes.tsv` in the following format:
+
+     ```
+     genome            species representative          genome_is_representative
+     GUT_GENOME091053  100001  GUT_GENOME091053        1
+     GUT_GENOME091054  100001  GUT_GENOME091053        0
+     GUT_GENOME178957  100003  GUT_GENOME178957        1
+     GUT_GENOME178958  100003  GUT_GENOME178957        0
+     GUT_GENOME178959  100003  GUT_GENOME178957        0
+     ```
+
+  Second, collect all the representative genomes in the following structure:
+
+     ```
+     ${custom_midasdb}/cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
+     ${custom_midasdb}/cleaned_imports/100001/GUT_GENOME091053/GUT_GENOME091053.fna.lz4
+     ${custom_midasdb}/cleaned_imports/100003/GUT_GENOME178957/GUT_GENOME178957.fna.lz4
+     ```
+
+  Third, run `midas_run_snps` with `--midasdb_name {custom_midasdb} --midasdb_dir /path/to/midasdb_dir`.
 
 Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
 
-## Pangenome profiling
+## Pangenome Abundance Profiling
 
 To quantify the pangenome genes presence/absence for the species of interest in the shotgun metagenomics sequencing data, reads were aligned to all the centroid_99 genes per species, and gene copy number are estimated.
 
