@@ -2,7 +2,7 @@
 
 [MIDAS](https://genome.cshlp.org/content/26/11/1612) is an integrated pipeline for profiling strain-level genomic variation and gene copy number variation for metagenomic data. Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes (MIDAS DB v1.2).
 
-The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive MIDAS DB, in a fast and scalable manner.
+The MIDAS subcommands in the IGGTOOLS package represent a reimplementation of the same analysis steps as the original [MIDAS tool](https://github.com/snayfach/MIDAS), but able to operate on the more comprehensive MIDAS DB for a larger collection of samples in a fast and scalable manner.
 
 
 Similar to the original MIDAS tool, the IGGTOOLS MIDAS subcommands presuppose a database construction step has already taken place. The construction step for the [UHGG1.0 catalogue](https://www.ebi.ac.uk/metagenomics/genome-catalogues/human-gut-v2-0), which consists of 4,644 gut-only species extracted from 286,997 genomes, is documented [here](https://github.com/czbiohub/iggtools/wiki). It was executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  This page is focused specifically on the analysis steps, not the database construction steps.  MIDAS users can build custom databases for any collections of genomes.
