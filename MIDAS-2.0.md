@@ -1,4 +1,4 @@
-# Metagenomic Intra-Species Diversity Analysis Subcommands
+# Metagenomic Intra-Species Diversity Analysis 2.0
 
 [MIDAS](https://genome.cshlp.org/content/26/11/1612) is an integrated pipeline for profiling strain-level genomic and functional variation for metagenomic data. Its analyses steps are run against a database of 5,926 bacterial species extracted from 30,000 genomes (MIDAS DB v1.2).
 
