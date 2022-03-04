@@ -169,16 +169,16 @@ To explore within-species variations for the species present in the sample data,
 
 ### New Features
 
-- Chunkified Pileup
+- **Chunkified Pileup**
 
   Single-sample Pileup was parallelized on the unit of chunk of sites, which is indexed by `species_id, chunk_id`. When all chunks from the same species finished processed, chunk-level Pileup results were then merged into species-level Pileup file (`{species}.snps.tsv.lz4`).
 
 
-- Reassign Representative Genome
+- **Reassign Representative Genome**
 
   Users can re-select representative genome by modifying the table of content `genomes.tsv` accordingly.
 
-- Custom MIDAS DB
+- **Custom MIDAS DB**
 
   This new infrastructure of MIDAS 2.0 dramatically simplifies the prior knowledge needed to build a custom MIDAS database. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species.
 
@@ -203,47 +203,52 @@ To explore within-species variations for the species present in the sample data,
 
   Third, run `midas_run_snps` with `--midasdb_name {custom_midasdb} --midasdb_dir /path/to/midasdb_dir`.
 
+
 Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
 
-## Pangenome Abundance Profiling
+## Pangenome Profiling
 
-To quantify the pangenome genes presence/absence for the species of interest in the shotgun metagenomics sequencing data, reads were aligned to all the centroid_99 genes per species, and gene copy number are estimated.
+Similar with the single-sample SNPs module, only abundant species in the restricted species profile would be used to build the sample-specific pangenome database. For each species, the hierarchical compute for each chunk of genes is: (1) For each gene, compute reads alignment based metrics, e.g. `aligned_reads`, `mapped_reads`, etc; (2) For all the pan-genes, compute the average vertical coverage of the 15 universal SCGs; (3) For each gene, infer the `copy number` normalized to the SGCs coverage, and quantify the pan-gene presence/absence.
 
-Similar to the above snps flow, genes flow also adopted the prebuilt **Bowtie2 database** and **chunk-of-genes** compute schema. The hierarchical compute for each chunk-of-genes start with: (1) For each gene, collect read alignments based metrics, such as `aligned_reads`, `mapped_reads`, `read_depths` and `gene_length` were computed; (2) For all the genes for given species, compute the average read depths of the 15 single copy marker genes; (3) For each gene, infer the copy number compared to the SGC marker gene vertical coverage. 
 
 ### Example command
 
-- Profile pangenome for given species, if their average vertical genome coverage higher than 10X (need to run midas_run_species beforehand). 
-
    ```
    python -m iggtools midas_run_genes --sample_name ${sample_name} \
-          -1 ${R1} -2 ${R2} --marker_depth 10 --num_cores 8 \
-          --species_list 100044,101302,102478 \
+          -1 ${R1} -2 ${R2} --num_cores 8 --marker_depth 10 \
+          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
+          --num_cores 12 \
+          --select_by median_marker_coverage,unique_fraction_covered \
+          --select_threshold=2,0.5 \
           ${midas_outdir}
    ```
 
-### Genes flow output files
+### Output files
 
-- `genes/genes_summary.tsv`
-
-   ```
-   species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage marker_coverage aligned_reads   mapped_reads
-   102478      704500          145717         0.206837          1.212148      0.000000        1710757         1259775
-   ```
-
-- `genes/{species_id}.genes.tsv.lz4`: 
+- `genes_summary.tsv`
 
    ```
-   gene_id              count_reads     coverage        copy_number
-   UHGG239769_04714     22              0.571323        0.000000
-   UHGG050950_03155     7               0.182088        0.100000
+   species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads   marker_coverage
+   102470      87136           6122           0.070             9.519          455045         269656         0.000
+   100039      79571           2350           0.030             9.462          206684         113644         0.000
    ```
+
+- `{species_id}.genes.tsv.lz4`: 
+
+   ```
+   gene_id              gene_length  aligned_reads  mapped_reads  mean_coverage  fraction_covered  copy_number
+   UHGG001538_00384     378          42             14            10.029         0.452              0.000
+   UHGG001538_00389     474          7              4             2.214          0.454              0.000
+   ```
+
 
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
 
-# Pooled samples analysis
+***
+
+# Across-samples Analysis
 
 Iggtools MIDAS can merge single sample analysis results across multiple samples, e.g. generate species abundance matrix across samples, or perform pooled-samples core-genome SNPs calling, or merge pan-genome profiling results across samples. 
 
@@ -270,9 +275,6 @@ The merged output files are structured as following:
 - `{midas_outdir}`: output directory is provided by the user, which is the root of the layout above and below.
 
 
-# Pooled samples results layout
-
-
 
 ## Merge species abundance profile
 
@@ -286,7 +288,7 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
 
 ### Output files
 
-- `species/species_prevalence.tsv`: summary statistics for each species across samples
+- `species_prevalence.tsv`: summary statistics for each species across samples
 
    ```
    species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  prevalence
@@ -294,7 +296,7 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
    102181      0.034             0.023           38.567           27.530         2
    ```
 
-- `species/species_rel_abundance.tsv`
+- `species_rel_abundance.tsv`
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -302,7 +304,7 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
    102549       0.000       0.011   0.049
    ```
 
-- `species/species_read_counts.tsv`: species-by-samples read counts matrix
+- `species_read_counts.tsv`: species-by-samples read counts matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -310,7 +312,7 @@ User can chose to build `local_bowtie2_indexes` given the merged species profile
    102549       0.000       2           7125
    ```
 
-- `species/species_coverage.tsv`: species-by-samples genome coverage matrix
+- `species_coverage.tsv`: species-by-samples genome coverage matrix
 
    ```
    species_id   SRS011271   SRS011061   SRS011134  
@@ -334,7 +336,7 @@ Example command to build Bowtie2 database with species present in at least three
           --num_cores 8 /path/to/custom_bt2_indexes
    ```
 
-## Pooled-samples core-genome SNPs calling
+## Across-samples core-genome SNPs calling
 
 To compute the across-samples pooled SNPs for each genomic site in the representative genome, `read_counts` and `sample_counts` of A,C,G,T are accumulated across all samples. Then we computed the across-samples major alleles for each genomic site, following by collecting the corresponding read depth and allele frequency for each sample. 
 
@@ -361,7 +363,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
 
 ### Output files
 
-- `snps/snps_summary.tsv`
+- `snps_summary.tsv`
 
    ```
    species_id sample_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered  mean_coverage
@@ -369,7 +371,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
    102293     SRS011134  3612475        2706546        209982386    3175007        2683395       0.749             77.583
    ```
 
-- `snps/{species_id}/snps_info.tsv`
+- `{species_id}/snps_info.tsv`
 
    ```
    site_id                              major_allele  minor_allele sample_counts snp_type  rc_A    rc_C    rc_G    rc_T    sc_A    sc_C    sc_G    sc_T
@@ -377,7 +379,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
    UHGG047905_C0_L562.0k_H31cf56|162|C  C             A            2             bi        1       41      0       0       1       2       0       0
    ```
 
-- `snps/{species_id}/snps_freq.tsv`
+- `{species_id}/snps_freq.tsv`
 
   ```
   site_id                                 SRS011271   SRS011134
@@ -385,7 +387,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
   UHGG047905_C0_L562.0k_H31cf56|162|C     0.000       0.043
   ```
 
-- `snps/snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
+- `snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
 
   ```
   site_id                                 SRS011271   SRS011134
