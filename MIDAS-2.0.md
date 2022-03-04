@@ -56,15 +56,11 @@ species
   |- species/species_read_counts.tsv            midas_merge_species  Species-by-sample read counts matrix
   |- species/species_coverage.tsv               midas_merge_species  Species-by-sample marker coverage matrix
   |- species/species_rel_abundance.tsv          midas_merge_species  Species-by-sample relative abundance matrix
-
-
 snps
   |- snps_summary.tsv                           midas_merge_snps     Alignment summary statistics per sample
   |- {species}/{species}.snps_info.tsv.lz4      midas_merge_snps     Per species metadata for genomic sites.
   |- {species}/{species}.snps_freqs.tsv.lz4     midas_merge_snps     Per species site-by-sample MAF matrix
   |- {species}/{species}.snps_depth.tsv.lz4     midas_merge_snps     Per species site-by-sample read depth matrix
-
-
 genes
   |- genes_summary.tsv                          midas_run_genes      Alignment summary statistics per sample
   |- {species}/{species}.genes_presabs.tsv.lz4  midas_run_genes      Per species gene-by-sample pre-abs matrix
@@ -77,9 +73,7 @@ genes
 
 ## Species Abundance Estimation
 
-For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). 
-
-We mapped the raw metagenomic reads to 15 universal single copy genes (SCGs). We computed the uniquely mapped read counts for each marker gene, and probabilistically assigned the ambiguous reads to marker genes. The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. Users can all a species **present* in the sample based on `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5.
+For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). Raw metagenomic reads were mapped to the 15 universal single copy genes (SCGs). And for each marker gene, uniquely mapped read counts were computed, and ambiguous reads were probabilistically assigned.  The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. Users can all a species **present* in the sample based on `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5.
 
 ### Example command
 
@@ -95,24 +89,18 @@ We mapped the raw metagenomic reads to 15 universal single copy genes (SCGs). We
 - `species_profile.tsv`: sorted in decreasing order of `median_coverage`. 
 
    ```
-   species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_relative_abundance total_covered_marker  unique_covered_marker  ambiguous_covered_marker  total_marker_counts  unique_fraction_covered  total_marker_length
-   102470      329                 3.53                    4.16             0.54                      15                    15                     515                        1.00.      9870     
-   100039      199                 3.45                    2.45             0.32                      11                    11                     15.   0.733333.    10095
-
-
-
-species_id	marker_read_counts	median_marker_coverage	marker_coverage marker_relative_abundance	total_covered_marker	unique_covered_marker	ambiguous_covered_marker	total_marker_counts	unique_fraction_covered	total_marker_length
-102470	329	3.532847	4.160993	0.538860	15	15	515	1.000000	9870
-100039	199	3.455367	2.445567	0.316707	11	11	15	0.733333	10095
-
+   species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_relative_abundance  total_covered_marker  unique_covered_marker  ambiguous_covered_marker  total_marker_counts  unique_fraction_covered  total_marker_length
+   102470      329                 3.53                    4.16             0.54                       15                    15                     5                         15                   1.00                     9870     
+   100039      199                 3.45                    2.45             0.32                       11                    11                     0                         15                   0.73                     10095
    ```
 
 - `markers_profile.tsv`: species-by-marker 
 
 
    ```
-   species_id  marker_id  marker_length  gene_id          total_reads  total_alnbps  coverage  uniq_reads  ambi_reads   uniq_alnbps     ambi_alnbps
-   102455      B000032    1052           195103.peg.1451  1680         2000          11.4      8200        1800         9680            2320
+   species_id  marker_id  marker_length  gene_id           total_reads  total_alnbps  coverage  uniq_reads  ambi_reads   uniq_alnbps     ambi_alnbps
+   102470      B000032    702            UHGG143484_04271  22           2763          3.94      18          4            2259            504
+   102470      B000039    606            UHGG143484_01873  7            856           1.41      3           4            379             477
    ```
 
 Refer to [original MIDAS's estimate species abundance](https://github.com/snayfach/MIDAS/blob/master/docs/species.md) for more details.
