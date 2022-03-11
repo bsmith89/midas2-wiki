@@ -19,7 +19,7 @@ MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its sc
 
 ## Single-sample Results Layout
 
-Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile functional abundance in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory. Here is an example of layout of the results of all three single-sample modules in the local filesystem.
+Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile pan-gene copy number in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory. Here is an example of layout of the results of all three single-sample modules in the local filesystem.
 
 ```
 Output                                          Producer            Meaning
@@ -49,7 +49,7 @@ Output                                          Producer            Meaning
 
 ## Across-samples Results Layout
 
-For a collection of samples, population SNPs and functional abundance can be computed using the corresponding subcommands `midas_merge_snps` and `midas_merge_genes`.  The result layout for those looks as follows:
+For a collection of samples, population SNPs and pan-gene abundance can be computed using the corresponding subcommands `midas_merge_snps` and `midas_merge_genes`.  `{midas_outdir}` is the output directory provided by the user, which is the root of the layout below.
 
 ```
 Output                                          Producer             Meaning
@@ -259,21 +259,6 @@ All three merge subcommands take a `samples_list` as input argument, which is a 
    SRS011134     /mnt/chunyu/iggtools-hmp-test
    SRS011271     s3://microbiome-chunyu/iggtools-hmp-test
    ```
-
-The merged output files are structured as following:
-
-   ```
-   ${midas_outdir}
-    |- species
-    |- snps
-    |- genes
-    |- temp
-    |  |- snps
-    |- [bt2_indexes]
-   ```
-
-- `{midas_outdir}`: output directory is provided by the user, which is the root of the layout above and below.
-
 
 
 ## Merge species abundance profile
