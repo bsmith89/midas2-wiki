@@ -65,10 +65,10 @@ snps
   |- {species}/{species}.snps_freqs.tsv.lz4     midas_merge_snps     Per species site-by-sample MAF matrix
   |- {species}/{species}.snps_depth.tsv.lz4     midas_merge_snps     Per species site-by-sample read depth matrix
 genes
-  |- genes_summary.tsv                          midas_merge_genes      Alignment summary statistics per sample
-  |- {species}/{species}.genes_presabs.tsv.lz4  midas_merge_genes      Per species gene-by-sample pre-abs matrix
-  |- {species}/{species}.genes_copynum.tsv.lz4  midas_merge_genes      Per species gene-by-sample copy number matrix
-  |- {species}/{species}.genes_depth.tsv.lz4    midas_merge_genes      Per species gene-by-sample read depth matrix
+  |- genes_summary.tsv                          midas_merge_genes    Alignment summary statistics per sample
+  |- {species}/{species}.genes_presabs.tsv.lz4  midas_merge_genes    Per species gene-by-sample pre-abs matrix
+  |- {species}/{species}.genes_copynum.tsv.lz4  midas_merge_genes    Per species gene-by-sample copy number matrix
+  |- {species}/{species}.genes_depth.tsv.lz4    midas_merge_genes    Per species gene-by-sample read depth matrix
 ```
 
 
