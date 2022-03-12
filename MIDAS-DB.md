@@ -2,7 +2,12 @@ This page is still under development
 
 ***
 
-# Integrated Gut Genome Tools
+# MIDAS DB
+
+At its core, MIDAS DB is an interface between collections of genomes and a set of custom files needed for strain-level metagenomics analysis. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species. This new infrastructure dramatically simplifies the prior knowledge needed to build a custom MIDAS database, and enables the dynamic assignment of representative genomes. Presently, MIDAS DB contains two public databases readily available for users: UHGG v1 (4644 species with 286997 genomes) and GTDB v202 (47893 species with 258405 genomes) in a public AWS S3 bucket.  MIDAS is the first pipeline to allow users the flexibility to select representative genomes, a key component for the accuracy of SNP calling, as demonstrated in Supplementary Table S2. 
+
+
+## UHGG
 
 A collection of 286,997 genomes assembled from metagenomes, isolates and single cells from human stool samples has been clustered into 4,644 species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as [IGGdb 2.0](http://ftp.ebi.ac.uk/pub/databases/metagenomics/mgnify_genomes/human-gut/v1.0/), IGG 2.0, IGG+, or simply IGG.  Perhaps the most important difference with respect to the original IGGdb 1.0 is that this new collection contains only gut genomes.
 
