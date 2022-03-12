@@ -4,7 +4,7 @@ This page is still under development
 
 # MIDAS DB
 
-At its core, MIDAS DB is an interface between collections of genomes and a set of custom files needed for strain-level metagenomics analysis. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species. This new infrastructure dramatically simplifies the prior knowledge needed to build a custom MIDAS database, and enables the dynamic assignment of representative genomes. Presently, MIDAS DB contains two public databases readily available for users: UHGG v1 (4644 species with 286997 genomes) and GTDB v202 (47893 species with 258405 genomes) in a public AWS S3 bucket.  MIDAS is the first pipeline to allow users the flexibility to select representative genomes, a key component for the accuracy of SNP calling, as demonstrated in Supplementary Table S2. 
+At its core, MIDAS DB is an interface between collections of genomes and a set of custom files needed for strain-level metagenomics analysis. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species. This new infrastructure dramatically simplifies the prior knowledge needed to build a custom MIDAS database, and enables the dynamic assignment of representative genomes. Presently, MIDAS DB contains two public databases readily available for users: UHGG v1 (4644 species with 286997 genomes) and GTDB v202 (47893 species with 258405 genomes) in a public AWS S3 bucket.  MIDAS is the first pipeline to allow users the flexibility to select representative genomes, a key component for the accuracy of SNP calling.
 
 
 ## UHGG
