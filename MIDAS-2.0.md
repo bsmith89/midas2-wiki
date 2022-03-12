@@ -347,7 +347,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
    sample1     100039      2852528        1764680        25765375     225497         224630        0.619             14.601
    ```
 
-- `{species_id}/{species_id}.snps_info.tsv`
+- `{species_id}/{species_id}.snps_info.tsv.lz4`
 
    ```
    site_id                          major_allele  minor_allele  sample_counts  snp_type  rc_A  rc_C  rc_G  rc_T  sc_A  sc_C  sc_G  sc_T  locus_type  gene_id           site_type  amino_acids
@@ -355,67 +355,66 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
    gnl|Prokka|UHGG143484_1|905|T    C             T             2              bi        0     2      0     16    0     2    0      2    CDS         UHGG143484_00002  1D         Y,S,C,F
    ```
 
-- `{species_id}/{species_id}.snps_freq.tsv`
+- `{species_id}/{species_id}.snps_freq.tsv.lz4`
 
   ```
-  site_id                                 SRS011271   SRS011134
-  UHGG047905_C0_L562.0k_H31cf56|139|C     1.000       0.000
-  UHGG047905_C0_L562.0k_H31cf56|162|C     0.000       0.043
+  site_id                           sample1   sample3
+  gnl|Prokka|UHGG143484_1|810|C	    0.167     0.167
+  gnl|Prokka|UHGG143484_1|905|T     0.889     0.889
   ```
 
-- `{species_id}/{species_id}.snps_depth.tsv`: site-by-sample number of mapped reads, only accounts for reads matching either major or minor allele
+- `{species_id}/{species_id}.snps_depth.tsv.lz4`: site-by-sample number of mapped reads, **only** accounts for reads matching either major or minor allele
 
   ```
-  site_id                                 SRS011271   SRS011134
-  UHGG047905_C0_L562.0k_H31cf56|139|C     20          25
-  UHGG047905_C0_L562.0k_H31cf56|162|C     19          23
+  site_id                           sample1  sample3
+  gnl|Prokka|UHGG143484_1|810|C	    6        6
+  gnl|Prokka|UHGG143484_1|905|T	    9	     9
   ```
 
 Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs/merge_snvs.md) for more details.
 
 
-## Merge results from pangenome profiling
+## Pan-gene Copy Number
 
-Considering the number of pan-genome genes is relatively smaller than the genome size, we merge results from pan-genome profiling across samples for all genes per species.
 
 ### Example command
 
    ```
-   python -m iggtools midas_merge_genes --samples_list /path/to/tsv --num_cores 8 /path/to/merged/midas/outdir
+   python -m iggtools midas_merge_genes --samples_list /path/to/tsv --num_cores 8 ${merged_midas_outdir}
    ```
 
 ### Target output files
 
-- `genes/genes_summary.tsv`
+- `genes_summary.tsv`
 
    ```
-   species_id  sample_name  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads mapped_reads marker_depth
-   102478      SRS011061    704500          241525         0.343             3.738          8590041       7841889      0.000
-   102478      SRS011134    704500          312336         0.443             2.144          6255805       5203378      0.000
+   sample_name  species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads  marker_depth
+   sample1      100247      87136           6122           0.070             9.519          455045         269656        0.000
+   sample3      100247      57785           1889           0.033             4.849          108041         30072         0.000
    ```
 
-- `genes/{species_id}.genes_copynum.tsv.lz4`
+- `{species_id}/{species_id}.genes_copynum.tsv.lz4`: copy number
 
   ```
-  gene_id            SRS011061  SRS011134
-  UHGG000186_01791   1.099      1.099
-  UHGG120544_00344   0.425      0.638
+  gene_id            sample1  sample3
+  UHGG000947_00080   0.000    0.000
+  UHGG000947_00082   0.000    0.000
   ```
 
-- `genes/{species_id}.genes_preabs.tsv.lz4`
+- `{species_id}/{species_id}.genes_preabs.tsv.lz4`: presence/absence
  
   ```
-  gene_id             SRS011061  SRS011134
-  UHGG000186_01791    1          1
-  UHGG120544_00344    0          1
+  gene_id             sample1  sample3
+  UHGG000947_00080    0        0
+  UHGG000947_00082    0        0
   ```
 
-- `genes/{species_id}.genes_coverage.tsv.lz4`
+- `{species_id}/{species_id}.genes_depth.tsv.lz4`: depth
 
   ```
-  gene_id            SRS011061  SRS011134
-  UHGG000186_01791   8.854      0.000
-  UHGG120544_00344   26.730     12.037
+  gene_id             sample1  sample3
+  UHGG000947_00080    2.208    2.208
+  UHGG000947_00082    2.371    2.371
   ```
 
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
