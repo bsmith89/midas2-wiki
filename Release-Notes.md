@@ -1,5 +1,13 @@
 # Versions
 
+## 0.8
+
+Rename IGGtools to MIDAS2.0.
+
+## 0.7
+
+IGGtools used for simulation and benchmark.
+
 ## 0.6
 
 Ability to run subcommands under AWS Batch with status tracking in s3 operations bucket. 
