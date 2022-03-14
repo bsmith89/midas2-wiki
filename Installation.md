@@ -12,7 +12,7 @@ conda config --add channels conda-forge
 Create Conda environment.
 
 ```
-conda env create --name=iggtools --quiet --file iggtools.yml
+conda env create --name=midas2.0 --quiet --file midas2.yml
 cpanm Bio::SearchIO::hmmer --force # Temporary fix for Prokka
 ```
 
