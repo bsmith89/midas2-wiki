@@ -47,10 +47,10 @@ sudo docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas:late
 Build.
 
 ```
-docker image build -t midas:v0.7 -t midas:latest -f Dockerfile .
+docker image build -t midas2:v0.8 -t midas2:latest -f Dockerfile .
 
-docker image tag midas:latest zhaoc1/midas:v0.7
-docker image tag midas:latest zhaoc1/midas:latest
+docker image tag midas2:latest zhaoc1/midas2:v0.8
+docker image tag midas2:latest zhaoc1/midas2:latest
 ```
 
 Push.
