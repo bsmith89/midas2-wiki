@@ -40,8 +40,8 @@ conda env export --no-builds | grep -v "^prefix:" > iggtools.update.yml
 Run.
 
 ```
-docker pull zhaoc1/midas:latest
-sudo docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas:latest
+docker pull zhaoc1/midas2:latest
+sudo docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
 ```
 
 Build.
