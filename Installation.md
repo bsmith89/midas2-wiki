@@ -56,8 +56,8 @@ docker image tag midas2:latest zhaoc1/midas2:latest
 Push.
 
 ```
-docker image push zhaoc1/midas:v0.7
-docker image push zhaoc1/midas:latest
+docker image push zhaoc1/midas2:v0.8
+docker image push zhaoc1/midas2:latest
 ```
 
 
