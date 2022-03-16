@@ -83,10 +83,8 @@ For each sample, the analysis begins with a simple species profiling. The goal o
 ### Example command
 
   ```
-  python -m iggtools midas_run_species \
-         --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-         --num_cores 8 --debug ${midas_outdir}
+  midas2 run_species --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
+         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb --num_cores 8 ${midas_outdir}
   ```
 
 ### Output files
@@ -124,13 +122,11 @@ To explore within-species variations for the species present in the sample data,
 - Perform Pileup for all the species in the restricted species profile: `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5
    
    ```
-   python -m iggtools midas_run_snps --sample_name ${sample_name} \
-          -1 ${R1} -2 ${R2} --num_cores 8 --marker_depth 10 \
+   midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R2} \
          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-         --num_cores 12 \
+         --num_cores 12 --fragment_length 1000 \
          --select_by median_marker_coverage,unique_fraction_covered \
-         --select_threshold=2,0.5 \
-         --fragment_length 1000 \
+         --select_threshold=3,0.5 \
           ${midas_outdir}
     ```
 
@@ -139,12 +135,11 @@ To explore within-species variations for the species present in the sample data,
   `--select_threshold=-1`: skip the Species module and pileup for all the species in a prebuilt Bowtie2 genome databases. Use with caution, only when you know exactly what you want to do.  
 
    ```
-   python -m iggtools midas_run_snps --sample_name ${sample_name} \
-          -1 $R1 -2 $R2 \
+   midas2 run_snps --sample_name ${sample_name} -1 $R1 -2 $R2 \
           --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
           --prebuilt_bowtie2_indexes ${bt2_indexes/${bt2_name} \
           --prebuilt_bowtie2_species ${bt2_indexes/${bt2_name}.species \
-          --select_threshold=-1 --num_cores 8 ${midas_outdir}
+          --select_threshold=-1 --num_cores 12 ${midas_outdir}
    ``` 
 
 
@@ -215,13 +210,11 @@ Similar with the single-sample SNPs module, only abundant species in the restric
 ### Example command
 
    ```
-   python -m iggtools midas_run_genes --sample_name ${sample_name} \
-          -1 ${R1} -2 ${R2} --num_cores 8 --marker_depth 10 \
+   midas2 run_genes --sample_name ${sample_name} -1 ${R1} -2 ${R2} \
           --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-          --num_cores 12 \
           --select_by median_marker_coverage,unique_fraction_covered \
           --select_threshold=2,0.5 \
-          ${midas_outdir}
+          --num_cores 12 ${midas_outdir}
    ```
 
 ### Output files
@@ -241,7 +234,6 @@ Similar with the single-sample SNPs module, only abundant species in the restric
    UHGG001538_00384     378          42             14            10.029         0.452              0.000
    UHGG001538_00389     474          7              4             2.214          0.454              0.000
    ```
-
 
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
 
@@ -266,7 +258,7 @@ All three merge subcommands take a `samples_list` as input argument, which is a 
 ## Example command
 
    ```
-   python -m iggtools midas_merge_species --samples_list /path/to/sample/lists ${merged_midas_outdir}
+   midas2 merge_species --samples_list /path/to/sample/lists ${merged_midas_outdir}
    ```
 
 ### Output files
@@ -334,7 +326,7 @@ More details about the compute can be found at [Cross-Sample SNP Analysis Tools 
 - Default parameters
 
    ```
-   python -m iggtools midas_merge_snps --samples_list /path/to/sample/lists --num_cores 32 ${merged_midas_outdir}
+   midas2 merge_snps --samples_list /path/to/sample/lists --num_cores 32 ${merged_midas_outdir}
    ```
 
 ### Output files
@@ -380,7 +372,7 @@ Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs
 ### Example command
 
    ```
-   python -m iggtools midas_merge_genes --samples_list /path/to/tsv --num_cores 8 ${merged_midas_outdir}
+   midas2 merge_genes --samples_list /path/to/tsv --num_cores 8 ${merged_midas_outdir}
    ```
 
 ### Target output files
