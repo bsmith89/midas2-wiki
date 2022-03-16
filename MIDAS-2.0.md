@@ -22,27 +22,27 @@ MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its sc
 Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile pan-gene copy number in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory. Here is an example of layout of the results of all three single-sample modules in the local filesystem.
 
 ```
-Output                                          Producer            Meaning
+Output                                        Producer            Meaning
 ------------------------------------------------------------------------------------------------------------
 {midas_output}/{sample_name}
   |- species
-     |- species_profile.tsv                     midas_run_species   Summary of species coverage
-     |- markers_profile.tsv                     midas_run_species   Per species marker coverage
+     |- species_profile.tsv                   midas_run_species   Summary of species coverage
+     |- markers_profile.tsv                   midas_run_species   Per species marker coverage
   |- snps
-     |- snps_summary.tsv                        midas_run_snps      Summary of reads mapping to rep-genome
-     |- {species}.snps.tsv.lz4                  midas_run_snps      Per species pileups
+     |- snps_summary.tsv                      midas_run_snps      Summary of reads mapping to rep-genome
+     |- {species}.snps.tsv.lz4                midas_run_snps      Per species pileups
   |- genes 
-     |- genes_summary.tsv                       midas_run_genes     Summary of reads mapping to pan-geneme
-     |- {species}.genes.tsv.lz4                 midas_run_genes     Per species pan-gene coverage
+     |- genes_summary.tsv                     midas_run_genes     Summary of reads mapping to pan-geneme
+     |- {species}.genes.tsv.lz4               midas_run_genes     Per species pan-gene coverage
  
- |- temp                                                            Temporary Files
+ |- temp                                                          Temporary Files
      |- snps
         |- repgenomes.bam
         |- {species}/snps_XX.tsv.lz4
      |- genes
         |- pangenome.bam
         |- {species}/genes_XX.tsv.lz4
-  |- bt2_indexes                                                    Sample-specific genome database
+  |- bt2_indexes                                                  Sample-specific genome database
      |- snps/repgenomes.*
      |- genes/pangenomes.*
 ```
