@@ -14,7 +14,7 @@ MIDAS is an all-in-one strain-level metagenomics pipeline. Its scope ranges from
 
 ## Single-sample Results Layout
 
-ALL single-sample workflow takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together with `sample_name` constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  All subsequent analysis steps operate within that directory.
+All single-sample workflow takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together with `sample_name` constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  All subsequent analysis steps operate within that directory.
 
 Single-sample analysis start with finding out abundant species in the given sample (`run_species`), followed by `run_snps` for pileup and `run_genes` pan-gene profiling.  Here is an example of layout of the results of all three single-sample modules in the local filesystem.
 
@@ -46,7 +46,7 @@ Output                                       Producer             Meaning
 
 ## Across-samples Results Layout
 
-For a collection of samples, population SNPs and pan-gene abundance can be computed using the corresponding subcommands `midas_merge_snps` and `midas_merge_genes`.  `{midas_outdir}` is the output directory provided by the user, which is the root of the layout below.
+For a collection of samples, population SNPs and pan-gene copy numbers can be estimated using subcommands `merge_snps` and `merge_genes`. User need to provide the output directory (`{midas_outdir}`) as the input parameter, which is the root of the layout below.
 
 ```
 Output                                          Producer             Meaning
@@ -75,9 +75,9 @@ genes
 
 ## Species Abundance Estimation
 
-For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). Raw metagenomic reads were mapped to the 15 universal single copy genes (SCGs). And for each marker gene, uniquely mapped read counts were computed, and ambiguous reads were probabilistically assigned.  The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes covered by more than two reads are reported. 
+For each sample, the analysis begins with a simple species profiling. The goal of the Species flow is to detect abundant species that is present in the sample, which can be used to construct the sample-specific representative genome database (rep-genome) and pangenome database (pan-genome). Raw metagenomic reads were mapped to the 15 universal single copy genes (SCGs). And for each marker gene, uniquely mapped read counts were computed, and ambiguous reads were probabilistically assigned.  The marker coverage is computed as the total alignment length over the gene length. Only species with more than two marker genes with more than two reads are reported. 
 
-### Example command
+### Sample command
 
   ```
   midas2 run_species --sample_name ${my_sample} -1 /path/to/R1 -2 /path/to/R2 \
@@ -108,28 +108,28 @@ Refer to [original MIDAS's estimate species abundance](https://github.com/snayfa
 
 ## Single Nucleotide Polymorphisms (SNPs) calling
 
-Only species passing the user specific filter based on the above mentioned Species module would be genotyped. The default species selection filter parameter is set to detect abundant species in the sample. Users can select the parameters to suit the purpose of their research: if the purpose to genotype low abundant species, we suggested loosen the parameters to `median_marker_coverage` > 0. 
+Only species passing the user specific filter based on the above mentioned Species module would be genotyped and construct the sample-specific genome database. Although the default parameters for the species selection is set to detect abundant species in the sample, users can adjust the parameters to suit the purpose of their research. That being said, to genotype low abundant species, we suggested loosen the parameters to `median_marker_coverage` > 0. 
 
-To explore within-species variations for the species present in the sample data, raw metagenomic reads were aligned to the sample-specific genome databases. Nucleotide variation for each genomic site was then quantified via pileup and alleles count. Reads mapping summary for all the species in the rep-genome database were reported in the per-sample snps summary file. MIDAS doesn't apply any more filters based on the reads mapping at this stage.
-
-
-### Example command
+To explore intra-species variations in the sample, raw metagenomic reads were aligned to the sample-specific genome databases. Nucleotide variation for each genomic site was then quantified via pileup and allele count. Reads mapping summary for all the species in the rep-genome database were reported in the per-sample snps summary file. MIDAS doesn't apply any more filters based on the reads mapping at this stage.
 
 
-- Perform Pileup for all the species in the restricted species profile: `median_marker_coverage` >= 2 and `unique_fraction_covered` > 0.5
+### Sample command
+
+
+- Perform Pileup for all the species in the restricted species profile: `median_marker_coverage` > 2 and `unique_fraction_covered` > 0.5
    
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R2} \
          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
          --num_cores 12 --fragment_length 1000 \
          --select_by median_marker_coverage,unique_fraction_covered \
-         --select_threshold=3,0.5 \
+         --select_threshold=2,0.5 \
           ${midas_outdir}
     ```
 
 - Genotyping with Prebuilt Genome Database
 
-  `--select_threshold=-1`: skip the Species module and pileup for all the species in a prebuilt Bowtie2 genome databases. Use with caution, only when you know exactly what you want to do.  
+  `--select_threshold=-1`: skip the Species module and pileup for all the species in a prebuilt Bowtie2 genome databases. Use with caution.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 $R1 -2 $R2 \
@@ -163,16 +163,16 @@ To explore within-species variations for the species present in the sample data,
 
 - **Chunkified Pileup**
 
-  Single-sample Pileup was parallelized on the unit of chunk of sites, which is indexed by `species_id, chunk_id`. When all chunks from the same species finished processed, chunk-level Pileup results were then merged into species-level Pileup file (`{species}.snps.tsv.lz4`).
+  Single-sample Pileup was parallelized on the unit of chunk of sites, which is indexed by `species_id, chunk_id`. When all chunks from the same species finished processing, chunk-level Pileup results were then merged into species-level Pileup file (`{species}.snps.tsv.lz4`).
 
 
-- **Reassign Representative Genome**
+- **Re-assign Representative Genome**
 
   Users can re-select representative genome by modifying the table of content `genomes.tsv` accordingly.
 
 - **Custom MIDAS DB**
 
-  This new infrastructure of MIDAS 2.0 dramatically simplifies the prior knowledge needed to build a custom MIDAS database. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file, containing genome-to-species assignment and a choice of representative genome for each species.
+  The new infrastructure of MIDAS 2.0 dramatically simplifies the prior knowledge needed to build a custom MIDAS database. The new implementation of MIDAS DB reads in a Table Of Contents (TOC) file containing genome-to-species assignment, and a choice of representative genome for each species.
 
   First, generate the `{custom_midasdb}/genomes.tsv` in the following format:
 
@@ -185,7 +185,7 @@ To explore within-species variations for the species present in the sample data,
      GUT_GENOME178959  100003  GUT_GENOME178957        0
      ```
 
-  Second, collect all the representative genomes in the following structure:
+  Second, collect all the representative genomes as following:
 
      ```
      ${custom_midasdb}/cleaned_imports/{species_id}/{genome_id}/{genome_id}.fna
@@ -193,7 +193,7 @@ To explore within-species variations for the species present in the sample data,
      ${custom_midasdb}/cleaned_imports/100003/GUT_GENOME178957/GUT_GENOME178957.fna.lz4
      ```
 
-  Third, run `midas_run_snps` with `--midasdb_name {custom_midasdb} --midasdb_dir /path/to/midasdb_dir`.
+  Third, run `run_snps` with `--midasdb_name {custom_midasdb} --midasdb_dir /path/to/midasdb_dir`.
 
 
 Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
@@ -201,10 +201,10 @@ Refer to [MIDAS's call single nucleotide polymorphisms](https://github.com/snayf
 
 ## Pangenome Profiling
 
-Similar with the single-sample SNPs module, only abundant species in the restricted species profile would be used to build the sample-specific pangenome database. For each species, the hierarchical compute for each chunk of genes is: (1) For each gene, compute reads alignment based metrics, e.g. `aligned_reads`, `mapped_reads`, etc; (2) For all the pan-genes, compute the average vertical coverage of the 15 universal SCGs; (3) For each gene, infer the `copy number` normalized to the SGCs coverage, and quantify the pan-gene presence/absence.
+Similar with the single-sample SNPs module, only abundant species in the restricted species profile would be used to build the sample-specific pangenome database. For each species, the hierarchical compuation for each chunk of genes is: (1) For each gene, compute reads alignment based metrics, e.g. `aligned_reads`, `mapped_reads`, etc; (2) For all the pan-genes, compute the average vertical coverage of the 15 universal SCGs; (3) For each gene, infer the `copy number` normalized to the SGCs coverage, and quantify the pan-gene presence/absence.
 
 
-### Example command
+### Sample command
 
    ```
    midas2 run_genes --sample_name ${sample_name} -1 ${R1} -2 ${R2} \
@@ -239,9 +239,9 @@ Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/M
 
 # Across-samples Analysis
 
-MIDAS can merge single-sample analysis results across multiple samples, e.g. generate species abundance matrix across samples, or perform across-samples core-genome SNPs calling, or merge pan-genome profiling results across samples. 
+MIDAS 2.0 can merge single-sample analysis results across multiple samples, such as performing across-samples core-genome SNPs calling, or merging pan-genome profiling results across samples. 
 
-All three merge subcommands take a `samples_list` as input argument, which is a TSV file with `sample name` and single-sample output directory `midas_outdir`.  For example, `midas_merge_species` expects to locate `/mnt/cz/hmp-test/SRS011134/species/species_profile.tsv`, generated by single-sample species flow.
+All three merge subcommands take a `samples_list` as the input argument, which is a TSV file with `sample name` and single-sample output directory `midas_outdir`.  For example, `midas_merge_species` expects to locate `/mnt/cz/hmp-test/SRS011134/species/species_profile.tsv`, generated by `run-species`.
 
    ```
    sample_name   midas_outdir
@@ -252,7 +252,7 @@ All three merge subcommands take a `samples_list` as input argument, which is a 
 
 ## Species Abundance Profile
 
-## Example command
+## Sample command
 
    ```
    midas2 merge_species --samples_list /path/to/sample/lists ${merged_midas_outdir}
@@ -305,7 +305,7 @@ Refer to [MIDAS's merge species abundance](https://github.com/snayfach/MIDAS/blo
 
 ## Population SNPs Calling
 
-For each **relevant** genomic site, we determine the set of alleles present for that site across all **relevant** samples. For each allele A, C, G, T we count the samples that are **relevant** for the site and contain that allele, and sum that allele's depths across those samples.  Then we computed the across-samples major alleles for each genomic site, following by collecting the corresponding read depth and allele frequency for each sample.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `snp_pooled_method ` argument.
+For each **relevant** genomic site, MIDAS 2.0 determine the set of alleles present for that site across all **relevant** samples. For each allele A, C, G, T we count the samples that are **relevant** for the site and contain that allele, and sum that allele's depths across those samples.  Then we computed the across-samples major alleles for each genomic site, following by collecting the corresponding read depth and allele frequency for each sample.  We use one or the other of these metrics as a proxy for allele frequency, as specified by the `snp_pooled_method ` argument.
 
 - **pipeline details**
 
@@ -318,7 +318,7 @@ For each **relevant** genomic site, we determine the set of alleles present for 
 More details about the compute can be found at [Cross-Sample SNP Analysis Tools (xsnp)](https://github.com/czbiohub/xsnp/wiki/Data-Schema-And-Computation)
 
 
-### Example commands
+### Sample commands
 
 - Default parameters
 
@@ -366,7 +366,7 @@ Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs
 ## Pan-gene Copy Number
 
 
-### Example command
+### Sample command
 
    ```
    midas2 merge_genes --samples_list /path/to/tsv --num_cores 8 ${merged_midas_outdir}
