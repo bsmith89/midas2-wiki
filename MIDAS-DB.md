@@ -9,9 +9,12 @@ Presently, MIDAS DB contains two public databases readily available for users: U
 
 ## UHGG
 
-A collection of 286,997 genomes assembled from metagenomes, isolates and single cells from human stool samples has been clustered into 4,644 species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as [UHGG](http://ftp.ebi.ac.uk/pub/databases/metagenomics/mgnify_genomes/human-gut/v1.0/).  Perhaps the most important difference with respect to the IGGdb 1.0 is that UHGG contains only gut genomes.
+A collection of 286,997 genomes assembled from metagenomes, isolates and single cells from human stool samples has been clustered into 4,644 gut-only species in an effort similar to [IGGdb 1.0](https://github.com/snayfach/IGGdb).   We refer to this new collection as [UHGG 1.0 catalogues](http://ftp.ebi.ac.uk/pub/databases/metagenomics/mgnify_genomes/human-gut/v1.0/).  Perhaps the most important difference with respect to the IGGdb 1.0 is that UHGG contains only gut genomes.
 
 The collection of UHGG genomes were provided by [Alexandre Almeida](https://www.ebi.ac.uk/about/people/alexandre-almeida) of EBI and mirrored in S3 by [Jason Shi](http://docpollard.org/people/jason-shi/), whose `s3://jason.shi-bucket/IGGdb2.0/clean_set/` serves as input to the tools in this repository. Six-digit numeric species ids were arbitrarily assigned by Jason Shi in `s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv`. 
+
+The construction step for MIDAS databases can be executed in AWS using hundreds of r5d.24xlarge instances over a period of a couple of days, depositing built products in S3.  The commands below implicitly reference the products of that build.  MIDAS users can build custom databases for any collections of genomes.
+
 
 ## GTDB
 
