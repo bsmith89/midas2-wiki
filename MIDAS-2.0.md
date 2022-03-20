@@ -8,13 +8,15 @@ MIDAS 2.0 represent a reimplementation of the same analysis steps as the origina
 
 # MIDAS Results Layout
 
-MIDAS is an all-in-one strain-level metagenomics bioinformatics pipeline. Its scope ranges from building custom MIDAS databases, species profiling, reads alignment, post-alignment filter, to strain-level metagenotyping and pan-gene abundance profiling. There are three modules of MIDAS pipeline: Species, SNPs, Genes. Each module have two workflows: single-sample and across-samples. 
+MIDAS is an all-in-one strain-level metagenomics pipeline. Its scope ranges from building custom MIDAS databases, species profiling, reads alignment, post-alignment filter, to strain-level metagenotyping and pan-gene copy number profiling. There are three modules of MIDAS pipeline: Species, SNPs, Genes. Each module consists of single-sample and across-samples two workflow.
 
 [insert a figure here.]
 
 ## Single-sample Results Layout
 
-Single sample analysis (`sample_name`) takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  The first subcommand to run for the sample is `midas_run_species`, to report abundant species present in the sample that we can genotype in the `midas_run_snps` and profile pan-gene copy number in the `midas_run_genes` flow.  All subsequent analysis steps operate within that directory. Here is an example of layout of the results of all three single-sample modules in the local filesystem.
+ALL single-sample workflow takes as a parameter the path to MIDAS results root directory (`midas_outdir`); and together with `sample_name` constitute the unique output directory {`output_dir`}, i.e.,  `{midas_outdir}/{sample_name}`.  All subsequent analysis steps operate within that directory.
+
+Single-sample analysis start with finding out abundant species in the given sample (`run_species`), followed by `run_snps` for pileup and `run_genes` pan-gene profiling.  Here is an example of layout of the results of all three single-sample modules in the local filesystem.
 
 ```
 Output                                       Producer             Meaning
