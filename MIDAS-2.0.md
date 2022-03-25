@@ -220,7 +220,7 @@ Similar with the single-sample SNPs module, only abundant species in the restric
 
    ```
    species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads   marker_coverage
-   102470      87136           6122           0.070             9.519          455045         269656         0.000
+   102470      87136           6122           0.070             9.519          455045         269656         3.447
    100039      79571           2350           0.030             9.462          206684         113644         0.000
    ```
 
@@ -228,8 +228,8 @@ Similar with the single-sample SNPs module, only abundant species in the restric
 
    ```
    gene_id              gene_length  aligned_reads  mapped_reads  mean_coverage  fraction_covered  copy_number
-   UHGG001538_00384     378          42             14            10.029         0.452              0.000
-   UHGG001538_00389     474          7              4             2.214          0.454              0.000
+   UHGG000947_00080     3138         53             6             2.208723       0.102294          0.640716
+   UHGG000947_00081     609          27             25            5.083770       0.940887          1.474722
    ```
 
 Refer to [MIDAS's predict pan-genome gene content](https://github.com/snayfach/MIDAS/blob/master/docs/cnvs.md) for more details.
@@ -378,32 +378,32 @@ Refer to [MIDAS's merge SNPs](https://github.com/snayfach/MIDAS/blob/master/docs
 
    ```
    sample_name  species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads  marker_depth
-   sample1      100247      87136           6122           0.070             9.519          455045         269656        0.000
+   sample1      100247      87136           6122           0.070             9.519          455045         269656        3.447
    sample3      100247      57785           1889           0.033             4.849          108041         30072         0.000
    ```
 
 - `{species_id}/{species_id}.genes_copynum.tsv.lz4`: copy number
 
   ```
-  gene_id            sample1  sample3
-  UHGG000947_00080   0.000    0.000
-  UHGG000947_00082   0.000    0.000
+  gene_id            sample1     sample3
+  UHGG000947_00080   0.640716    0.640716
+  UHGG000947_00081   1.474722    1.474722
   ```
 
 - `{species_id}/{species_id}.genes_preabs.tsv.lz4`: presence/absence
  
   ```
-  gene_id             sample1  sample3
-  UHGG000947_00080    0        0
-  UHGG000947_00082    0        0
+  gene_id             sample1     sample3
+  UHGG000947_00080    1           1
+  UHGG000947_00081    1           1
   ```
 
 - `{species_id}/{species_id}.genes_depth.tsv.lz4`: depth
 
   ```
-  gene_id             sample1  sample3
-  UHGG000947_00080    2.208    2.208
-  UHGG000947_00082    2.371    2.371
+  gene_id             sample1     sample3
+  UHGG000947_00080    2.208723    2.208723
+  UHGG000947_00081    5.083770    5.083770
   ```
 
 Refer to [MIDAS's merge gene content](https://github.com/snayfach/MIDAS/blob/master/docs/merge_cnvs.md) for more details.
