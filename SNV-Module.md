@@ -24,7 +24,39 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
          --num_cores 12 ${midas_outdir}         
     ```
 
-- Single-sample Pileup for all the species in a prebuilt rep-genome database. 
+  The default post-alignment filters are:
+
+   ```
+   --mapq >= 20: discard read alignments with alignment quality < 20
+   --mapid >= 0.94: discard read alignments with alignment identity < 0.94
+   --aln_readq >= 20: discard read alignment with mean quality < 20
+   --aln_cov >= 0.75: discard read alignment with alignment coverage < 0.75
+   --aln_baseq >= 30: discard bases with quality < 30
+   ```
+
+  Users can adjust these post-alignment quality filter parameters via the command line arguments. 
+
+
+- Single-sample pileup for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
+  
+  We recommend to use the `--paired_only` with proper `--fragment_length`, to recruiting only properly paired reads for pileup. The post-alignment metrics would be computed based on a reads pair, instead of single read.
+
+   ```
+   midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
+         --select_by median_marker_coverage,unique_fraction_covered \
+         --select_threshold=2,0.5 \
+         --fragment_length 2000 --paired_only \
+         --num_cores 12 ${midas_outdir}         
+    ```
+
+- Single-sample variant calling for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
+  
+  In recognition of the need for single-sample SNV calling, we added an `--advanced` mode together with `--ignore_ambiguous`, to the single-sample SNV step in MIDAS 2.0 to report per species major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter should be applied by the users. MIDAS 2.0 ignore ambiguous alleles calling, where genomic sites recruit tied read counts.
+`--ignore_ambiguous`   recommend users set the parameter  to ignore ambiguous alleles, 
+
+
+- Single-sample pileup for all the species in a prebuilt rep-genome database. 
   
   We presuppose users already follow the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#population-specific-species-panel) step, and have the prebuilt rep-genome database located at `${midas_outdir}/bt2_indexes`. 
 
@@ -38,13 +70,21 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
 
 ### Output files
 
-- Reads mapping and pileup summary: `snps_summary.tsv`
+- `snps_summary.tsv`: the statistics of read mapping and pileup summary
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered   mean_coverage
    102506      5339468        2373275        8045342      468667         224553        0.444              3.390
    102337      2749621        2566404        47723458     1479479        1010530       0.933              18.595
    ```
+   - genome_length: genome length
+   - covered_bases: number of bases covered by at least two reads
+   - total_depth: total read-depth across all covered_bases
+   - aligned_reads: total read counts across sites
+   - mapped_reads: total read counts across sites after quality filter
+   - fraction_covered: fraction of sites covered by at least two reads, horizontal genome coverage
+   - mean_coverage: 
+
 
 - Per-species reads pileup results: `{species}.snps.tsv.lz4`
 
