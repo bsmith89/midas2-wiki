@@ -113,7 +113,7 @@ For some analysis, using one comprehensive list of species across samples in the
 The Bowtie2 rep-genome / pan-genome database can be build upon a list of customized species across a given panel of samples. Species selection metrics based on the `species_prevalence.tsv` can be passed to `build_bowtie2eb` via `--select_by` and `--select_threshold`. For example, to build one rep-genome database for all the species that is present in more than two samples:
 
 ```
-build_bowtie2db \
+midas2 build_bowtie2db \
     --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \ 
     --select_threshold sample_counts --select_by 2 --num_cores 8 \
     --bt2_indexes_name repgenome --bt2_indexes_dir ${midas_outdir}/bt2_indexes
