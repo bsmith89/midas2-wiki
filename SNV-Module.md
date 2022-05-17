@@ -14,7 +14,7 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
 
 - Single-sample Pileup for all the species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`. 
 
-  We presuppose users already profiling the species coverage, and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv` exists.
+  We presuppose users already [profiling the species coverage](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#species-to-genotype), and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv` exists.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
