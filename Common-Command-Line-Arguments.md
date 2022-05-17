@@ -42,7 +42,7 @@ And this _my_sample_list_ can be passed to `merge_snps` or `merge_genes` analysi
 
 For all MIDAS 2.0 subcommands, users need to choose (1) a valid precomputed MIDAS DB name (uhgg, gtdb):
 
-- `my_midasdb_name=UHGG`
+- `my_midasdb_name=uhgg`
 
 and (2) a valid path to local MIDAS DB:
 
