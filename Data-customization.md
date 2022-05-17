@@ -1,0 +1,3 @@
+
+Reference-based metagenotyping pipeline requires users to choose a reference genome(s) as the **template genome database**. Microbiome data usually contains hundreds of species in one sample, and only species with enough read coverage can be used for reliable strain-level analysis. A good reference database should be both representative and comprehensive in terms of the sufficiently abundant species in the sample. Therefore, a typical MIDAS 2.0 workflow starts with a "database customization" step which build sample-specific reference database of sufficiently abundant species selected via profiling 15 universal single copy marker genes. 
+
