@@ -1,36 +1,39 @@
 
+# Population Single Nucleotide Variants (SNVs) Calling
 
-## Single Nucleotide Variants (SNVs) Calling
+The SNV module proceeds in two phages: (1) single-sample read pileup (2) population variants calling across all the species. The first steps can be potentially in parallel.  We presuppose users already run the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization) step, and either have single-sample `species_profile.tsv` or a prebuilt Bowtie2 rep-genome database ready for the SNV module.
 
-Sample-specific rep-genome database of the species in the restricted species profile were built, to which reads were aligned using Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the species in the rep-genome database are reported by MIDAS 2.0.  MIDAS 2.0 purposely hold any species selection based on the pileup results until across-samples SNVs analysis. That being said, per species reads mapping summary are reported in `snps_summay.tsv`, and pileup and variants calling results are organized by species; therefore users can easily select species accordingly based on the reported `horizontal_coverage` and `vertical_coverage` in the `snps_summary.tsv`.
+
+## Single-Sample SNV Analysis
+
+In a standard workflow, rep-genome database of the species in the restricted species profile were built for each sample, to which reads were aligned using Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the species in the rep-genome database are reported by MIDAS 2.0.  
+
+MIDAS 2.0 purposely hold any species selection based on the pileup results until across-samples SNVs analysis. That being said, per species reads mapping summary are reported in `snps_summay.tsv`, and pileup/variants calling results are organized by species. Therefore users can easily filter species accordingly based on the reported `horizontal_coverage` and `vertical_coverage` in the `snps_summary.tsv` on their own.
 
 ### Sample command
 
-- Single-sample SNVs calling for all the species in the restricted species profile: `median_marker_coverage` > 2 and `unique_fraction_covered` > 0.5
-   
-   ```
-   midas2 run_species --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2\
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-         --num_cores 8 /path/to/base/midas/output
+- Single-sample Pileup for all the species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`. 
 
-   midas2 run_snps --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
+  We presuppose users already profiling the species coverage, and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv` exists.
+
+   ```
+   midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
          --select_by median_marker_coverage,unique_fraction_covered \
          --select_threshold=2,0.5 \
-         --num_cores 12 /path/to/base/midas/output
+         --num_cores 12 ${midas_outdir}         
     ```
 
-- Single-sample SNVs calling with prebuilt rep-genome database. Species module is no longer needed.
-
-  - `--select_threshold=-1`: escape species selection filters based on the SCG species profiling. Pilup would be performed for all the species in the user-provided Bowtie2 databases.
+- Single-sample Pileup for all the species in a prebuilt rep-genome database. 
+  
+  We presuppose users already follow the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#population-specific-species-panel) step, and have the prebuilt rep-genome database located at `${midas_outdir}/bt2_indexes`. 
 
    ```
-   midas2 run_snps --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-          --prebuilt_bowtie2_indexes /path/to/prebuilt/bowtie2_index \
-          --prebuilt_bowtie2_species /path/to/list/of/species/in/bowtie2_index \
-          --select_threshold=-1 \
-          --num_cores 12 /path/to/base/midas/output
+   midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
+          --prebuilt_bowtie2_indexes ${midas_output}/bt2_indexes/repgenome \
+          --prebuilt_bowtie2_species ${midas_output}/bt2_indexes/repgenome.species \
+          --select_threshold=-1 --num_cores 12 ${midas_output}
    ``` 
 
 ### Output files
