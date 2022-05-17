@@ -1,46 +1,5 @@
 
 
-## Abundant Species Detection
-
-The goal of the single-sample Species module is to quickly detect the presence of abundant species in the given sample, to better serve the needs of building proper sample-specific reference databases.  Metagenomic sequencing reads were mapped to 15 universal single copy genes (SCGs) via `hs-blastn`, and uniquely mapped read counts per marker gene were computed. And ambiguous mapped reads were then probabilistically assigned. Only species with more than two marker genes covered with more than two reads are reported in the `species_profile.tsv`. Due to the simplicity of only 15 universal SCG markers, we don't recommend using `run_species` for taxonomic profiling. 
-
-### Sample command
-
-  ```
-  midas2 run_species --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb --num_cores 8 /path/to/base/midas/output
-  ```
-
-### Output files
-
-- `species_profile.tsv`: sorted in decreasing order of `median_marker_coverage`. 
-
-   ```
-   species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_relative_abundance   unique_fraction_covered
-   102337      4110                28.48                   28.91            0.30                        1.00
-   102506      734                 4.98                    4.98             0.05                        0.93
-   ```
-
-### Select Species for Strain-level Analysis
-
-The panel of species eligible for strain-level genomic variation analysis is determined by the SCG profiling results. Sample-specific rep-genome and pan-genome database would be built only for the species passing the filter.  We recommend using the combination of `median_marker_coverage` and `unique_fraction_covered` as the metrics to determine the list of abundant species. However, if the goal of the experiment is to genotype low abundant species, then users need to set the parameters properly, e.g. `median_marker_coverage > 0`.  The two subcommands `run_snps` and `run_genes` share the same command line arguments for filtering species:
-
-```
-  --select_by SELECT_BY
-                        Comma separated columns from species_profile to filter
-                        species.
-  --select_threshold CHAR
-                        Comma separated cutoff correspond to select_by to filter
-                        species (> XX) (2, )
-```
-  
-An alternative way to select the species for downstream analysis is to directly provide the list of species. The species in the provided species list is still subject to the `select_threshold` restriction. Users can set `--select_threshold=-1` to escape any filters.
-
-```
-  --species_list CHAR   Comma separated list of species ids
-```
-
-
 ## Single Nucleotide Variants (SNVs) Calling
 
 Sample-specific rep-genome database of the species in the restricted species profile were built, to which reads were aligned using Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the species in the rep-genome database are reported by MIDAS 2.0.  MIDAS 2.0 purposely hold any species selection based on the pileup results until across-samples SNVs analysis. That being said, per species reads mapping summary are reported in `snps_summay.tsv`, and pileup and variants calling results are organized by species; therefore users can easily select species accordingly based on the reported `horizontal_coverage` and `vertical_coverage` in the `snps_summary.tsv`.
