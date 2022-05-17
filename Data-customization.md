@@ -126,8 +126,8 @@ midas2 build_bowtie2db \
 If taking this approach, for the single-sample SNV or CNV analysis, users can pass the pre-built rep-genome to `run_snps` analysis (pan-genome for `run_genes`), as following:
 
 ```
---prebuilt_bowtie2_indexes ${merge_midas_outdir}/bt2_indexes/repgenome \
---prebuilt_bowtie2_species ${merge_midas_outdir}/bt2_indexes/repgenome.species \
+--prebuilt_bowtie2_indexes ${midas_outdir}/bt2_indexes/repgenome \
+--prebuilt_bowtie2_species ${midas_outdir}/bt2_indexes/repgenome.species \
 --select_threshold=-1
 ```
 
