@@ -42,7 +42,7 @@ For genotyping low abundant species, users need to adjust the parameters properl
 --select_by median_marker_coverage,unique_fraction_covered --select_threshold=0,0.5 
 ```
 
-An alternative way is to pass a comma separated species of interests to `--species_list`. It is worth noting that the species in the provided species list is still subject to the `--select_threshold` restriction. Users can set `--select_threshold=-1` to escape any filters:
+An alternative way is to pass a comma separated species of interests to `--species_list`. It is worth noting that the species in the provided species list is still subject to the `--select_threshold` restriction. Users can set `--select_threshold=-1` to escape species selection filters based on the SCG species profiling:
 
 ```
 --species_list 102337,102506 --select_threshold=-1
