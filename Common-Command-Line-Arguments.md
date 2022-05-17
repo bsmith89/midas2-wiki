@@ -1,6 +1,4 @@
 
-# Common Command Line Arguments
-
 ## Single-Sample Analysis
 
 ### Input
