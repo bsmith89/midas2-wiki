@@ -13,3 +13,7 @@ Genome collections
 
 
 *Bowtie2 Index*: Rather than bowtie2 database or some other ambiguous term
+
+Species-level pangenome refers to the set of non-redundant genes (centroids) clustered from all the genomes within one species cluster. 
+
+
