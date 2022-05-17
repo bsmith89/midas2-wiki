@@ -130,3 +130,6 @@ If taking this approach, for the single-sample SNV or CNV analysis, users can pa
 --prebuilt_bowtie2_species ${merge_midas_outdir}/bt2_indexes/repgenome.species \
 --select_threshold=-1
 ```
+
+Having finished the database customization step, users can now go to [SNV](https://github.com/czbiohub/MIDAS2.0/wiki/SNV-Module) or [CNV](https://github.com/czbiohub/MIDAS2.0/wiki/CNV-Module) modules, depending on the scientific aims. 
+
