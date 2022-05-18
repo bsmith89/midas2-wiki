@@ -12,7 +12,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
 
 ### Sample commands
 
-- Single-sample Pileup for all the species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`. 
+- Single-sample pileup for all the species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`. 
 
   We presuppose users already [profiling the species coverage](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#species-to-genotype), and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv` exists.
 
