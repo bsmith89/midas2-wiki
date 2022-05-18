@@ -51,7 +51,7 @@ For example, for users who have followed the across-samples abundant species det
 
 ```
 # Generate the list of species that is present in more than one sample
-awk '$6 > 1 {print $6}' ${midas_outdir}/species/`species_prevalence.tsv` > my_species_list.tsv
+awk '$6 > 1 {print $6}' ${midas_outdir}/species/species_prevalence.tsv > my_species_list.tsv
 
 # Download MIDAS DB GTDB only for the species in my list
 midas2 database --download --midasdb_name gtdb --midasdb_dir ${my_midasdb_gtdb} --species_list my_species_list.tsv
