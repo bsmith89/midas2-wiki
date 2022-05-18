@@ -1,5 +1,5 @@
 
-# Population Single Nucleotide Variants (SNVs) Calling
+# SNV Module: Population Single Nucleotide Variants (SNVs) Calling
 
 The SNV module proceeds in two phages: (1) single-sample read pileup (2) population variants calling across all the species. The first steps can be potentially in parallel.  We presuppose users already run the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization) step, and either have single-sample `species_profile.tsv` or a prebuilt Bowtie2 rep-genome database ready for the SNV module.
 
@@ -8,7 +8,7 @@ The SNV module proceeds in two phages: (1) single-sample read pileup (2) populat
 
 In a standard workflow, rep-genome database of the species in the restricted species profile were built for each sample, to which reads were aligned using Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the species in the rep-genome database are reported by MIDAS 2.0.  
 
-MIDAS 2.0 purposely hold any species selection based on the pileup results until across-samples SNVs analysis. That being said, per species reads mapping summary are reported in `snps_summay.tsv`, and pileup/variants calling results are organized by species. Therefore users can easily filter species accordingly based on the reported `horizontal_coverage` and `vertical_coverage` in the `snps_summary.tsv` on their own.
+MIDAS 2.0 purposely holds any filter or species selection upon the single-sample pileup results until across-samples SNV analysis. That being said, read mapping summary is reported in `snps_summay.tsv`, and pileup/variants calling results are reported by species. Therefore users can easily customize species selection on their own.
 
 ### Sample command
 
@@ -24,7 +24,7 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
          --num_cores 12 ${midas_outdir}         
     ```
 
-  The default post-alignment filters are:
+  Users can adjust post-alignment quality filter parameters via the command line arguments, and the defaults are:
 
    ```
    --mapq >= 20: discard read alignments with alignment quality < 20
@@ -34,12 +34,9 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
    --aln_baseq >= 30: discard bases with quality < 30
    ```
 
-  Users can adjust these post-alignment quality filter parameters via the command line arguments. 
-
-
 - Single-sample pileup for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
   
-  We recommend to use the `--paired_only` with proper `--fragment_length`, to recruiting only properly paired reads for pileup. The post-alignment metrics would be computed based on a reads pair, instead of single read.
+  Users can recruit only properly paired reads for pileup, by passing the `--paired_only` with proper `--fragment_length`. In this case, the post-alignment metrics will be computed based on a read pair, instead of single read.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -52,13 +49,21 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
 
 - Single-sample variant calling for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
   
-  In recognition of the need for single-sample SNV calling, we added an `--advanced` mode together with `--ignore_ambiguous`, to the single-sample SNV step in MIDAS 2.0 to report per species major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter should be applied by the users. MIDAS 2.0 ignore ambiguous alleles calling, where genomic sites recruit tied read counts.
-`--ignore_ambiguous`   recommend users set the parameter  to ignore ambiguous alleles, 
+  In recognition of the need for single-sample SNV calling, we added an `--advanced` mode to the single-sample SNV analysis in MIDAS 2.0 to report per species major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter should be applied by the users. MIDAS 2.0 ignore ambiguous alleles calling, where genomic sites recruit tied read counts (`--ignore_ambiguous`)
 
+   ```
+   midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
+         --select_by median_marker_coverage,unique_fraction_covered \
+         --select_threshold=2,0.5 \
+         --fragment_length 2000 --paired_only \
+         --advanced --ignore_ambiguous \
+         --num_cores 12 ${midas_outdir}         
+    ```
 
 - Single-sample pileup for all the species in a prebuilt rep-genome database. 
   
-  We presuppose users already follow the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#population-specific-species-panel) step, and have the prebuilt rep-genome database located at `${midas_outdir}/bt2_indexes`. 
+  We presuppose users already followed the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#population-specific-species-panel) step, and have the prebuilt rep-genome database located at `${midas_outdir}/bt2_indexes`. 
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -70,23 +75,23 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
 
 ### Output files
 
-- `snps_summary.tsv`: the statistics of read mapping and pileup summary
+- `snps_summary.tsv`: the statistics summary of read mapping and pileup for all the species in the rep-genome database
 
    ```
    species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered   mean_coverage
    102506      5339468        2373275        8045342      468667         224553        0.444              3.390
    102337      2749621        2566404        47723458     1479479        1010530       0.933              18.595
    ```
-   - genome_length: genome length
-   - covered_bases: number of bases covered by at least two reads
-   - total_depth: total read-depth across all covered_bases
-   - aligned_reads: total read counts across sites
-   - mapped_reads: total read counts across sites after quality filter
-   - fraction_covered: fraction of sites covered by at least two reads, horizontal genome coverage
-   - mean_coverage: 
+   - _genome_length_: genome length
+   - _covered_bases_: number of bases covered by at least two reads
+   - _total_depth_: total read depth across all _covered_bases_
+   - _aligned_reads_: total read counts across sites before post-alignment filter
+   - _mapped_reads_: total read counts across sites after post-alignment filter
+   - _fraction_covered_: fraction of _covered_bases_; horizontal genome coverage
+   - _mean_coverage_: mean read depth across all _covered_bases_; vertical genome coverage
 
 
-- Per-species reads pileup results: `{species}.snps.tsv.lz4`
+- `{species}.snps.tsv.lz4`: per-species read pileup results 
 
    ```
    ref_id                    ref_pos   ref_allele  depth   count_a  count_c  count_g  count_t
@@ -94,8 +99,16 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
    gnl|Prokka|UHGG144544_1   881436    T           13      0        5        0        8
    gnl|Prokka|UHGG144544_1   881437    T           12      0        6        0        6
    ```
-
-- In the advanced mode (`--advanced`), the per-species pileup results would also report the called variants for **all** the genomic sites. We recommend setting `--ignore_ambiguous` to avoid falsely calling major/minor allele for site with read counts ties (e.g. ref_position: 881437).
+   - _ref_id_: scaffold/contig id
+   - _ref_pos_: reference position
+   - _ref_allele_: reference nucleodie
+   - _depth_: number of mapped reads
+   - _count_a_: read counts of A allele
+   - _count_c_: read counts of C allele
+   - _count_g_: read counts of G allele
+   - _count_t_: read counts of T allele
+   
+- In the `--advanced` mode, per-species pileup file will also include the called variants for **all** the genomic sites. 
 
    ```
    ref_id                    ref_pos   ref_allele  depth   count_a  count_c  count_g  count_t  major_allele  minor_allele  major_allele_freq  minor_allele_freq  allele_counts
@@ -103,57 +116,90 @@ MIDAS 2.0 purposely hold any species selection based on the pileup results until
    gnl|Prokka|UHGG144544_1   881436    T           13      0        5        0        8        T             C             0.615              0.385              2
    gnl|Prokka|UHGG144544_1   881437    T           12      0        6        0        6        C             T             0.500              0.500              2
    ```
+   - _major_allele_: the allele with the most read counts
+   - _minor_allele_: the allele with the 2nd most read counts; same with major_allele if only one allele is observed
+   - _major_allele_freq_: allele frequency of _major_allele_
+   - _minor_allele_freq_: allele frequency of _minor_allele_; 0.0 if only one allele is observed 
+   - _allele_counts_: number of alleles observed
+
+## Population SNVs Calling Analysis 
+
+Having run the single-sample SNV step for all the sample, users next can compute the across-sample SNV analysis using the `merge_snps` command. `merge_snps` requires a TSV file (`${my_sample_list}`) specifying the sample name `sample_name` and root output directory of single-sample SNV results `midas_outdir`. See [this page](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis) for details.
 
 
+### Important Concepts
 
-# Across-samples Analysis
-
-Population metagenomic SNVs calling and pangenome CNVs estimation can be accomplished by merging single-sample analysis results using the subcommands `merge_snps` and `merge_genes`.  All across-samples subcommands require the input file `samples_list`: a TSV file with `sample_name` and single-sample midas output directory `midas_outdir`. For example, given the following `samples_list`, `merge_snps` would expect to locate `/home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample/SRR172903/snps/snps_summary.tsv`, generated by `run_snps`.
-
-   ```
-   sample_name   midas_outdir
-   SRR172902     /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
-   SRR172903     /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
-   ```
-
-
-## Population SNVs Calling
+In this section, we will introduce the species and sample filters, the genomic site filters, the compute of population SNV in MIDAS 2.0, and the chunkified pileup. Beginner users can skip this section and go straight to [Sample commands](). 
 
 1. **<species, sub-samples-lists> selection**
 
-   As mentioned in the single-sample step, MIDAS 2.0 purposely hold any filter upon the single-sample pileup summary until the across-samples step.  The across-samples SNPs analysis restricts attention to "sufficiently well" covered species in "sufficiently many" samples. To be specific, only <species, sample> pair with more than 40% horizontal genome coverage (`fraction_covered`) and 5X vertical genome coverage (`mean_coverage`) would be kept. Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`sample_counts`) would be included for the population SNVs analysis. Therefore, different species may have different lists of relevant samples.
+   Population SNV analysis **restricts attention to "sufficiently well" covered species in "sufficiently many" samples**. 
+
+   To be specific, a given <species, sample> pair will only be kept if it has more than 40% horizontal genome coverage (`--genome_coverage`) and 5X vertical genome coverage (`--genome_depth`). Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`--sample_counts`) would be included for the population SNVs analysis. Therefore, different species may have different lists of relevant samples.
 
 
 2. **<site, relevant sample> selection**
 
-   For each genomic site, a sample is considered to be "relevant" if the corresponding site read depth falls between the range defined by the input parameters `site_depth` and `site_ratio * genome_depth`; otherwise ignored for the pooled-SNPs compute.  Therefore, different genomic sites from the same species may have different panels of "relevant samples".  And genomic site prevalence can be computed as the ratio of the number of relevant samples for the given site over the total number of relevant samples for the given species.
+   For each genomic site, a sample is considered to be "relevant" if the corresponding site depth falls between the range defined by the input arguments `site_depth` and `site_ratio * mean_genome_coverage`; otherwise it is ignored for the pooled-SNVs compute.  
+
+   Therefore, different genomic sites from the same species may have different panels of "relevant samples".  And genomic site prevalence can be computed as the ratio of the number of relevant samples for the given site over the total number of relevant samples for the given species.
 
 3. **Relevant site** 
 
-   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input argument `snv_type` and `site_prev`. 
+   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input arguments `--snv_type` and `--site_prev`. By default, common SNVs with more than 90% prevalence are reported.
 
+4. **Population SNVs Computation**
 
-4. **Population SNVs**
+   There are three main steps to compute and report population SNVs in MIDAS 2.0.
 
-   (1) For each **relevant** genomic site, MIDAS 2.0 determines the set of alleles present across **all** relevant samples. Specifically, for each allele (A, C, G, T), `merge_snps` subcommand (1) counts the sample counts (sc) of **relevant samples** containing corresponding allele (`scA:scT`), and (2) sums up the read counts (rc) of the corresponding allele across all the relevant samples (`rc_G:rc_T`).
+   First, for each **relevant** genomic site, MIDAS 2.0 determines the set of alleles present across **all** relevant samples.  Specifically, for each allele (A, C, G, T), `merge_snps` subcommand (1) tallys the sample counts (_sc_) of **relevant samples** containing corresponding allele (`scA:scT`), and (2) sums up the read counts (_rc_) of the corresponding allele across all the relevant samples (`rc_G:rc_T`).
 
    ```
    site_id                            rc_A  rc_C  rc_G  rc_T  sc_A  sc_C  sc_G  sc_T
-   gnl|Prokka|UHGG000587_14|34360|A   26    10    0     0     2     2     0     0
-   gnl|Prokka|UHGG000587_11|83994|T   0     0     11    45    0     0     2     2
+   gnl|Prokka|UHGG000587_14|34360|A   26    10    0     0     1     2     0     0
    ```
 
-   (2) Across-samples major and minor allele for a single site can be computed by the metric specified via the `snps_pooled_method`: sample counts as in `prevalence` and read counts as in `abundance`. For example, the population major allele of site UHGG143484_1|905|T in the above example is T defined by accumulated read counts and C defined by accumulated sample counts. And the population minor allele refers to the second most prevalent/abundant allele.  
+   Second, population major and minor alleles for a single site can be computed based on accumulated read counts or sample counts across all relevant samples (specified via `--snp_pooled_method`). The population allele refers to the most abundant/prevalent allele, and the population minor allele refers to the second most prevalent/abundant allele. For example, the population major allele of the site `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by accumulated read counts and `C` defined by accumulated sample counts. 
 
-   (3) The sample by site matrix of the corresponding site depths and allele frequency of the above calculated across-samples minor allele for each sample will be collected and reported.
+   Third, MIDAS 2.0 collects and reports the sample-by-site matrix of the corresponding (1) site depths and (2) allele frequency of the above calculated **population minor allele** for each sample.
 
-   More details about the compute can be found at [Cross-Sample SNP Analysis Tools (xsnp)](https://github.com/czbiohub/xsnp/wiki/Data-Schema-And-Computation)
+
+For large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species.
+
 
 
 ### Sample commands
 
+- Across-samples SNVs calling using default filters.
+
    ```
-   midas2 merge_snps --samples_list /path/to/sample/lists --num_cores 32 /path/to/merged/midas/outdir
+   midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \ --num_cores 32 ${midas_outdir}
+   ```
+
+- Users can customize species, sample, site filters. For example, we can
+   - compute all the bi-allelic, common population SNVs (present in more than 80% of the population) from the protein coding genes based on accumulated sample counts. The minimal allele frequency to call allele present is 0.05.
+
+     ```
+     --snp_type bi --snp_maf 0.05 --locus_type CDS --snp_pooled_method prevalence --site_prev 0.8
+     ```
+   - consider species with horizontal coverage > 40%, vertical coverage > 3X and present in more than 30 samples; only consider genomic site with 
+     ```
+     --genome_coverage 0.4 --genome_depth 3 --sample_counts 30 
+     ```
+   - include site with minimal read depth >= 5, and maximal read depth <= 3 * _mean_coverage_
+     ```
+     --site_depth 5 --site_ratio 3 
+     ```
+   
+   Now we can put all the above-mentioned filters in one `merge_snps` command:
+  
+   ```
+   midas2 merge_snps --samples_list ${my_sample_list} \
+        --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
+        --genome_coverage 0.4 --genome_depth 3 --sample_counts 30 \
+        --site_depth 5 --site_ratio 3 \
+        --snp_type bi --snp_maf 0.05 --locus_type CDS --snp_pooled_method prevalence \
+        --num_cores 32 ${midas_outdir}
    ```
 
 ### Output files
