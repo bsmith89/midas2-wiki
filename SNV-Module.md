@@ -10,7 +10,7 @@ In a standard workflow, rep-genome database of the species in the restricted spe
 
 MIDAS 2.0 purposely holds any filter or species selection upon the single-sample pileup results until across-samples SNV analysis. That being said, read mapping summary is reported in `snps_summay.tsv`, and pileup/variants calling results are reported by species. Therefore users can easily customize species selection on their own.
 
-### Sample command
+### Sample commands
 
 - Single-sample Pileup for all the species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`. 
 
