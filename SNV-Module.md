@@ -82,6 +82,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
    102506      5339468        2373275        8045342      468667         224553        0.444              3.390
    102337      2749621        2566404        47723458     1479479        1010530       0.933              18.595
    ```
+   - _species_id_: six digits species id
    - _genome_length_: genome length
    - _covered_bases_: number of bases covered by at least two reads
    - _total_depth_: total read depth across all _covered_bases_
