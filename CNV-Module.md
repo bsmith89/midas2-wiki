@@ -4,7 +4,7 @@ Similar to the SNV module, the CNV module also proceed in two phases: (1) single
 
 ## Single-Sample CNV Calling
 
-Species in the restricted species profile are concatenated and used to build the sample-specific pangenome database, to which reads are aligned using Bowtie2. Per species per centroid **copy numbers** are computed in three steps: (1) Per centroid, read alignment metrics, e.g _mapped_reads_ and _mean_coverage_, are computed; (2) Per species, median read coverage of all the mapped centroids corresponding to the 15 universal SCGs are determined; (3) Per centroid, `copy numbers` are computed and gene presence/absence are inferred.
+Species pangenome refers to the set of non-redundant genes (centroids) clustered from all the genome within on species cluster. Species in the restricted species profile are concatenated and used to build the sample-specific pangenome database, to which reads are aligned using Bowtie2. Per species per centroid **copy numbers** are computed in three steps: (1) Per centroid, read alignment metrics, e.g _mapped_reads_ and _mean_coverage_, are computed; (2) Per species, median read coverage of all the mapped centroids corresponding to the 15 universal SCGs are determined; (3) Per centroid, `copy numbers` are computed and gene presence/absence are inferred.
 
 ### Sample command
 
