@@ -33,7 +33,7 @@ Per species per centroid **copy numbers** are computed in three steps: (1) Per c
 
 ### Output files
 
-- `genes_summary.tsv`: read mapping and pan-gene coverage summary: 
+- `genes_summary.tsv`: read mapping and pan-gene coverage summary for all the species in the sample-specific pan-genome database
 
    ```
    species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads   marker_coverage
