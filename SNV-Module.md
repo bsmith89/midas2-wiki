@@ -219,8 +219,8 @@ In this section, we will introduce the species and sample filters, the genomic s
    SRR172902    100122      2560878        2108551        10782066     248700         207047        0.823             5.113
    SRR172903    100122      2560878        2300193        39263110     1180505        820736        0.898             17.069
    ```
-   - sample_name: unique sample name
-   - species_id: six-digit species id
+   - _sample_name_: unique sample name
+   - _species_id_: six-digit species id
 
 - `{species_id}.snps_info.tsv.lz4`: per species SNV metadata information.  
 
