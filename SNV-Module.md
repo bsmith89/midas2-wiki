@@ -159,13 +159,15 @@ In this section, we will introduce the species and sample filters, the genomic s
    gnl|Prokka|UHGG000587_14|34360|A   26    10    0     0     1     2     0     0
    ```
 
-   Second, population major and minor alleles for a single site can be computed based on accumulated read counts or sample counts across all relevant samples (specified via `--snp_pooled_method`). The population allele refers to the most abundant/prevalent allele, and the population minor allele refers to the second most prevalent/abundant allele. For example, the population major allele of the site `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by accumulated read counts and `C` defined by accumulated sample counts. 
+   Second, population major and minor alleles for a single site can be computed based on accumulated read counts or sample counts across all relevant samples (specified via `--snp_pooled_method`). The population allele refers to the most abundant/prevalent allele, and the population minor allele refers to the second most prevalent/abundant allele. 
+
+   For example, the population major allele of the site `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by accumulated read counts and `C` defined by accumulated sample counts. 
 
    Third, MIDAS 2.0 collects and reports the sample-by-site matrix of the corresponding (1) site depths and (2) allele frequency of the above calculated **population minor allele** for each sample.
 
+5. **Chunkified Pileup Implementation**
 
-For large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species.
-
+   Both single-sample and across-samples pileup was parallelized on the unit of chunk of sites, which is indexed by <species_id, chunk_id>. Only when all chunks from the same species finished processing, chunk-level pileup results would be merged into species-level pileup file. This implementation makes population SNVs analysis across thousands of samples possible. To compute the population SNVs for one chunk, all the pileup results of corresponding sites across all the samples need to be read into memory. With the uses of multiple CPUs, multiple chunks can be processed at the same time. Therefore, for large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species. Users can adjust the number of sites per chunk via the `--chunk_size`. MIDAS 2.0 also has a `--robust_chunk` option, where adjusting chunk size based on species prevalence.
 
 
 ### Sample commands
@@ -176,19 +178,24 @@ For large collections of samples, we recommend higher CPU counts and smaller chu
    midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \ --num_cores 32 ${midas_outdir}
    ```
 
-- Users can customize species, sample, site filters. For example, we can
-   - compute all the bi-allelic, common population SNVs (present in more than 80% of the population) from the protein coding genes based on accumulated sample counts. The minimal allele frequency to call allele present is 0.05.
+- Users can customize species, sample, site filters. 
 
-     ```
-     --snp_type bi --snp_maf 0.05 --locus_type CDS --snp_pooled_method prevalence --site_prev 0.8
-     ```
+   For example, we can apply the species and sample filters as following:  
    - consider species with horizontal coverage > 40%, vertical coverage > 3X and present in more than 30 samples; only consider genomic site with 
      ```
      --genome_coverage 0.4 --genome_depth 3 --sample_counts 30 
      ```
+
+   For example, we can apply genomic sites filters as following: 
    - include site with minimal read depth >= 5, and maximal read depth <= 3 * _mean_coverage_
      ```
      --site_depth 5 --site_ratio 3 
+     ```
+   
+   For example, we can choose to only report SNVs meeting the following criteria:
+   - compute all the bi-allelic, common population SNVs (present in more than 80% of the population) from the protein coding genes based on accumulated sample counts. The minimal allele frequency to call allele present is 0.05.
+     ```
+     --snp_type bi --snp_maf 0.05 --locus_type CDS --snp_pooled_method prevalence --site_prev 0.8
      ```
    
    Now we can put all the above-mentioned filters in one `merge_snps` command:
@@ -204,23 +211,42 @@ For large collections of samples, we recommend higher CPU counts and smaller chu
 
 ### Output files
 
-- Pooled single-sample pileup summary: `snps_summary.tsv`
+- `snps_summary.tsv`: merged single-sample pileup summary. The reported columns _covered_bases_:_mean_coverage_ are the same with single-sample pileup summary.
 
    ```
    sample_name  species_id  genome_length  covered_bases  total_depth  aligned_reads  mapped_reads  fraction_covered  mean_coverage
    SRR172902    100122      2560878        2108551        10782066     248700         207047        0.823             5.113
    SRR172903    100122      2560878        2300193        39263110     1180505        820736        0.898             17.069
    ```
+   - sample_name: unique sample name
+   - species_id: six-digit species id
 
-- Per species SNPs information file: `{species_id}.snps_info.tsv.lz4`.  It contains the computed population major and minor alleles, together with all the metadata.
+- `{species_id}.snps_info.tsv.lz4`: per species SNVs metadata information.  
 
    ```
    site_id                             major_allele  minor_allele  sample_counts  snp_type  rc_A  rc_C  rc_G  rc_T  sc_A  sc_C  sc_G  sc_T  locus_type  gene_id           site_type  amino_acids
    gnl|Prokka|UHGG000587_14|34360|A    A             C              2             bi        26    10    0     0     2     2     0     0     CDS         UHGG000587_02083  4D         T,T,T,T
    gnl|Prokka|UHGG000587_11|83994|T    G             T              2             bi        0     0     11    45    0     0     2     2     IGR         None              None       None
    ```
+   - _site_id_: unique site id, composed of f"{ref_id}|{ref_pos}|{ref_allele}"
+   - _major_allele_: most common/prevalent allele in metagenomes
+   - _minor_allele_: second most common/prevalent allele in metagenomes
+   - _sample_counts_: number of relevant samples where metagenomes is found
+   - _snp_type_: the number of alleles observed at site (mono,bi,tri,quad)
+   - _rc_A_: accumulated read counts of A allele in metagenomes
+   - _rc_C_: accumulated read counts of C allele in metagenomes
+   - _rc_G_: accumulated read counts of G allele in metagenomes
+   - _rc_T_: accumulated read counts of T allele in metagenomes
+   - _sc_A_: accumulated sample counts of A allele in metagenomes
+   - _sc_C_: accumulated sample counts of C allele in metagenomes
+   - _sc_G_: accumulated sample counts of G allele in metagenomes
+   - _sc_T_: accumulated sample counts of T allele in metagenomes
+   - _locus_type_: CDS (site in coding gene), RNA (site in non-coding gene), IGR (site in intergenic region)
+   - _gene_id_: gene identified if locus type is CDS, or RNA
+   - _site_type_: indicates degeneracy: 1D, 2D, 3D, 4D
+   - _amino_acids_: amino acids encoded by 4 possible alleles
 
-- Per species site-by-sample allele frequency matrix of **population minor allele**: `{species_id}.snps_freq.tsv.lz4`.
+- `{species_id}.snps_freq.tsv.lz4`: per species site-by-sample allele frequency matrix of **population minor allele**.
 
   ```
   site_id                             SRR172902   SRR172903
@@ -228,12 +254,11 @@ For large collections of samples, we recommend higher CPU counts and smaller chu
   gnl|Prokka|UHGG000587_14|34360|A    0.300       0.269
   ```
 
-- Per species site-by-sample site depth matrix: `{species_id}.snps_depth.tsv.lz4`. **Only** accounts for the alleles matching either population major or/and population minor allele.
+- `{species_id}.snps_depth.tsv.lz4`: per species site-by-sample site depth matrix. **Only** accounts for the alleles matching the population major and/or population minor allele.
 
   ```
   site_id                             SRR172902   SRR172903
   gnl|Prokka|UHGG000587_11|83994|T    13          43
   gnl|Prokka|UHGG000587_14|34360|A    10          26
   ```
-
 
