@@ -36,7 +36,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
 
 - Single-sample pileup for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
   
-  Users can recruit only properly paired reads for pileup, by passing the `--paired_only` with proper `--fragment_length`. In this case, the post-alignment metrics will be computed based on a read pair, instead of single read.
+  Users can recruit only properly paired reads for pileup, by passing the `paired_only` with proper `fragment_length`. In this case, the post-alignment metrics will be computed based on a read pair, instead of single read.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -49,7 +49,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
 
 - Single-sample variant calling for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
   
-  In recognition of the need for single-sample variant calling, we added an `advanced` mode to the single-sample SNV analysis in MIDAS 2.0. In the advanced mode, per-species pileup results will also report major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter can be applied by the users. Users are advised to use the setting `--ignore_ambiguous` to avoid falsely calling major/minor alleles for sites with tied read counts.
+  In recognition of the need for single-sample variant calling, we added an `advanced` mode to the single-sample SNV analysis in MIDAS 2.0. In the advanced mode, per-species pileup results will also report major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter can be applied by the users. Users are advised to use the setting `ignore_ambiguous` to avoid falsely calling major/minor alleles for sites with tied read counts.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -135,7 +135,7 @@ In this section, we will introduce the species and sample filters, the genomic s
 
    Population SNV analysis **restricts attention to "sufficiently well" covered species in "sufficiently many" samples**. 
 
-   To be specific, a given <species, sample> pair will only be kept if it has more than 40% horizontal genome coverage (`--genome_coverage`) and 5X vertical genome coverage (`--genome_depth`). Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`--sample_counts`) would be included for the population SNV analysis. Therefore, different species may have different lists of relevant samples.
+   To be specific, a given <species, sample> pair will only be kept if it has more than 40% horizontal genome coverage (`genome_coverage`) and 5X vertical genome coverage (`genome_depth`). Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`sample_counts`) would be included for the population SNV analysis. Therefore, different species may have different lists of relevant samples.
 
 
 2. **<site, relevant sample> selection**
@@ -146,7 +146,7 @@ In this section, we will introduce the species and sample filters, the genomic s
 
 3. **Relevant site** 
 
-   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input arguments `--snv_type` and `--site_prev`. By default, common SNV with more than 90% prevalence are reported.
+   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input arguments `snv_type` and `site_prev`. By default, common SNV with more than 90% prevalence are reported.
 
 4. **Population SNV Computation**
 
@@ -159,7 +159,7 @@ In this section, we will introduce the species and sample filters, the genomic s
    gnl|Prokka|UHGG000587_14|34360|A   26    10    0     0     1     2     0     0
    ```
 
-   Second, population major and minor alleles for a single site can be computed based on accumulated read counts or sample counts across all relevant samples (specified via `--snp_pooled_method`). The population allele refers to the most abundant/prevalent allele, and the population minor allele refers to the second most prevalent/abundant allele. 
+   Second, population major and minor alleles for a single site can be computed based on accumulated read counts or sample counts across all relevant samples (specified via `snp_pooled_method`). The population allele refers to the most abundant/prevalent allele, and the population minor allele refers to the second most prevalent/abundant allele. 
 
    For example, the population major allele of the site `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by accumulated read counts and `C` defined by accumulated sample counts. 
 
@@ -167,7 +167,7 @@ In this section, we will introduce the species and sample filters, the genomic s
 
 5. **Chunkified Pileup Implementation**
 
-   Both single-sample and across-samples pileup was parallelized on the unit of chunk of sites, which is indexed by <species_id, chunk_id>. Only when all chunks from the same species finished processing, chunk-level pileup results would be merged into species-level pileup file. This implementation makes population SNV analysis across thousands of samples possible. To compute the population SNV for one chunk, all the pileup results of corresponding sites across all the samples need to be read into memory. With the uses of multiple CPUs, multiple chunks can be processed at the same time. Therefore, for large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species. Users can adjust the number of sites per chunk via the `--chunk_size`. MIDAS 2.0 also has a `--robust_chunk` option, where adjusting chunk size based on species prevalence.
+   Both single-sample and across-samples pileup was parallelized on the unit of chunk of sites, which is indexed by <species_id, chunk_id>. Only when all chunks from the same species finished processing, chunk-level pileup results would be merged into species-level pileup file. This implementation makes population SNV analysis across thousands of samples possible. To compute the population SNV for one chunk, all the pileup results of corresponding sites across all the samples need to be read into memory. With the uses of multiple CPUs, multiple chunks can be processed at the same time. Therefore, for large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species. Users can adjust the number of sites per chunk via the `chunk_size` (default value = 1000000). MIDAS 2.0 also has a `robust_chunk` option, where adjusting chunk size based on species prevalence.
 
 
 ### Sample commands
@@ -175,7 +175,7 @@ In this section, we will introduce the species and sample filters, the genomic s
 - Across-samples SNV calling using default filters.
 
    ```
-   midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \ --num_cores 32 ${midas_outdir}
+   midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} --num_cores 32 ${midas_outdir}
    ```
 
 - Users can customize species, sample, site filters. 
