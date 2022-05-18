@@ -122,7 +122,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
    - _minor_allele_freq_: allele frequency of _minor_allele_; 0.0 if only one allele is observed 
    - _allele_counts_: number of alleles observed
 
-## Population SNVs Calling Analysis 
+## Population SNV Calling Analysis 
 
 Having run the single-sample SNV step for all the sample, users next can compute the across-sample SNV analysis using the `merge_snps` command. `merge_snps` requires a TSV file (`${my_sample_list}`) specifying the sample name `sample_name` and root output directory of single-sample SNV results `midas_outdir`. See [this page](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis) for details.
 
@@ -135,22 +135,22 @@ In this section, we will introduce the species and sample filters, the genomic s
 
    Population SNV analysis **restricts attention to "sufficiently well" covered species in "sufficiently many" samples**. 
 
-   To be specific, a given <species, sample> pair will only be kept if it has more than 40% horizontal genome coverage (`--genome_coverage`) and 5X vertical genome coverage (`--genome_depth`). Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`--sample_counts`) would be included for the population SNVs analysis. Therefore, different species may have different lists of relevant samples.
+   To be specific, a given <species, sample> pair will only be kept if it has more than 40% horizontal genome coverage (`--genome_coverage`) and 5X vertical genome coverage (`--genome_depth`). Furthermore, only "sufficiently prevalent" species with "sufficiently many" (`--sample_counts`) would be included for the population SNV analysis. Therefore, different species may have different lists of relevant samples.
 
 
 2. **<site, relevant sample> selection**
 
-   For each genomic site, a sample is considered to be "relevant" if the corresponding site depth falls between the range defined by the input arguments `site_depth` and `site_ratio * mean_genome_coverage`; otherwise it is ignored for the pooled-SNVs compute.  
+   For each genomic site, a sample is considered to be "relevant" if the corresponding site depth falls between the range defined by the input arguments `site_depth` and `site_ratio * mean_genome_coverage`; otherwise it is ignored for the pooled-SNV compute.  
 
    Therefore, different genomic sites from the same species may have different panels of "relevant samples".  And genomic site prevalence can be computed as the ratio of the number of relevant samples for the given site over the total number of relevant samples for the given species.
 
 3. **Relevant site** 
 
-   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input arguments `--snv_type` and `--site_prev`. By default, common SNVs with more than 90% prevalence are reported.
+   For each species, a site is considered to be "relevant" if the site prevalence meets the range defined by the input arguments `--snv_type` and `--site_prev`. By default, common SNV with more than 90% prevalence are reported.
 
-4. **Population SNVs Computation**
+4. **Population SNV Computation**
 
-   There are three main steps to compute and report population SNVs in MIDAS 2.0.
+   There are three main steps to compute and report population SNV in MIDAS 2.0.
 
    First, for each **relevant** genomic site, MIDAS 2.0 determines the set of alleles present across **all** relevant samples.  Specifically, for each allele (A, C, G, T), `merge_snps` subcommand (1) tallys the sample counts (_sc_) of **relevant samples** containing corresponding allele (`scA:scT`), and (2) sums up the read counts (_rc_) of the corresponding allele across all the relevant samples (`rc_G:rc_T`).
 
@@ -167,12 +167,12 @@ In this section, we will introduce the species and sample filters, the genomic s
 
 5. **Chunkified Pileup Implementation**
 
-   Both single-sample and across-samples pileup was parallelized on the unit of chunk of sites, which is indexed by <species_id, chunk_id>. Only when all chunks from the same species finished processing, chunk-level pileup results would be merged into species-level pileup file. This implementation makes population SNVs analysis across thousands of samples possible. To compute the population SNVs for one chunk, all the pileup results of corresponding sites across all the samples need to be read into memory. With the uses of multiple CPUs, multiple chunks can be processed at the same time. Therefore, for large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species. Users can adjust the number of sites per chunk via the `--chunk_size`. MIDAS 2.0 also has a `--robust_chunk` option, where adjusting chunk size based on species prevalence.
+   Both single-sample and across-samples pileup was parallelized on the unit of chunk of sites, which is indexed by <species_id, chunk_id>. Only when all chunks from the same species finished processing, chunk-level pileup results would be merged into species-level pileup file. This implementation makes population SNV analysis across thousands of samples possible. To compute the population SNV for one chunk, all the pileup results of corresponding sites across all the samples need to be read into memory. With the uses of multiple CPUs, multiple chunks can be processed at the same time. Therefore, for large collections of samples, we recommend higher CPU counts and smaller chunk sizes to optimally balance memory and I/O usage, especially for highly prevalent species. Users can adjust the number of sites per chunk via the `--chunk_size`. MIDAS 2.0 also has a `--robust_chunk` option, where adjusting chunk size based on species prevalence.
 
 
 ### Sample commands
 
-- Across-samples SNVs calling using default filters.
+- Across-samples SNV calling using default filters.
 
    ```
    midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \ --num_cores 32 ${midas_outdir}
@@ -192,8 +192,8 @@ In this section, we will introduce the species and sample filters, the genomic s
      --site_depth 5 --site_ratio 3 
      ```
    
-   For example, we can choose to only report SNVs meeting the following criteria:
-   - compute all the bi-allelic, common population SNVs (present in more than 80% of the population) from the protein coding genes based on accumulated sample counts. The minimal allele frequency to call allele present is 0.05.
+   For example, we can choose to only report SNV meeting the following criteria:
+   - compute all the bi-allelic, common population SNV (present in more than 80% of the population) from the protein coding genes based on accumulated sample counts. The minimal allele frequency to call allele present is 0.05.
      ```
      --snp_type bi --snp_maf 0.05 --locus_type CDS --snp_pooled_method prevalence --site_prev 0.8
      ```
@@ -221,7 +221,7 @@ In this section, we will introduce the species and sample filters, the genomic s
    - sample_name: unique sample name
    - species_id: six-digit species id
 
-- `{species_id}.snps_info.tsv.lz4`: per species SNVs metadata information.  
+- `{species_id}.snps_info.tsv.lz4`: per species SNV metadata information.  
 
    ```
    site_id                             major_allele  minor_allele  sample_counts  snp_type  rc_A  rc_C  rc_G  rc_T  sc_A  sc_C  sc_G  sc_T  locus_type  gene_id           site_type  amino_acids
