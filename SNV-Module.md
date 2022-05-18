@@ -49,7 +49,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
 
 - Single-sample variant calling for all the species in the restricted species profile with paired-ends based post-alignment quality filter.
   
-  In recognition of the need for single-sample SNV calling, we added an `--advanced` mode to the single-sample SNV analysis in MIDAS 2.0 to report per species major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter should be applied by the users. MIDAS 2.0 ignore ambiguous alleles calling, where genomic sites recruit tied read counts (`--ignore_ambiguous`)
+  In recognition of the need for single-sample variant calling, we added an `advanced` mode to the single-sample SNV analysis in MIDAS 2.0. In the advanced mode, per-species pileup results will also report major allele and minor allele for all the genomic sites covered by at least two reads, upon which custom variant calling filter can be applied by the users. Users are advised to use the setting `--ignore_ambiguous` to avoid falsely calling major/minor alleles for sites with tied read counts.
 
    ```
    midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -108,7 +108,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
    - _count_g_: read counts of G allele
    - _count_t_: read counts of T allele
    
-- In the `--advanced` mode, per-species pileup file will also include the called variants for **all** the genomic sites. 
+- In the `advanced` mode, per-species pileup file will also include the called variants for **all** the genomic sites. 
 
    ```
    ref_id                    ref_pos   ref_allele  depth   count_a  count_c  count_g  count_t  major_allele  minor_allele  major_allele_freq  minor_allele_freq  allele_counts
