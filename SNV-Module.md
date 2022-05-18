@@ -125,7 +125,7 @@ MIDAS 2.0 purposely holds any filter or species selection upon the single-sample
 
 ## Population SNV Calling Analysis 
 
-Having run the single-sample SNV steps for all the sample, users next can compute the across-sample SNV analysis using the `merge_snps` command. `merge_snps` requires a TSV file (`${my_sample_list}`) specifying the sample name `sample_name` and root output directory of single-sample SNV results `midas_outdir`. See [this page](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis) for details.
+Having run the single-sample SNV steps for all the sample, users next can compute the across-samples SNV analysis using the `merge_snps` command. `merge_snps` requires a TSV file (`${my_sample_list}`) specifying the sample name `sample_name` and root output directory of single-sample SNV results `midas_outdir`. See [this page](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis) for details.
 
 
 ### Important Concepts
