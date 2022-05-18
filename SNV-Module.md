@@ -1,5 +1,5 @@
 
-# SNV Module: Population Single Nucleotide Variants (SNVs) Calling
+# SNV Module: Population Single Nucleotide Variants Calling
 
 The SNV module proceeds in two phages: (1) single-sample read pileup (2) population variants calling across all the species. The first steps can be potentially in parallel.  We presuppose users already run the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization) step, and either have single-sample `species_profile.tsv` or a prebuilt Bowtie2 rep-genome database ready for the SNV module.
 
