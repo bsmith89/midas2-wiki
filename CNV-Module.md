@@ -1,36 +1,50 @@
+# CNV Module: Population Pangenome Copy Number Variants Calling
 
+Similar to the SNV module, the CNV module also proceed in two phases: (1) single-sample pan-genome copy number variants calling (2) merge these results into a summary across all samples. The first step can potentially run in parallel. We presuppose users already follow the [database customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization) step, and have single-sample `species_profile.tsv` ready.
 
-## Pangenome Profiling
+## Single-Sample CNV Calling
 
-Species-level pangenome refers to the set of non-redundant genes (centroids) clustered from all the genomes within one species cluster. Species in the restricted species profile would be concatenated and used to build the sample-specific pangenome database, to which reads were aligned using Bowtie2. Per species per centroid **copy number** were computed in three steps: (1) Per centroid, reads alignment metrics, .e.g `mapped reads` and `mean coverage`, were computed; (2) Per species, median reads coverage of all the mapped centroids corresponding to the 15 universal single-copy genes (SCGs); (3) Per centroid, `copy number` were computed and gene presence/absence were inferred.
+Species in the restricted species profile are concatenated and used to build the sample-specific pangenome database, to which reads are aligned using Bowtie2. Per species per centroid **copy numbers** are computed in three steps: (1) Per centroid, read alignment metrics, e.g _mapped_reads_ and _mean_coverage_, are computed; (2) Per species, median read coverage of all the mapped centroids corresponding to the 15 universal SCGs are determined; (3) Per centroid, `copy numbers` are computed and gene presence/absence are inferred.
 
 ### Sample command
 
+- Single-sample CNV calling for all species in the restricted species profile: `median_marker_coverage > 2` and `unique_fraction-covered` > 0.5. 
    ```
-   midas2 run_species --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-         --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-         --num_cores 8 /path/to/base/midas/output
+   midas2 run_genes --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
+         --select_by median_marker_coverage,unique_fraction_covered \
+         --select_threshold=2,0.5 \
+         --num_cores 12 ${midas_outdir}     
+   ```
 
-   midas2 run_genes --sample_name ${sample_name} -1 /path/to/R1 -2 /path/to/R2 \
-          --midasdb_name uhgg --midasdb_dir /path/to/local/midasdb \
-          --select_by median_marker_coverage,unique_fraction_covered \
-          --select_threshold=2,0.5 \
-          --num_cores 12 /path/to/base/midas/output
+   Users can adjust post-alignment quality filter parameters via the command line arguments, and the defaults are:
+
+   ```
+   --mapq >= 2: reads aligned to more than one genomic locations equally well are discard (MAPQ=0,1).
+   --mapid >= 0.94: discard read alignments with alignment identity < 0.94
+   --aln_readq >= 20: discard read alignment with mean quality < 20
+   --aln_cov >= 0.75: discard read alignment with alignment coverage < 0.75
    ```
 
 ### Output files
 
-- Reads mapping and gene coverage summary: `genes_summary.tsv`. 
-
-  - By default, reads aligned to more than one genomic location equally well (`MAPQ=0, 1`) are ignored.
+- `genes_summary.tsv`: read mapping and pan-gene coverage summary: 
 
    ```
    species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads   marker_coverage
    102337      15578           4468           0.287             16.213         1650361        450353         20.213
    102506      731186          4733           0.006             3.803          681335         37272          2.140
    ```
+   - _species_id_: six-digit species id
+   - _pangenome_size_: number of non-redundant genes (centroids) in the species pan-genome
+   - _covered_genes_: number of genes covered with at least one read
+   - _fraction_covered_: fraction of _covered_genes_ over _pangenome_size_
+   - _mean_coverage_: average read depth across _covered_genes_
+   - _aligned_reads_: total number of aligned reads before post-alignment filter
+   - _mapped_reads_: total number of aligned reads after post-alignment filter
+   - _marker_coverage_: average read depth across universal SCGs in the species pan-genome
 
-- Per-species gene content profiling results: `{species_id}.genes.tsv.lz4`: 
+- `{species_id}.genes.tsv.lz4`: per-species gene content profiling summary 
 
    ```
    gene_id              gene_length  aligned_reads  mapped_reads  mean_coverage  fraction_covered  copy_number
@@ -38,14 +52,18 @@ Species-level pangenome refers to the set of non-redundant genes (centroids) clu
    UHGG143901_03589     384          103            57            32.840708      0.294271          15.347667
    UHGG143902_04031     207          9              2             1.737500       0.386473          0.811997
    ```
+   - gene_id: id of centroid in the species pan-genome
+   - gene_length: gene length
+   - aligned_reads: number of aligned reads before post-alignment filter
+   - mapped_reads: number of aligned reads after post-alignment filter
+   - mean_coverage: average read depth of _gene_id_ based on _mapped_reads_ (total_gene_depth / covered_bases)
+   - fraction_covered: horizontal proportion of the covered genes (covered_bases / gene_length)
+   - copy_number: estimated copy number of _gene_id_ based on _mapped_reads_ (_mean_coverage_ / median_marker_coverage)
 
-***
 
+## Across-Samples CNV Calling
 
-
-# Across-samples Analysis
-
-Population metagenomic SNVs calling and pangenome CNVs estimation can be accomplished by merging single-sample analysis results using the subcommands `merge_snps` and `merge_genes`.  All across-samples subcommands require the input file `samples_list`: a TSV file with `sample_name` and single-sample midas output directory `midas_outdir`. For example, given the following `samples_list`, `merge_snps` would expect to locate `/home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample/SRR172903/snps/snps_summary.tsv`, generated by `run_snps`.
+Take the [same](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis) `${my_sample_list}`:
 
    ```
    sample_name   midas_outdir
@@ -53,29 +71,40 @@ Population metagenomic SNVs calling and pangenome CNVs estimation can be accompl
    SRR172903     /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
    ```
 
+`merge_genes` would expect to locate `/home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample/SRR172903/genes/genes_summary.tsv`, generated by `run_genes`.
 
-## Population CNVs Profiling
 
-MIDAS 2.0 `merge_gene` subcommands merge single-sample gene content profiling results across all the samples listed in the `samples_list`, and further on quantify each gene's presence/absence by compare the `copy_number` with the user defined minimal gene copy number to call a gene present (`min_copy`).
+Having run the single-sample CNV analysis for all the samples listed in the `${my_sample_list}`, users next can merge the results and product a summary with `merge_genes` command, and further quantify each gene's presence/absence by comparing the `copy_number` with the user-defined minimal gene copy number (`min_copy`).
 
 
 ### Sample command
 
-   ```
-   midas2 merge_genes --samples_list /path/to/sample/lists --num_cores 8 /path/to/merged/midas/outdir
-   ```
-
-### Target output files
-
-- Pooled single-sample gene content summary: `genes_summary.tsv`
+- Across-samples CNV analysis using default filters.
 
    ```
-   sample_name  species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads  marker_depth
+   midas2 merge_genes --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} --num_cores 8 ${midas_outdir}
+   ```
+
+   By default, gene CNV is reported for genes clustered at 95% identity. `cluster_pid` and `min_copy` can be customized with the following command line options:
+  ```
+  --genome_depth: filter out species with mean_coverage < 1X. 
+  --min_copy: genes with copy_number >= 0.35 are classified as present.
+  --cluster_pid: gene CNV results can be reported at various clustering cutoffs {75, 80, 85, 90, 95, 99}.
+  ```
+
+### Output files
+
+- `genes_summary.tsv`: merged single-sample gene content summary. The reported columns _covered_genes_:_marker_coverage_ are the same with single-sample pileup summary.
+
+   ```
+   sample_name  species_id  pangenome_size  covered_genes  fraction_covered  mean_coverage  aligned_reads  mapped_reads  marker_coverage
    SRR172902    100122      29165           2535           0.087             4.723          263395         53006         1.435
    SRR172903    100122      29165           3212           0.110             16.095         1447684        263878        10.713
    ```
+   - _sample_name_: unique sample name
+   - _species_id_: six-digit species id
 
-- Per species gene-by-sample copy number matrix: `{species_id}.genes_copynum.tsv.lz4`
+- `{species_id}.genes_copynum.tsv.lz4`: per species gene-by-sample copy number matrix
 
   ```
   gene_id            SRR172902     SRR172903
@@ -84,7 +113,7 @@ MIDAS 2.0 `merge_gene` subcommands merge single-sample gene content profiling re
   UHGG000587_00962   2.370930      0.289325
   ```
 
-- Per species gene-by-sample presence absence matrix: `{species_id}.genes_preabs.tsv.lz4`
+- `{species_id}.genes_preabs.tsv.lz4`: per species gene-by-sample presence absence matrix 
  
   ```
   gene_id             SRR172902    SRR172903
@@ -93,7 +122,7 @@ MIDAS 2.0 `merge_gene` subcommands merge single-sample gene content profiling re
   UHGG000587_00962    1            0 
   ```
 
-- Per species gene-by-sample gene average coverage matrix: `{species_id}.genes_depth.tsv.lz4`
+- `{species_id}.genes_depth.tsv.lz4`: per species gene-by-sample gene average coverage matrix 
 
   ```
   gene_id             SRR172902   SRR172903
