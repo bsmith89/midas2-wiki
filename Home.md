@@ -206,6 +206,108 @@ TODO
 
 TODO
 
+# Module: Database Management
+
+A MIDASDB is comprised of species pangenomes, representative genomes, and
+marker genes.
+We have already constructed and made available for download MIDASDBs for two
+comprehensive public microbial genome collections.
+
+TODO: Link to the websites for each of these.
+
+```
+$ midas2 database --list
+uhgg 286997 genomes from 4644 species version 1.0
+gtdb 258405 genomes from 47893 species version r202
+```
+
+Most MIDAS commands take as an argument a path to a local mirror of the MIDASDB,
+as well as the name of the database.
+
+```
+--midasdb_dir: /path/to/the/local/MIDASDB
+--midasdb_name: the name prokaryotic genome database (either 'uhgg' or 'gtdb')
+```
+
+For the purposes of this documentation we'll generally assume that we're working
+with the prebuilt `gtdb` MIDASDB and that the local mirror is in a subdirectory
+of the project root: `./midasdb`.
+However, in practice, users may prefer to have a centralized
+MIDASDB so that multiple projects and users can use previously cached files.
+
+## Preloading species marker genes
+
+We highly recommend that first time users initialize a local MIDASDB
+This downloads the minimal information needed to run the species module
+needed for species selection by the SNV and CNV modules.
+
+```
+midas2 database --init --midasdb_name gtdb --midasdb_dir ./midasdb
+```
+
+## Preloading all species
+
+While it _is_ possible to download an entire MIDASDB using the following
+command:
+
+```
+midas2 database --download --midasdb_name gtdb --midasdb_dir ./midasdb -s all
+```
+
+this requires a large amount of data transfer and storage:
+93 GB for `uhgg` and 539 GB for `gtdb`.
+
+## Preloading select species
+
+Instead, we recommend that users take advantage of species-level database
+sharding to download and decompress only the necessary portions of a
+MIDASDB.
+
+This can be done on-demand based on various species-filtering criteria (see TODO)
+passed to the single-sample analyses of both the SNV and CNV modules.
+Unfortunately, this does not play nicely with parallelizing computation
+across samples, because multiple `run_snps` or `run_genes` processes
+might simultaneously attempt to download the same species data.
+Instead, we recommend that users consider pre-selecting a list of species
+for download.
+
+If we save the following list of species IDs (here an example with only two
+species) to a plain text file named `./species.list`:
+
+```
+102506
+122337
+```
+
+we can then run the following to preload all of the data needed for these species:
+
+```
+midas2 database \
+    --download --midasdb_name gtdb --midasdb_dir ./midasdb \
+    --species_list ./species.list
+```
+
+Advanced users may be interested in using the outputs of the `merge_species`
+command used in the [species selection module](#module--species-selection)
+to generate this list of species, e.g.:
+
+```
+# Generate the list of species that is present in more than one sample
+# TODO: What is in column $6? (be explicit)
+awk '$6 > 1 {print $6}' \
+    < ./midas_output/species/species_prevalence.tsv \
+    > ./species.tsv
+```
+
+Now, when running `run_snps` or `run_genes` for multiple samples in parallel
+(e.g. using a workflow manager or background processes in UNIX),
+MIDAS2 will see that the necessary parts of the MIDASDB have already been
+downloaded and will not repeat that step.
+
+It is also possible for users to
+[construct their own MIDASDB](#advanced--building-your-own-midasdb)
+from a custom genome collection (e.g. for metagenome assembled genomes).
+
 # Module: Species Selection
 
 - TODO: Any special details for run_species, merge_species? Necessary flags?
@@ -260,13 +362,7 @@ docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
 # TODO
 ```
 
-# Advanced: Database Management
-
-## Downloading Databases
-
-TODO
-
-## Building Your Own MIDASDB
+# Advanced: Building Your Own MIDASDB
 
 TODO
 
