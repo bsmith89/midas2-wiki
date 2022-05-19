@@ -1,7 +1,7 @@
 # MIDAS2: Metagenomic Intra-Species Diversity Analysis
 
 Metagenomic Intra-Species Diversity Analysis
-([MIDAS2](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
+([MIDAS](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
 workflows for
 **profiling strain-level genomic variations in shotgun metagenomic data**.
 Specifically, MIDAS2 is designed to profile strain genotypes in two
@@ -17,7 +17,7 @@ If it's MIDAS 2.0, then what's the
 next minor version? MIDAS 2.1? MIDAS 2.0 v0.1, 2.0.2? MIDAS2 is also cleaner to my eye and
 matches the program name
 -->
-MIDAS2 implements the same analyses as the original [MIDAS](https://github.com/snayfach/MIDAS),
+MIDAS2 implements the same analyses as the original [MIDAS tool](https://github.com/snayfach/MIDAS),
 but re-engineered to (1) allow for multiple, alternative reference databases
 (MIDASDBs), and (2) optimize scaling to collections of thousands of samples.
 
