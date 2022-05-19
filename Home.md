@@ -476,8 +476,8 @@ species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  sa
      102506       0.019       0.052
      ```
 
-Having finished the database customization step, users can now go to
-the SNV or CNV modules, depending on their scientific aims.
+Having finished the species-selection step, users can now go to the SNV or CNV
+modules, depending on their scientific aims.
 
 # Module: Single-Nucleotide Variant Analysis
 
