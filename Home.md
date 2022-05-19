@@ -382,15 +382,10 @@ All development is done with git and GitHub
 
 ## Installation
 
-Use the [developer installation](#developer-installation) as described.
-```
-git clone https://github.com/czbiohub/MIDAS2.0.git midas2
-cd midas2
-```
+Use the [developer installation](#developer-installation) as described;
+be sure to run pip with the `-e` or `--editable` flag.
 
-## Run Unit Tests
-
-For advanced users, a more complex unit test for all main features of MIDAS 2.0:
+## Run Integration Tests
 
 ```
 bash tests/midas2_analysis.sh 8
