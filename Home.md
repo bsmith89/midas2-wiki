@@ -159,7 +159,9 @@ SNVs analysis (SNV module) and pan-genome CNVs analysis (CNV module).  Each
 module includes two sequential steps: single-sample analysis and across-samples
 analysis.
 
-![Figure 1: MIDAS2 Analysis Modules](static/Fig.Modules.png)
+![
+MIDAS2 Analysis Modules
+](static/Fig.Modules.png)
 
 Before running these modules, however, the MIDAS workflow starts by identifying
 species at high coverage in each sample (species module).
@@ -775,7 +777,9 @@ and the target layout using a toy collection of genomes with only one species
 cluster `species1` with two genomes (`genome1` and `genome2`).
 
 
-![Figure 1: MIDAS Reference Database Target Layout and Construction Steps](static/Fig.DB.Layout.png)
+![
+MIDAS Reference Database Target Layout and Construction Steps
+](static/Fig.DB.Layout.png)
 
 
 ### Inputs
