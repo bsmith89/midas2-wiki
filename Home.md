@@ -159,7 +159,7 @@ SNVs analysis (SNV module) and pan-genome CNVs analysis (CNV module).  Each
 module includes two sequential steps: single-sample analysis and across-samples
 analysis.
 
-![Figure 1: MIDAS2 Analysis Modules](https://github.com/czbiohub/MIDAS2.0/blob/master/docs/images/Fig.Modules.png?raw=true "Title")
+![Figure 1: MIDAS2 Analysis Modules](static/Fig.Modules.png)
 
 Before running these modules, however, the MIDAS workflow starts by identifying
 species at high coverage in each sample (species module).
@@ -580,8 +580,7 @@ genomes. The target layout of MIDASDB can refer to [this page](TODO).  This
 page is focused specifically on the database construction commands.
 
 To start with, users need to organize the genomes in a specific format and
-produce the TOC `genomes.tsv` according to the
-[Inputs](https://github.com/czbiohub/MIDAS2.0/wiki/4.-MIDAS-Database#inputs)
+produce the TOC `genomes.tsv` as described in [the documentation](TODO)
 
 We have prepared a toy collections of genomes.
 
@@ -776,7 +775,7 @@ and the target layout using a toy collection of genomes with only one species
 cluster `species1` with two genomes (`genome1` and `genome2`).
 
 
-![Figure 1: MIDAS Reference Database Target Layout and Construction Steps](https://github.com/czbiohub/MIDAS2.0/blob/master/docs/images/Fig.DB.Layout.png?raw=true "Title")
+![Figure 1: MIDAS Reference Database Target Layout and Construction Steps](static/Fig.DB.Layout.png)
 
 
 ### Inputs
