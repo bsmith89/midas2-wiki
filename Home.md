@@ -29,13 +29,13 @@ and running the three standard modules: [species selection](#module-species-sele
 [CNV profiling](#module-copy-number-variant-analysis).
 In addition, the philosophy and details of how MIDAS operates are described,
 along with instructions for more advanced usage
-(for example: [database customization](#advanced-building-your-own-midasdb)).
+(e.g. [building custom database](#advanced-building-your-own-midasdb)).
 
 # Quickstart
 
-### Basic installation (conda and pip)
+1. Install MIDAS2.
 
-These instruction assume that [conda has already been installed](TODO-link-to-conda).
+(NOTE: These instruction assume that [conda has already been installed](TODO-link-to-conda).)
 
 <!--
 # TODO: Where does midas2.yml come from?
@@ -51,7 +51,7 @@ cpanm Bio::SearchIO::hmmer --force
 pip install midas2
 ```
 
-### Download test data
+2. Download test data.
 
 <!--
 TODO: wget URL
@@ -65,16 +65,16 @@ tar -zxf TODO
 # Inflates into a reads/ directory with R1/R2 for each of two samples.
 ```
 
-### Pre-download marker genes
+3. Pre-download marker genes.
 
 ```
 # TODO: midas2 download_db  ... # Download the MIDASDB-UHGG to ./midas_db/uhgg
 ```
 
-### Identify abundant species
+4. Identify abundant species.
 
-This is designed only to select high-coverage species in each sample.
-IMPORTANT: It is not meant to quantify species abundance.
+(NOTE: This is designed only to select high-coverage species in each sample.
+_It is not intended to quantify species abundance._)
 
 <!--
 TODO: It would be nice if there was a file in midasdb_dir that told it the
@@ -98,7 +98,7 @@ done
 
 ```
 
-### Run SNVs module
+5. Run SNVs module.
 
 <!--
 TODO: Can we drop the extra flags (e.g. chunksize, select_by, etc)?
@@ -126,7 +126,7 @@ summarizing the number of sites that have been identified
 as polymorphic within and across samples for each species found to be at
 sufficient coverage.
 
-### Run CNVs module
+5. Run CNVs module.
 
 <!--
 TODO: Can we drop the extra flags (e.g. chunksize, select_by, etc)?
