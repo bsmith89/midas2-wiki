@@ -1,10 +1,10 @@
 # MIDAS2: Metagenomic Intra-Species Diversity Analysis
 
 Metagenomic Intra-Species Diversity Analysis
-([MIDAS](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
+([MIDAS2](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
 workflows for
 **profiling strain-level genomic variations in shotgun metagenomic data**.
-Specifically, MIDAS is designed to profile strain genotypes in two
+Specifically, MIDAS2 is designed to profile strain genotypes in two
 complementary ways:
 
 - single-nucleotide variants (SNVs) across polymorphic sites in a species reference
@@ -17,8 +17,7 @@ If it's MIDAS 2.0, then what's the
 next minor version? MIDAS 2.1? MIDAS 2.0 v0.1, 2.0.2? MIDAS2 is also cleaner to my eye and
 matches the program name
 -->
-MIDAS2 implements the same analyses as the original
-(here referred to as [MIDAS1](https://github.com/snayfach/MIDAS)),
+MIDAS2 implements the same analyses as the original [MIDAS](https://github.com/snayfach/MIDAS),
 but re-engineered to (1) allow for multiple, alternative reference databases
 (MIDASDBs), and (2) optimize scaling to collections of thousands of samples.
 
@@ -27,7 +26,7 @@ This documentation includes instructions for [installing software](#advanced-ins
 and running the three standard modules: [species selection](#module-species-selection),
 [SNV profiling](#module-single-nucleotide-variant-analysis), and
 [CNV profiling](#module-copy-number-variant-analysis).
-In addition, the philosophy and details of how MIDAS operates are described,
+In addition, the philosophy and details of how MIDAS2 operates are described,
 along with instructions for more advanced usage
 (e.g. [building custom database](#advanced-building-your-own-midasdb)).
 
@@ -158,9 +157,9 @@ The CNV results can be found in TODO,
 summarizing TODO within and across samples for each species found to be at
 sufficient coverage.
 
-# Overview: The MIDAS Workflow
+# Overview: The MIDAS2 Workflow
 
-MIDAS contains two strain-level reads-to-table analysis modules: population
+MIDAS2 contains two strain-level reads-to-table analysis modules: population
 SNVs analysis (SNV module) and pan-genome CNVs analysis (CNV module).  Each
 module includes two sequential steps: single-sample analysis and across-samples
 analysis.
@@ -169,7 +168,7 @@ analysis.
 MIDAS2 Analysis Modules
 ](static/Fig.Modules.png)
 
-Before running these modules, however, the MIDAS workflow starts by identifying
+Before running these modules, however, the MIDAS2 workflow starts by identifying
 species at high coverage in each sample (species module).
 The results of this analysis are then be used to filter the databases used
 in subsequent steps.
@@ -191,23 +190,27 @@ This is important because fundamentally there is a trade-off between:
 
 MIDAS2 is a reference-based strain-level genomic variation analysis
 pipeline, and it also presuppose a reference database construction step has
-already taken place.  "MIDAS reference database (MIDASDB)" refers to a set of
+already taken place.  "MIDAS2 reference database (MIDASDB)" refers to a set of
 custom files needed for the strain-level metagenomic analysis.
 
-MIDAS1 provided a default bacterial reference databases (see
+The original MIDAS provided a default bacterial reference databases (see
 [Figure 1](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5088602/)).
 [MIDASDB v1.2](http://lighthouse.ucsf.edu/MIDAS/midas_db_v1.2.tar.gz)
 was constructed from a collection of 5952 bacterial species clusters
 representing 31,007 high-quality bacterial genome.
 
 In the past few years, the number of sequenced microbial genomes have increased
-vastly, in particular with the addition of metagenome-assembled genomes (MAGs)
-sequenced from varied habitats. Therefore, it is necessary to update MIDAS
+vastly,
+<!--
+TODO: How much?
+-->
+in particular with the addition of metagenome-assembled genomes (MAGs)
+sequenced from varied habitats. Therefore, it is necessary to update MIDAS2
 reference database accordingly. On the other hand, processing the large amount
 of available genome sequences poses a significant compute challenge. For MIDAS2,
 instead of generating the species clusters from scratch, we take advantage
 of several published collections of prokaryotic genome databases, and build
-MIDAS reference databases individually.
+MIDAS2 reference databases individually.
 
 
 # Overview: Maximizing Performance
@@ -224,17 +227,23 @@ MIDAS reference databases individually.
 TODO: Link out to e.g. StrainPhlan, GT-Pro, maybe explain briefly what the pros/cons
 of other tools are.
 
-# Overview: The MIDAS Interface
+# Overview: The MIDAS2 Interface
 
 ## Common CLI options
 
 TODO: output dir, sample name, database dir/name, species selection, etc.
 
-The three single-sample commands (`run_species`, `run_snps` and `run_genes`), and
-share the following
-command-line options.
+### Single-sample commands
 
-- User-specified root output directory: `midas_outdir=/path/to/root/outdir`.
+The three single-sample commands (`run_species`, `run_snps` and `run_genes`), and
+share a number of command-line flags.
+
+<!--
+TODO: Replace midas_outdir=, $midas_outdir, /path/to/outdir, etc.
+with output/ and mention in key places that this is chosen by the
+user.
+-->
+- User-specified output directory: `midas_outdir=/path/to/root/outdir`.
   This is always passed as a mandatory positional argument to each of the
   MIDAS2 command.
 
@@ -242,10 +251,6 @@ command-line options.
 
 Together, `${midas_outdir}/${sample_name}` constitutes the unique output
 directory for single-sample analysis.
-
-## Input
-
-### Single-Sample Analysis
 
 The FASTA/FASTQ file containing single-end or paired-ends sequencing reads:
 
@@ -257,7 +262,7 @@ R2=/path/to/reverse/reads/R2.fq.gz
 `${R1}` and/or `${R2}` need to be passed to MIDAS2 analysis commands via
 arguments `-1` and `-2` as: `-1 ${R1} -2 ${R2}`
 
-### Across-Samples Analysis
+### Sample merge commands
 
 A TSV file, which lists the _sample_name_ and single-sample root output
 directory _midas_outdir_, is required for across-samples analyses
@@ -266,6 +271,9 @@ Users
 need to pass the local path of the TSV file
 (`my_sample_list=/path/to/tsv/file`) to the command-line argument
 `sample_list`, e.g. `--sample_list ${my_sample_list}`
+<!--
+Replace $my_sample_list, etc. with samples.tsv
+-->
 
 A template _sample_list_ is shown here:
 
@@ -275,11 +283,17 @@ SRR172902         /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
 SRR172903         /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
 ```
 
-## MIDAS DB
+<!--
+TODO: How much of the FULL path in this example is actually necessary? Will
+relative paths work? If not: it should. If so: we should use one above.
+-->
 
-For all MIDAS2 analysis, users need to choose (1) a valid precomputed MIDAS DB
-name (uhgg, gtdb): `my_midasdb_name=uhgg`, and (2) a valid path to local MIDAS
-DB: `my_midasdb_dir=/path/to/local/midasdb/uhgg`.
+
+## MIDASDB
+
+For all MIDAS2 analysis, users need to choose (1) a valid precomputed MIDASDB
+name (uhgg, gtdb): `my_midasdb_name=uhgg`, and (2) a valid path to local MIDASDB:
+`my_midasdb_dir=/path/to/local/midasdb/uhgg`.
 <!--
 TODO: I think I've changed my mind and I don't like the shell variable version.
 Can we switch to using an "example dir" that we also reference in the
@@ -288,7 +302,7 @@ quickstart and also serves as a tutorial of sorts?
 
 MIDAS2 analysis can take two arguments as: `--midasdb_name
 ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir}`. If the `--midasdb_dir` is
-not specified, MIDAS DB will be downloaded to the current directory.
+not specified, MIDASDB will be downloaded to the current directory.
 <!--
 TODO: This seems dangerous. I expect some users to forget that one flag and
 start an enormous download... :-[
@@ -337,7 +351,7 @@ Alternatively, we could mention them in common args, link to here, and then put
 all the details about how to use them in this section.
 TODO: Right now there's a lot of redundancy across sections.
 -->
-Most MIDAS commands take as an argument a path to a local mirror of the MIDASDB,
+Most MIDAS2 commands take as an argument a path to a local mirror of the MIDASDB,
 as well as the name of the database.
 
 ```
@@ -1337,7 +1351,7 @@ steps operate within the directory `${midas_outdir}`.
 
 ### Single-Sample Results Layout
 
-MIDAS analysis usually starts with species selection which
+MIDAS2 analysis usually starts with species selection which
 selects sufficiently abundant species in each sample (subcommand
 `run_species`). After completing this step, users can run either of two
 strain-level analysis: `run_snps` for single-sample read pileup (SNV module) or
@@ -1403,7 +1417,7 @@ implemented a new database infrastructure, geared to run on
 [AWS Batch](https://aws.amazon.com/batch/) and
 [S3](https://aws.amazon.com/s3/), to
 achieve [elastic scaling](https://github.com/czbiohub/pairani/wiki) for
-building MIDAS reference databases. To be specific, the MIDAS reference
+building MIDAS2 reference databases. To be specific, the MIDAS2 reference
 database construction step can be executed in AWS using hundreds of
 r5d.24xlarge instances over a period of a couple of days, depositing built
 products in S3.  For example, it took ~\$80,000 and a week to build the species
@@ -1414,7 +1428,7 @@ pan-genome for all 47,894 species of GTDB r202.
 
 The new database infrastructure reads in a table of contents (TOC) file,
 containing genome-to-species assignment and a choice of representative genome
-for each species cluster.  One TOC file (`genomes.tsv`) per MIDAS reference
+for each species cluster.  One TOC file (`genomes.tsv`) per MIDAS2 reference
 database, listing the genome-to-species assignment for all genomes, with per
 genome each row. The TOC file has four columns, among which
 `genome_is_representative` specify whether the `genome` is the representative
@@ -1458,7 +1472,7 @@ from NCBI genomes repository using
 
 ### Database Target Layout and Construction
 
-MIDAS reference database (MIDASDB) primarily consist of three parts: rep-genome
+MIDAS2 reference database (MIDASDB) primarily consist of three parts: rep-genome
 databases, pan-genome databases, and universal single copy genes (SGC) marker
 database. The target layout of any MIDASDB follow the same relative structure,
 based on the base directory of the database, both in the S3 bucket and locally.
@@ -1468,7 +1482,7 @@ cluster `species1` with two genomes (`genome1` and `genome2`).
 
 
 ![
-MIDAS Reference Database Target Layout and Construction Steps
+MIDAS2 Reference Database Target Layout and Construction Steps
 ](static/Fig.DB.Layout.png)
 
 
@@ -1502,7 +1516,7 @@ gene_annotations/100001/genome2/genome2.genes.lz4
 
 ### SCG Marker Database
 
-Marker genes are defined as universal, single-copy gene families. MIDAS uses
+Marker genes are defined as universal, single-copy gene families. MIDAS2 uses
 a subset (15) of the [PhyEco gene
 families](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0077033).
 The pre-computed HMM model of this set of 15 single copy genes (SCGs) are
@@ -1589,7 +1603,7 @@ conda env export --no-builds | grep -v "^prefix:" > midas2.yml
 
 # End Matter: Glossary
 
-- *Module*: i.e. one of Species, SNPs, Genes (or maybe also MIDAS DB building?)
+- *Module*: i.e. one of Species, SNPs, Genes (or maybe also MIDASDB building?)
 - *Analysis*: Either the single-sample alignment-based tallying of reads
   belonging to species, SNVs, or genes (depending on which module) OR the
   merging, filtering, and summarization of these results across samples.
@@ -1599,8 +1613,8 @@ conda env export --no-builds | grep -v "^prefix:" > midas2.yml
   analysis.
 - *Reference database*: The upstream UHGG, GTDB, something user supplies, etc.
   that is then pre-processed to make a specific...
-- *MIDAS DB*: The pre-processed reference data in a format to be consumed by
-  the MIDAS modules, including marker genes, reference genomes, pangenomes,
+- *MIDASDB*: The pre-processed reference data in a format to be consumed by
+  the MIDAS2 modules, including marker genes, reference genomes, pangenomes,
   etc.
 - *Genome collections*: TODO
 - *Bowtie2 Index*: Rather than bowtie2 database or some other ambiguous term
