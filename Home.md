@@ -33,7 +33,7 @@ along with instructions for more advanced usage
 
 # Quickstart
 
-1. Install MIDAS2.
+1. **Install MIDAS2.**
 
 (NOTE: These instruction assume that [conda has already been installed](TODO-link-to-conda).)
 
@@ -51,7 +51,7 @@ cpanm Bio::SearchIO::hmmer --force
 pip install midas2
 ```
 
-2. Download test data.
+2. **Download example data.**
 
 <!--
 TODO: wget URL
@@ -65,13 +65,13 @@ tar -zxf TODO
 # Inflates into a reads/ directory with R1/R2 for each of two samples.
 ```
 
-3. Pre-download marker genes.
+3. **Pre-download marker genes.**
 
 ```
 # TODO: midas2 download_db  ... # Download the MIDASDB-UHGG to ./midas_db/uhgg
 ```
 
-4. Identify abundant species.
+4. **Identify abundant species.**
 
 (NOTE: This is designed only to select high-coverage species in each sample.
 _It is not intended to quantify species abundance._)
@@ -98,7 +98,7 @@ done
 
 ```
 
-5. Run SNVs module.
+5. **Run SNVs module.**
 
 <!--
 TODO: Can we drop the extra flags (e.g. chunksize, select_by, etc)?
@@ -126,7 +126,7 @@ summarizing the number of sites that have been identified
 as polymorphic within and across samples for each species found to be at
 sufficient coverage.
 
-5. Run CNVs module.
+5. **Run CNVs module.**
 
 <!--
 TODO: Can we drop the extra flags (e.g. chunksize, select_by, etc)?
