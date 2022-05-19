@@ -14,7 +14,7 @@ complementary ways:
 <!--
 TODO: Tried to rename MIDAS 2.0 as MIDAS2 everywhere.
 If it's MIDAS 2.0, then what's the
-next minor version? MIDAS 2.1? 2.0.2? MIDAS2 is also cleaner to my eye and
+next minor version? MIDAS 2.1? MIDAS 2.0 v0.1, 2.0.2? MIDAS2 is also cleaner to my eye and
 matches the program name
 -->
 MIDAS2 implements the same analyses as the original
@@ -198,8 +198,8 @@ In the past few years, the number of sequenced microbial genomes have increased
 vastly, in particular with the addition of metagenome-assembled genomes (MAGs)
 sequenced from varied habitats. Therefore, it is necessary to update MIDAS
 reference database accordingly. On the other hand, processing the large amount
-of available genome sequences poses a significant compute challenge. For MIDAS
-2.0, instead of generating the species clusters from scratch, we take advantage
+of available genome sequences poses a significant compute challenge. For MIDAS2,
+instead of generating the species clusters from scratch, we take advantage
 of several published collections of prokaryotic genome databases, and build
 MIDAS reference databases individually.
 
@@ -579,9 +579,9 @@ rep-genome database ready for the SNV module.
 In a standard workflow, rep-genome database of the species in the restricted
 species profile were built for each sample, to which reads were aligned using
 Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the
-species in the rep-genome database are reported by MIDAS 2.0.
+species in the rep-genome database are reported by MIDAS2.
 
-MIDAS 2.0 purposely holds any filter or species selection upon the
+MIDAS2 purposely holds any filter or species selection upon the
 single-sample pileup results until across-samples SNV analysis. That being
 said, read mapping summary is reported in `snps_summay.tsv`, and
 pileup/variants calling results are organized by species. Therefore users can
@@ -619,7 +619,7 @@ and the defaults are:
 - Single-sample pileup for all the species in the restricted species profile
   with paired-ends based post-alignment quality filter.
 
-With `paired_only` and proper `fragment_length`, MIDAS 2.0 will only recruit
+With `paired_only` and proper `fragment_length`, MIDAS2 will only recruit
 properly paired-ends reads for pileup. And all the post-alignment metrics will
 be computed based on a read pair, instead of a single read.
 
@@ -636,7 +636,7 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
   species profile with paired-ends based post-alignment quality filter.
 
 In recognition of the need for single-sample variant calling, we added an
-`advanced` mode to the single-sample SNV analysis in MIDAS 2.0. In the
+`advanced` mode to the single-sample SNV analysis in MIDAS2. In the
 `advanced` mode, per-species pileup results will also report major allele and
 minor allele for all the genomic sites covered by at least two reads, upon
 which custom variant calling filter can be applied by the users. Users are
@@ -735,7 +735,7 @@ for details.
 ### Important Concepts
 
 In this section, we will introduce the species and sample filters, the genomic
-site filters, the compute of population SNV in MIDAS 2.0, and the chunkified
+site filters, the compute of population SNV in MIDAS2, and the chunkified
 pileup. Beginner users can skip this section and go straight to [Sample
 commands]().
 
@@ -774,7 +774,7 @@ commands]().
 
    There are three main steps to compute and report population SNV in MIDAS2.
 
-   First, for each **relevant** genomic site, MIDAS 2.0 determines the set of
+   First, for each **relevant** genomic site, MIDAS2 determines the set of
    alleles present across **all** relevant samples.  Specifically, for each
    allele (A, C, G, T), `merge_snps` subcommand (1) tallys the sample counts
    (_sc_) of **relevant samples** containing corresponding allele (`scA:scT`),
@@ -796,10 +796,10 @@ For example, the population major allele of the site
 `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by
 accumulated read counts and `C` defined by accumulated sample counts.
 
-Third, MIDAS 2.0 collects and reports the sample-by-site matrix of the
+Third, MIDAS2 collects and reports the sample-by-site matrix of the
 corresponding (1) site depth and (2) allele frequency of the above calculated
 **population minor allele** for all the relevant samples. In these two
-matrices, MIDAS 2.0 encode `site_depth = 0` and `allele_frequency = -1` with
+matrices, MIDAS2 encode `site_depth = 0` and `allele_frequency = -1` with
 the special meaning of missing <site, sample> pair.
 
 5. **Chunkified Pileup Implementation**
@@ -816,7 +816,7 @@ the uses of multiple CPUs, multiple chunks can be processed at the same time.
 Therefore, for large collections of samples, we recommend higher CPU counts and
 smaller chunk size to optimally balance memory and I/O usage, especially for
 highly prevalent species. Users can adjust the number of sites per chunk via
-`chunk_size` (default value = 1000000). MIDAS 2.0 also has a `robust_chunk`
+`chunk_size` (default value = 1000000). MIDAS2 also has a `robust_chunk`
 option, where assigning different chunk sizes to different species based on the
 species prevalence.
 
@@ -1305,8 +1305,8 @@ Output                                             Producer        Meaning
 
 ## MIDASDB Directory Layout
 
-To meet the challenge of increased number of available genome sequences, MIDAS
-2.0 implemented a new database infrastructure, geared to run on
+To meet the challenge of increased number of available genome sequences, MIDAS2
+implemented a new database infrastructure, geared to run on
 [AWS Batch](https://aws.amazon.com/batch/) and
 [S3](https://aws.amazon.com/s3/), to
 achieve [elastic scaling](https://github.com/czbiohub/pairani/wiki) for
