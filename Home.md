@@ -223,7 +223,41 @@ TODO
 
 # Advanced: Installation
 
-TODO
+### Conda Only (Recommended)
+
+```
+conda config --set channel_priority flexible
+conda install -c zhaoc1 -c anaconda -c bioconda -c conda-forge -c defaults midas2
+```
+
+### Conda and Pip (Use this one for editable installation)
+
+<!--
+TODO: I updated this to show where the midas2.yml file came from
+as a bonus, this is how I'd suggest developers install it.
+Makes the repo editable.
+-->
+```
+git clone https://github.com/czbiohub/MIDAS2.0.git midas2
+cd midas2
+conda env create -n midas2 -f midas2.yml
+cpanm Bio::SearchIO::hmmer --force # Temporary fix for Prokka
+pip install .  # Include -e flag for editable installation/development
+```
+
+### Docker
+
+```
+docker pull zhaoc1/midas2:latest
+docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
+# TODO: Is the above correct? What about binding the DBs and stuff?
+```
+
+### Singularity
+
+```
+# TODO
+```
 
 # Advanced: Database Management
 
@@ -245,19 +279,35 @@ TODO
 
 TODO
 
-# Advanced: How to Contribute
+# Advanced: Contributing / Development Notes
+
+All development is done with git and GitHub
 
 ```
 git clone https://github.com/czbiohub/MIDAS2.0.git midas2
 cd midas2
 ```
 
-## Unit tests
+## Run Unit Tests
 
 For advanced users, a more complex unit test for all main features of MIDAS 2.0:
 
 ```
 bash tests/midas2_analysis.sh 8
+```
+
+## Export Your Conda Environment
+
+<!--
+TODO: Moved this from the installation page because it wasn't clear
+why users would want to do this.
+TODO: Maybe this belongs in the developer notes?
+-->
+
+```
+conda update --all 
+conda clean –all
+conda env export --no-builds | grep -v "^prefix:" > midas2.yml
 ```
 
 # End Matter: Glossary
