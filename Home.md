@@ -236,7 +236,7 @@ command-line options.
 - Unique sample name: `sample_name=/unique/sample/identifier`.
 
 Together, `${midas_outdir}/${sample_name}` constitutes the unique output
-directory for single-sample analysis. 
+directory for single-sample analysis.
 
 
 ## Input
@@ -616,7 +616,11 @@ docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
 
 ## Population Specific Species Panel
 
-The Bowtie2 rep-genome / pan-genome database can be build upon a list of customized species across a given panel of samples. Species selection metrics based on the `species_prevalence.tsv` can be passed to `build_bowtie2eb` via `--select_by` and `--select_threshold`. For example, to build one rep-genome database for all the species that is present in more than two samples:
+The Bowtie2 rep-genome / pan-genome database can be build upon a list of
+customized species across a given panel of samples. Species selection metrics
+based on the `species_prevalence.tsv` can be passed to `build_bowtie2eb` via
+`--select_by` and `--select_threshold`. For example, to build one rep-genome
+database for all the species that is present in more than two samples:
 
 ```
 midas2 build_bowtie2db \
@@ -629,7 +633,9 @@ midas2 build_bowtie2db \
   - The list of customized species can be found at `${midas_outdir}/bt2_indexes/repgenome.species`
 
 
-If taking this approach, for the single-sample SNV or CNV analysis, users can pass the pre-built rep-genome to `run_snps` analysis (pan-genome for `run_genes`), as following:
+If taking this approach, for the single-sample SNV or CNV analysis, users can
+pass the pre-built rep-genome to `run_snps` analysis (pan-genome for
+`run_genes`), as following:
 
 ```
 --prebuilt_bowtie2_indexes ${midas_outdir}/bt2_indexes/repgenome \
@@ -693,7 +699,7 @@ midas2 build_midasdb --generate_cluster_info --species all --midasdb_name newdb 
 ### MIDAS2 Results Layout
 
 MIDAS2 writes its outputs to a user-specified root directory, which is always
-passed as a mandatory argument to each of the MIDAS 2.0 command. In this
+passed as a mandatory argument to each of the MIDAS2 command. In this
 documentation we refer to this directory as:
 
 - `midas_outdir=/path/to/results/root/directory`
