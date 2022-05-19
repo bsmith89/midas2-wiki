@@ -1,4 +1,4 @@
-# Metagenomic Intra-Species Diversity Analysis, version 2
+# MIDAS2: Metagenomic Intra-Species Diversity Analysis
 
 Metagenomic Intra-Species Diversity Analysis
 ([MIDAS](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
@@ -14,7 +14,8 @@ complementary ways:
 <!--
 TODO: Tried to rename MIDAS 2.0 as MIDAS2 everywhere.
 If it's MIDAS 2.0, then what's the
-next minor version? MIDAS 2.1? 2.0.2?
+next minor version? MIDAS 2.1? 2.0.2? MIDAS2 is also cleaner to my eye and
+matches the program name
 -->
 MIDAS2 implements the same analyses as the original
 (here referred to as [MIDAS1](https://github.com/snayfach/MIDAS)),
@@ -58,7 +59,8 @@ TODO: Download *two* example files so that we can run a full workflow.
 mkdir -p midas_example
 cd midas_example
 wget TODO
-tar -zxf TODO  # Inflates into a reads/ directory with R1/R2 for each of two samples.
+tar -zxf TODO
+# Inflates into a reads/ directory with R1/R2 for each of two samples.
 ```
 
 ### Pre-download marker genes
@@ -78,12 +80,18 @@ name of the database. Why does it even need to know the name? Couldn't I
 just point it to an arbitrary path with the database?
 TODO: I dropped num_cores to 2 from 8. A personal laptop is less likely to have
 8 cores...
+TODO: Any reason it's just R1 and not R2 as well?
 -->
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_species --sample_name ${sample_name} -1 reads/${sample_name}_R1.fastq.gz \
-        --midasdb_name uhgg --midasdb_dir ./midas_db/uhgg --num_cores 2 midas_output
+    midas2 run_species \
+    --sample_name ${sample_name} \
+    -1 reads/${sample_name}_R1.fastq.gz \
+        --midasdb_name uhgg \
+        --midasdb_dir ./midas_db/uhgg \
+        --num_cores 2 \
+        midas_output
 done
 
 ```
@@ -97,10 +105,16 @@ Are there defaults that can be used for this quickstart?
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_snps --sample_name ${sample_name} -1 reads/${sample_name}_R1.fastq.gz \
-        --midasdb_name uhgg --midasdb_dir midas_db/uhgg --chunk_size 500000 \
-        --select_by median_marker_coverage,unique_fraction_covered --select_threshold=5,0.5 \
-        --num_cores 2 midas_output
+    midas2 run_snps \
+        --sample_name ${sample_name} \
+        -1 reads/${sample_name}_R1.fastq.gz \
+        --midasdb_name uhgg \
+        --midasdb_dir midas_db/uhgg \
+        --chunk_size 500000 \
+        --select_by median_marker_coverage,unique_fraction_covered \
+        --select_threshold=5,0.5 \
+        --num_cores 2 \
+        midas_output
 done
 # TODO: midas2 merge_snps
 ```
@@ -119,10 +133,15 @@ Are there defaults that can be used for this quickstart?
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_genes --sample_name ${sample_name} -1 reads/${sample_name}_R1.fastq.gz \
-        --midasdb_name uhgg --midasdb_dir midas_db/uhgg \
-        --select_by median_marker_coverage,unique_fraction_covered --select_threshold=5,0.5 \
-        --num_cores 2 midas_output
+    midas2 run_genes \
+        --sample_name ${sample_name} \
+        -1 reads/${sample_name}_R1.fastq.gz \
+        --midasdb_name uhgg \
+        --midasdb_dir midas_db/uhgg \
+        --select_by median_marker_coverage,unique_fraction_covered \
+        --select_threshold=5,0.5 \
+        --num_cores 2 \
+        midas_output
 done
 # TODO: midas2 merge_genes
 ```
