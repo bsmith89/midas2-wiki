@@ -1,7 +1,3 @@
----
-toc: true
----
-
 # MIDAS2: Metagenomic Intra-Species Diversity Analysis
 
 Metagenomic Intra-Species Diversity Analysis
