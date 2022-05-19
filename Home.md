@@ -188,9 +188,13 @@ This is important because fundamentally there is a trade-off between:
 - TODO: mention prebuilt bowtie2 indexes
 - TODO: etc.
 
+# Overview: Similar Tools
+
+TODO
+
 # Overview: The MIDAS Interface
 
-## Common CLI options:
+## Common CLI options
 
 TODO: output dir, sample name, database dir/name, species selection, etc.
 
@@ -243,12 +247,53 @@ TODO
 
 # Advanced: How to Contribute
 
-TODO
+```
+git clone https://github.com/czbiohub/MIDAS2.0.git midas2
+cd midas2
+```
+
+## Unit tests
+
+For advanced users, a more complex unit test for all main features of MIDAS 2.0:
+
+```
+bash tests/midas2_analysis.sh 8
+```
 
 # End Matter: Glossary
 
-TODO
+- *Module*: i.e. one of Species, SNPs, Genes (or maybe also MIDAS DB building?)
+- *Analysis*: Either the single-sample alignment-based tallying of reads
+  belonging to species, SNVs, or genes (depending on which module) OR the
+  merging, filtering, and summarization of these results across samples.
+- *Workflow*: The overall conceptual order of events from an implicit database
+  and pre-requisite shotgun metagenomic samples through species selection and
+  SNPs/genes modules, to results that will go into some sort of downstream
+  analysis.
+- *Reference database*: The upstream UHGG, GTDB, something user supplies, etc.
+  that is then pre-processed to make a specific...
+- *MIDAS DB*: The pre-processed reference data in a format to be consumed by
+  the MIDAS modules, including marker genes, reference genomes, pangenomes,
+  etc.
+- *Genome collections*: TODO
+- *Bowtie2 Index*: Rather than bowtie2 database or some other ambiguous term
+- Species-level pangenome refers to the set of non-redundant genes (centroids)
+  clustered from all the genomes within one species cluster.
 
 # End Matter: Release Notes
 
-TODO
+## 0.8
+
+Rename IGGtools to MIDAS2.0.
+
+## 0.7
+
+IGGtools used for simulation and benchmark.
+
+## 0.6
+
+Ability to run subcommands under AWS Batch with status tracking in s3 operations bucket.
+
+## 0.5
+
+Implement `build_pangenomes` subcommand.   [Docs](https://github.com/czbiohub/iggtools/commit/d0a6f9ede)
