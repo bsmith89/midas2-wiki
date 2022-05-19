@@ -230,8 +230,6 @@ of other tools are.
 
 TODO: output dir, sample name, database dir/name, species selection, etc.
 
-## Output
-
 The three single-sample commands (`run_species`, `run_snps` and `run_genes`), and
 share the following
 command-line options.
@@ -244,7 +242,6 @@ command-line options.
 
 Together, `${midas_outdir}/${sample_name}` constitutes the unique output
 directory for single-sample analysis.
-
 
 ## Input
 
@@ -307,7 +304,6 @@ Users can set the `--num_cores` to the number of physical cores to use: e.g.
 
 And all MIDAS2 analysis can print out the full help message and exit by `-h` or
 `--help`.
-
 
 ## Input files
 
