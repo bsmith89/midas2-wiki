@@ -181,14 +181,12 @@ This is important because fundamentally there is a trade-off between:
 - TODO: The DB includes different parts for the different modules.
 - TODO: DBs can be downloaded and shared across projects
 
-## MIDAS Reference Database
-
-MIDAS 2.0 is a reference-based strain-level genomic variation analysis
+MIDAS2 is a reference-based strain-level genomic variation analysis
 pipeline, and it also presuppose a reference database construction step has
-already taken place.  **MIDAS reference database (MIDASDB)** refers to a set of
+already taken place.  "MIDAS reference database (MIDASDB)" refers to a set of
 custom files needed for the strain-level metagenomic analysis.
 
-MIDAS provided a **default bacterial reference databases** (see
+MIDAS1 provided a default bacterial reference databases (see
 [Figure 1](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5088602/)).
 [MIDASDB v1.2](http://lighthouse.ucsf.edu/MIDAS/midas_db_v1.2.tar.gz)
 was constructed from a collection of 5952 bacterial species clusters
@@ -341,13 +339,13 @@ from a custom genome collection (e.g. for metagenome assembled genomes).
   CNV modules.
 
 Reference-based metagenotyping pipeline requires users to choose a reference
-genome(s) as the **template genome database**. Microbiome data usually contains
+genome(s) as the template genome database. Microbiome data usually contains
 hundreds of species in one sample, and only species with enough read coverage
 can be used for reliable strain-level analysis. A good reference database
 should be both representative and comprehensive in terms of the sufficiently
-abundant species in the sample. Therefore, a typical MIDAS 2.0 workflow starts
-with a "database customization" step which build **sample-specific reference
-database** of sufficiently abundant species selected via profiling 15 universal
+abundant species in the sample. Therefore, a typical MIDAS2 workflow starts
+with a species selection step which chooses a sample-specific reference
+database of sufficiently abundant species selected via profiling 15 universal
 single copy marker genes.
 
 
@@ -577,8 +575,8 @@ If taking this approach, for the single-sample SNV or CNV analysis, users can pa
 
 # Advanced: Building Your Own MIDASDB
 
-MIDAS2 users can locally build a new MIDAS DB for a custom collection of
-genomes. The target layout of MIDAS DB can refer to [this page](TODO).  This
+MIDAS2 users can locally build a new MIDASDB for a custom collection of
+genomes. The target layout of MIDASDB can refer to [this page](TODO).  This
 page is focused specifically on the database construction commands.
 
 To start with, users need to organize the genomes in a specific format and
@@ -628,20 +626,27 @@ midas2 build_midasdb --generate_cluster_info --species all --midasdb_name newdb 
 
 ## Output Directory Layout
 
-### MIDAS 2.0 Results Layout
+### MIDAS2 Results Layout
 
-MIDAS 2.0 writes its outputs to a user-specified root directory, which is always passed as a mandatory argument to each of the MIDAS 2.0 command. In this documentation we refer to this directory as:
+MIDAS2 writes its outputs to a user-specified root directory, which is always
+passed as a mandatory argument to each of the MIDAS 2.0 command. In this
+documentation we refer to this directory as:
+
 - `midas_outdir=/path/to/results/root/directory`
 
 Together with the unique sample name:
+
 - `sample_name=/unique/id/of/sample`
 
-`${midas_outdir}/${sample_name}` constitute the unique output directory for single-sample analysis. All subsequent analysis steps operate within this directory. For the across-samples SNV or CNV analysis, all subsequent analysis steps operate within the directory `${midas_outdir}`.
+`${midas_outdir}/${sample_name}` constitute the unique output directory for
+single-sample analysis. All subsequent analysis steps operate within this
+directory. For the across-samples SNV or CNV analysis, all subsequent analysis
+steps operate within the directory `${midas_outdir}`.
 
 
 ### Single-Sample Results Layout
 
-MIDAS 2.0 analysis usually starts with the "database customization" which
+MIDAS analysis usually starts with species selection which
 selects sufficiently abundant species in each sample (subcommand
 `run_species`). After completing this step, users can run either of two
 strain-level analysis: `run_snps` for single-sample read pileup (SNV module) or
@@ -731,7 +736,7 @@ GUT_GENOME138501    104351       GUT_GENOME269084      0
 GUT_GENOME269084    104351       GUT_GENOME269084      1
 ```
 
-By default, MIDAS 2.0 inherits the representative genome assignments from
+By default, MIDAS2 inherits the representative genome assignments from
 published prokaryotic genome databases. Inspired by the importance of selecting
 proper reference genome for accurate template-based SNP calling, this new
 infrastructure empowers user the flexibility to dynamically re-assign the
@@ -746,7 +751,7 @@ The collection of all the UHGG genomes were mirrored in
 the database construction. [Six-digit numeric species
 ids](s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv) were arbitrarily
 assigned. Instead of species name, these `species_id` are used as species
-identifier in all the reports generated by MIDAS 2.0.
+identifier in all the reports generated by MIDAS2.
 
 **Genome Taxonomy Database (GTDB)**:
 [GTDB R06-RS202](https://gtdb.ecogenomic.org/stats/r202) contains 45,555
