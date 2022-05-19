@@ -22,12 +22,14 @@ MIDAS2 implements the same analyses as the original
 but re-engineered to (1) allow for multiple, alternative reference databases
 (MIDASDBs), and (2) optimize scaling to collections of thousands of samples.
 
-This documentation includes instructions for [installing software](#installation),
-downloading one or more reference databases(#getting-databases),
-and running the three standard modules: (species filtering)[#species-filtering-module],
-(SNV profiling)[#snv-module], and (CNV profiling)[#cnv-module].
+This documentation includes instructions for [installing software](#advanced-installation),
+[downloading one or more reference databases](#module-database-management),
+and running the three standard modules: [species selection](#module-species-selection),
+[SNV profiling](#module-single-nucleotide-variant-analysis), and
+[CNV profiling](#module-copy-number-variant-analysis).
 In addition, the philosophy and details of how MIDAS operates are described,
-along with instructions for more advanced usage (e.g. (database customization)[#custom-databases]).
+along with instructions for more advanced usage
+(for example: [database customization](#advanced-building-your-own-midasdb)).
 
 # Quickstart
 
@@ -288,7 +290,7 @@ midas2 database \
 ```
 
 Advanced users may be interested in using the outputs of the `merge_species`
-command used in the [species selection module](#module--species-selection)
+command used in the [species selection module](#module-species-selection)
 to generate this list of species, e.g.:
 
 ```
@@ -305,7 +307,7 @@ MIDAS2 will see that the necessary parts of the MIDASDB have already been
 downloaded and will not repeat that step.
 
 It is also possible for users to
-[construct their own MIDASDB](#advanced--building-your-own-midasdb)
+[construct their own MIDASDB](#advanced-building-your-own-midasdb)
 from a custom genome collection (e.g. for metagenome assembled genomes).
 
 # Module: Species Selection
