@@ -159,7 +159,7 @@ SNVs analysis (SNV module) and pan-genome CNVs analysis (CNV module).  Each
 module includes two sequential steps: single-sample analysis and across-samples
 analysis.
 
-![Figure 1: MIDAS 2.0 Analysis Modules](https://github.com/czbiohub/MIDAS2.0/blob/master/docs/images/Fig.Modules.png?raw=true "Title")
+![Figure 1: MIDAS2 Analysis Modules](https://github.com/czbiohub/MIDAS2.0/blob/master/docs/images/Fig.Modules.png?raw=true "Title")
 
 Before running these modules, however, the MIDAS workflow starts by identifying
 species at high coverage in each sample (species module).
@@ -366,7 +366,7 @@ docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
 
 # Advanced: Building Your Own MIDASDB
 
-MIDAS 2.0 users can locally build a new MIDAS DB for a custom collection of
+MIDAS2 users can locally build a new MIDAS DB for a custom collection of
 genomes. The target layout of MIDAS DB can refer to [this page](TODO).  This
 page is focused specifically on the database construction commands.
 
@@ -377,11 +377,11 @@ produce the TOC `genomes.tsv` according to the
 We have prepared a toy collections of genomes.
 
 ```
-git clone https://github.com/czbiohub/MIDAS2.0.git .
-cd MIDAS2.0/tests/genomes
+git clone https://github.com/czbiohub/MIDAS2.0.git midas2
+cd midas2/tests/genomes
 ```
 
-We will build the new MIDASDB under the directory of `MIDAS2.0/tests/genomes`.
+We will build the new MIDASDB under the directory of `midas2/tests/genomes`.
 There are two command-line parameters that we need to pass:
 
 ```
