@@ -223,14 +223,14 @@ TODO
 
 # Advanced: Installation
 
-### Conda Only (Recommended)
+### Conda
 
 ```
 conda config --set channel_priority flexible
 conda install -c zhaoc1 -c anaconda -c bioconda -c conda-forge -c defaults midas2
 ```
 
-### Conda and Pip (Use this one for editable installation)
+### Developer Installation
 
 <!--
 TODO: I updated this to show where the midas2.yml file came from
@@ -242,10 +242,11 @@ git clone https://github.com/czbiohub/MIDAS2.0.git midas2
 cd midas2
 conda env create -n midas2 -f midas2.yml
 cpanm Bio::SearchIO::hmmer --force # Temporary fix for Prokka
+# TODO: Temporary? When will it no longer be needed?
 pip install .  # Include -e flag for editable installation/development
 ```
 
-### Docker
+### Docker Image
 
 ```
 docker pull zhaoc1/midas2:latest
@@ -253,7 +254,7 @@ docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
 # TODO: Is the above correct? What about binding the DBs and stuff?
 ```
 
-### Singularity
+### Singularity Image
 
 ```
 # TODO
@@ -283,6 +284,9 @@ TODO
 
 All development is done with git and GitHub
 
+## Installation
+
+Use the [developer installation](#developer-installation) as described.
 ```
 git clone https://github.com/czbiohub/MIDAS2.0.git midas2
 cd midas2
