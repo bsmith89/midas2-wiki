@@ -56,19 +56,26 @@ pip install midas2
 <!--
 TODO: wget URL
 TODO: Download *two* example files so that we can run a full workflow.
+TODO: Revise paths throughout to point to this midas_example root directory
+with e.g. midas_example/midasdb as the uhgg download location,
+midas_example/reads/sample1_R1.fastq.gz, and midas_example/midas_output/
+as the output directory in all example code.
+Users would also implicitly already be in midas_example (in fact we'd only
+reference it once in the quickstart) and everything else would work
+with relative paths from that project root.
 -->
 ```
 mkdir -p midas_example
 cd midas_example
 wget TODO
 tar -zxf TODO
-# Inflates into a reads/ directory with R1/R2 for each of two samples.
+# Inflates into a reads/ directory with R1/R2 for each of two samples: sample1 and sample2.
 ```
 
 3. **Pre-download marker genes.**
 
 ```
-# TODO: midas2 download_db  ... # Download the MIDASDB-UHGG to ./midas_db/uhgg
+midas2 database --init --midasdb_name uhgg --midasdb_dir midasdb/uhgg
 ```
 
 4. **Identify abundant species.**
@@ -88,14 +95,13 @@ TODO: Any reason it's just R1 and not R2 as well?
 for sample_name in sample1 sample2
 do
     midas2 run_species \
-    --sample_name ${sample_name} \
-    -1 reads/${sample_name}_R1.fastq.gz \
+        --sample_name ${sample_name} \
+        -1 reads/${sample_name}_R1.fastq.gz \
         --midasdb_name uhgg \
-        --midasdb_dir ./midas_db/uhgg \
+        --midasdb_dir midas_db \
         --num_cores 2 \
         midas_output
 done
-
 ```
 
 5. **Run SNVs module.**
@@ -173,7 +179,7 @@ This is important because fundamentally there is a trade-off between:
 
 - "cannibalization" of reads by reference genomes with shared sequence
 - incorrect mapping of reads to genomes of interest from different,
-  closely related organisms found in the same
+  closely related organisms found in the same sample.
 
 # Overview: The MIDASDBs
 
@@ -215,7 +221,8 @@ MIDAS reference databases individually.
 
 # Overview: Similar Tools
 
-TODO
+TODO: Link out to e.g. StrainPhlan, GT-Pro, maybe explain briefly what the pros/cons
+of other tools are.
 
 # Overview: The MIDAS Interface
 
@@ -225,8 +232,8 @@ TODO: output dir, sample name, database dir/name, species selection, etc.
 
 ## Output
 
-The two single-sample strain-level analysis (`run_snps` and `run_genes`), and
-the database customization analysis (`run_species`) share the following
+The three single-sample commands (`run_species`, `run_snps` and `run_genes`), and
+share the following
 command-line options.
 
 - User-specified root output directory: `midas_outdir=/path/to/root/outdir`.
@@ -245,9 +252,10 @@ directory for single-sample analysis.
 
 The FASTA/FASTQ file containing single-end or paired-ends sequencing reads:
 
-- `R1=/path/to/forward/reads/R1.fq.gz`
-
-- `R2=/path/to/reverse/reads/R2.fq.gz`
+```
+R1=/path/to/forward/reads/R1.fq.gz
+R2=/path/to/reverse/reads/R2.fq.gz
+```
 
 `${R1}` and/or `${R2}` need to be passed to MIDAS2 analysis commands via
 arguments `-1` and `-2` as: `-1 ${R1} -2 ${R2}`
@@ -255,7 +263,9 @@ arguments `-1` and `-2` as: `-1 ${R1} -2 ${R2}`
 ### Across-Samples Analysis
 
 A TSV file, which lists the _sample_name_ and single-sample root output
-directory _midas_outdir_, is required for all across-samples analysis. Users
+directory _midas_outdir_, is required for across-samples analyses
+in the species, SNV, and CNV modules.
+Users
 need to pass the local path of the TSV file
 (`my_sample_list=/path/to/tsv/file`) to the command-line argument
 `sample_list`, e.g. `--sample_list ${my_sample_list}`
@@ -272,31 +282,45 @@ SRR172903         /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
 
 For all MIDAS2 analysis, users need to choose (1) a valid precomputed MIDAS DB
 name (uhgg, gtdb): `my_midasdb_name=uhgg`, and (2) a valid path to local MIDAS
-DB: `my_midasdb_dir=/path/to/local/midasdb`.
+DB: `my_midasdb_dir=/path/to/local/midasdb/uhgg`.
+<!--
+TODO: I think I've changed my mind and I don't like the shell variable version.
+Can we switch to using an "example dir" that we also reference in the
+quickstart and also serves as a tutorial of sorts?
+-->
 
-MIDAS2 analysis can takes in two arguments as: `--midasdb_name
+MIDAS2 analysis can take two arguments as: `--midasdb_name
 ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir}`. If the `--midasdb_dir` is
 not specified, MIDAS DB will be downloaded to the current directory.
+<!--
+TODO: This seems dangerous. I expect some users to forget that one flag and
+start an enormous download... :-[
+TODO: "Can" take two arguments? What if "--midasdb_name" is not given? Doesn't
+it *need* those arguments?
+-->
 
 
 ### Others Parameters
 
-Users can set the `--num_cores` to the number of physical cores to use: `--num_cores 16`.
+Users can set the `--num_cores` to the number of physical cores to use: e.g.
+`--num_cores 16`.
 
-And all MIDAS2 analysis can print out the full help message and exit by `-h` or `--help`.
+And all MIDAS2 analysis can print out the full help message and exit by `-h` or
+`--help`.
 
 
 ## Input files
 
-TODO
+TODO: Fastq format. What preprocessing do these reads need?
 
 ## Output files
 
-TODO
+TODO: What are the key tables from CNV and SNV modules that users may want to
+put into downstream analyses?
 
 # Module: Database Management
 
-A MIDASDB is comprised of species pangenomes, representative genomes, and
+A MIDASDB is comprised of marker genes, representative genomes, and species pangenomes, representative genomes, and
 marker genes.
 We have already constructed and made available for download MIDASDBs for two
 comprehensive public microbial genome collections.
@@ -309,6 +333,14 @@ uhgg 286997 genomes from 4644 species version 1.0
 gtdb 258405 genomes from 47893 species version r202
 ```
 
+<!--
+TODO: This is redundant with the "common cli arguments" material.
+I kinda like it better here, though. Maybe we drop the common cli arguments
+section in favor of introducing flags when they're actually important.
+Alternatively, we could mention them in common args, link to here, and then put
+all the details about how to use them in this section.
+TODO: Right now there's a lot of redundancy across sections.
+-->
 Most MIDAS commands take as an argument a path to a local mirror of the MIDASDB,
 as well as the name of the database.
 
@@ -318,19 +350,24 @@ as well as the name of the database.
 ```
 
 For the purposes of this documentation we'll generally assume that we're working
-with the prebuilt `gtdb` MIDASDB and that the local mirror is in a subdirectory
-of the project root: `./midasdb`.
+with the prebuilt `uhgg` MIDASDB and that the local mirror is in a subdirectory
+of the project root: `midasdb`.
 However, in practice, users may prefer to have a centralized
-MIDASDB so that multiple projects and users can use previously cached files.
+MIDASDB so that multiple projects and users can share cached files.
 
 ## Preloading species marker genes
 
-We highly recommend that first time users initialize a local MIDASDB
-This downloads the minimal information needed to run the species module
-needed for species selection by the SNV and CNV modules.
+We highly recommend that first time users initialize a local MIDASDB.
+This downloads the minimal information needed to run the
+[species module](#module-species-selection) needed for species selection by the
+[SNV](#module-single-nucleotide-variant-analysis) and
+[CNV](#module-copy-number-variant-analysis) modules.
+<!--
+TODO: Add cross-links throughout.
+-->
 
 ```
-midas2 database --init --midasdb_name gtdb --midasdb_dir ./midasdb
+midas2 database --init --midasdb_name uhgg --midasdb_dir midasdb
 ```
 
 ## Preloading all species
@@ -339,7 +376,7 @@ While it _is_ possible to download an entire MIDASDB using the following
 command:
 
 ```
-midas2 database --download --midasdb_name gtdb --midasdb_dir ./midasdb -s all
+midas2 database --download --midasdb_name uhgg --midasdb_dir midasdb -s all
 ```
 
 this requires a large amount of data transfer and storage:
@@ -360,7 +397,7 @@ Instead, we recommend that users consider pre-selecting a list of species
 for download.
 
 If we save the following list of species IDs (here an example with only two
-species) to a plain text file named `./species.list`:
+species) to a plain text file named `species.list`:
 
 ```
 102506
@@ -371,8 +408,8 @@ we can then run the following to preload all of the data needed for these specie
 
 ```
 midas2 database \
-    --download --midasdb_name gtdb --midasdb_dir ./midasdb \
-    --species_list ./species.list
+    --download --midasdb_name uhgg --midasdb_dir midasdb \
+    --species_list species.list
 ```
 
 Advanced users may be interested in using the outputs of the `merge_species`
@@ -383,8 +420,8 @@ to generate this list of species, e.g.:
 # Generate the list of species that is present in more than one sample
 # TODO: What is in column $6? (be explicit)
 awk '$6 > 1 {print $6}' \
-    < ./midas_output/species/species_prevalence.tsv \
-    > ./species.tsv
+    < midas_output/species/species_prevalence.tsv \
+    > species.tsv
 ```
 
 Now, when running `run_snps` or `run_genes` for multiple samples in parallel
@@ -403,39 +440,46 @@ from a custom genome collection (e.g. for metagenome assembled genomes).
 - TODO: Mention that species selection itself happens downstream in the SNV and
   CNV modules.
 
-Reference-based metagenotyping pipeline requires users to choose a reference
-genome(s) as the template genome database. Microbiome data usually contains
-hundreds of species in one sample, and only species with enough read coverage
-can be used for reliable strain-level analysis. A good reference database
-should be both representative and comprehensive in terms of the sufficiently
-abundant species in the sample. Therefore, a typical MIDAS2 workflow starts
-with a species selection step which chooses a sample-specific reference
-database of sufficiently abundant species selected via profiling 15 universal
-single copy marker genes.
+<!--
+TODO: Citations for the below?
+-->
+Reference-based metagenotyping depends crucially
+on the choice of reference sequences and incorrect mapping of
+reads is a major problem.
+Microbiome data usually contains
+hundreds of species in one sample, and an ideal reference database
+is both representative and comprehensive in terms of the
+species in the sample.
+A badly chosen reference may suffer both from ambiguous mapping
+of reads to two or more sequences or spurious mapping to incorrect
+sequences.
+Therefore, a typical MIDAS2 workflow starts
+with a species selection step, which
+filters the reference database to species believed to be abundant in each
+particular sample based on profiling 15 universal single copy marker genes.
 
-
-## Single Sample Abundant Species Detection
-
-Species coverage was estimated via profiling 15 universal single copy genes
-(SCGs) (`run_species`). The simple 15 universal SCGs serves the purpose of
-quickly screening the panel of abundant species in the sample, instead of
-taxonomic profiling.
-
-### Sample command
 
 ```
-midas2 run_species --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
-    --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
-    --num_cores 8 ${midas_outdir}
+midas2 run_species \
+    --sample_name ${sample_name} \
+    -1 reads/${sample_name}_R1.fastq.gz \
+    --midasdb_name uhgg \
+    --midasdb_dir midas_db \
+    --num_cores 2 \
+    midas_output
 ```
 
-### Output files
+<!--
+TODO: Full path to species_profile.tsv
+TODO: The details of this output, how it's constructed and the meaning of each
+column, should go into the outputs reference section under Advanced topics.
+-->
 
-`species_profile.tsv` is the primary output of the abundant species detection
-analysis.
+The primary output of this command is `TODO/species_profile.tsv`
+which describes the coverage of each species' marker genes in the sample.
 Species are sorted in decreasing order of `median_marker_coverage`.
 Only species with more than two marker genes covered with more than two reads
-are reported.
+(a very low bar) are reported.
 
 ```
 species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_relative_abundance   unique_fraction_covered
@@ -449,35 +493,40 @@ species_id  marker_read_counts  median_marker_coverage  marker_coverage  marker_
 * _marker_relative_abundance_: computed based on _marker_coverage_
 * _unique_fraction_covered_: the fraction of uniquely mapped SCGs genes
 
-## Species To Genotype
+<!--
+TODO: I think this needs to move up to the CLI interface overview.
+This is clearly important material, but I don't think it belongs with
+`run_species`; you should introduced e.g. `run_snps` first.
+-->
 
-Results from the SCGs profiling are used to identify the panel of species
-eligible for strain-level genomic variation analysis. In the `run_snps` and
-`run_genes` analysis, users need to pass the `--select_by` and
-`--select_threshold` accordingly to select the list of species to genotype.
-`--select_by` are comma separated columns from above mentioned
-`species_profile.tsv`, and `--select_threshold` are comma separated
-corresponding cutoff values.
+In order to use these marker gene profiles to select species for
+index building in the `run_snps` and `run_genes` commands,
+users pass flags specifying those parameters:
+`--select_by` followed by a comma separated list of column names in
+`species_profile.tsv` and
+`--select_threshold` followed by a comma-separated list of threshold values for
+selection.
 
-For sufficiently abundant species selection, we recommend using the combination
+For most analyses we recommend using the combination
 of `median_marker_coverage > 2X` and `unique_fraction_covered > 0.5`:
 
 ```
 --select_by median_marker_coverage,unique_fraction_covered --select_threshold=2,0.5
 ```
 
-For genotyping low abundant species, users need to adjust the parameters
-properly:
+Some users may wish to genotype low abundant species
+and should adjust the parameters accordingly:
 
 ```
 --select_by median_marker_coverage,unique_fraction_covered --select_threshold=0,0.5
 ```
 
-An alternative way is to pass a comma separated species of interests to
-`--species_list`. It is worth noting that the species in the provided species
-list is still subject to the `--select_threshold` restriction. Users can set
-`--select_threshold=-1` to escape species selection filters based on the SCG
-species profiling:
+Alternatively, users can directly pick a list of species using the
+`--species_list` option
+It is worth noting that the species in the provided species
+list are still subject to the `--select_threshold` restriction.
+Users can set `--select_threshold=-1` to escape species selection filters based
+on the SCG species profiling:
 
 ```
 --species_list 102337,102506 --select_threshold=-1
@@ -486,6 +535,11 @@ species profiling:
 Sample-specific rep-genome and/or pan-genome database would be built only for
 the species passing the above mentioned filters in the single-sample SNV or CNV
 module.
+
+<!--
+TODO: We should link here to instructions for how to build the index just once
+and use it for all samples.
+-->
 
 
 ## Across-Samples Abundant Species
@@ -505,7 +559,7 @@ midas2 merge_species --samples_list ${my_sample_list} ${midas_outdir}
 
 ### Output files
 
-- `species_prevalence.tsv`: the primary output of the across-samples species merging analysis.
+The primary output of the across-samples species merging analysis is the file `species_prevalence.tsv`:
 
 ```
 species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  sample_counts
@@ -519,6 +573,11 @@ species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  sa
 * _mean_coverage_: mean _median_marker_coverge_ across samples
 * _sample_counts_: number of samples with _median_marker_coverge_ > 0
 
+
+<!--
+TODO: The below should be removed from this section. Perhaps moved to the
+output directory structure advanced section below.
+-->
 - Each column in the single-sample `species_profile.tsv` are merged across
   samples into a species-by-sample matrix, shown as following:
 
@@ -569,33 +628,45 @@ modules, depending on their scientific aims.
 
 The SNV module proceeds in two phages: (1) single-sample read pileup (2)
 population variants calling across all the samples. The first step can be run
-in parallel.  We presuppose users already follow the [database
-customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization)
-step, and either have `species_profile.tsv` for each sample or a prebuilt
-rep-genome database ready for the SNV module.
+in parallel.  We presuppose users have already completed the
+[species selection module](#module-species-selection) and have
+`species_profile.tsv` for each sample.
+Alternatively, advanced users can pass a
+[prebuilt rep-genome database](TODO) ready for the SNV module.
+<!--
+TODO: Link to how to make this prebuild rep-genome database.
+TODO: Consider moving this suggestion to later in the instructions; it's
+an advanced topic.
+TODO: "rep-genome" database gets very confusing when we're also talking about
+MIDASDBs. Can we change that term to "representative genome index"
+or "representative genome bowtie2 index"?
+That also works with "pangenome bowtie2 index".
+-->
 
-## Single-Sample SNV Analysis
+Typically, the `run_snps` command proceeds by
 
-In a standard workflow, rep-genome database of the species in the restricted
-species profile were built for each sample, to which reads were aligned using
-Bowtie2. Per genomic site read pileup and nucleotide variation for **all** the
-species in the rep-genome database are reported by MIDAS2.
+1. selecting species based on taxonomic marker gene profiles;
+2. building a sample-specific representative genome bowtie2 index;
+3. mapping reads with bowtie2 to this index;
+4. outputting read mapping results on a per-species basis.
+
+A subsequent call to `merge_snps` combines results from all
+samples and filters polymorphic sites based on their
+representation across samples.
 
 MIDAS2 purposely holds any filter or species selection upon the
-single-sample pileup results until across-samples SNV analysis. That being
+single-sample pileup results until across-samples SNV analysis.
+
+<!--
+TODO: What does the below mean? Is it important to be here at the top of
+this section?
+-->
+That being
 said, read mapping summary is reported in `snps_summay.tsv`, and
 pileup/variants calling results are organized by species. Therefore users can
 easily customize species selection on their own.
 
-### Sample commands
-
-- Single-sample pileup for all the species in the restricted species profile:
-  `median_marker_coverage > 2` and `unique_fraction_covered > 0.5`.
-
-We presuppose users already
-[profiling the species coverage](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#species-to-genotype),
-and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv`
-exists.
+A typical call to `run_snps` for one sample is:
 
 ```
 midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -605,8 +676,49 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --num_cores 12 ${midas_outdir}
 ```
 
-Users can adjust post-alignment filters via the following command-line options,
-and the defaults are:
+After running all samples in this way, SNV calling is performed across
+samples as follows:
+
+```
+midas2 merge_snps \
+    --samples_list ${my_sample_list} \
+    --midasdb_name ${my_midasdb_name} \
+    --midasdb_dir ${my_midasdb_dir} \
+    --num_cores 32 \
+    ${midas_outdir}
+```
+
+Where `${my_sample_list}` is a sample manifest file
+[described here](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis).
+
+The key outputs of this command are:
+
+TODO
+
+## Advanced SNV Analyses
+
+<!--
+TODO: Ideally, the start of each module is a quick summary
+of what th module does, followed by
+instructions for how to do it the default way.
+Next, we describe ONLY the key outputs that they'll want to use in a downstream
+analysis.
+Then we delve into the details at an intermediate level.
+Finally we save truly advanced materials for either a different section entirely "Advanced:"
+or we put them at the very bottom of the Module: section.
+TODO: Break up this advanced section into subsection. My non-expert understanding
+is they should be something like this:
+- modifying mapping parameters (quality filters, paired only, fragment length, etc.)
+- modified outputs for single-sample analysis
+- concepts of how to call SNPs across samples
+- passing a prebuilt index (I think this could also go into the maximizing
+  performance section or be linked from there)
+- Performance improvements for merging samples (this should also go into the
+  performance optimization advanced section below.)
+-->
+
+Advanced users can adjust post-alignment filters via the following command-line
+options (default values indicated):
 
 ```
 --mapq >= 20: discard read alignments with alignment quality < 20
@@ -632,7 +744,7 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --num_cores 12 ${midas_outdir}
 ```
 
-- Single-sample **variant calling** for all the species in the restricted
+- Single-sample variant calling for all the species in the restricted
   species profile with paired-ends based post-alignment quality filter.
 
 In recognition of the need for single-sample variant calling, we added an
@@ -654,11 +766,6 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
 ```
 
 - Single-sample pileup for all the species in a prebuilt rep-genome database.
-
-We presuppose users already followed the [database
-customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#population-specific-species-panel)
-step, and have the prebuilt rep-genome database located at
-`${midas_outdir}/bt2_indexes`.
 
 ```
 midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
@@ -708,7 +815,7 @@ gnl|Prokka|UHGG144544_1   881437    T           12      0        6        0     
 - _count_t_: read counts of T allele
 
 - In the `advanced` mode, per-species pileup results will also include the
-  called variants for **all** the covered genomic sites.
+  called variants for all the covered genomic sites.
 
 ```
 ref_id                    ref_pos   ref_allele  depth   count_a  count_c  count_g  count_t  major_allele  minor_allele  major_allele_freq  minor_allele_freq  allele_counts
@@ -727,10 +834,6 @@ gnl|Prokka|UHGG144544_1   881437    T           12      0        6        0     
 
 Having run the single-sample SNV steps for all the samples, users next can
 perform the population SNV analysis using the `merge_snps` command.
-`merge_snps` requires a TSV file (`${my_sample_list}`) listing the
-`sample_name` and single-sample root output directory `midas_outdir`. See [this
-page](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis)
-for details.
 
 ### Important Concepts
 
@@ -741,8 +844,8 @@ commands]().
 
 1. **<species, sub-samples-lists> selection**
 
-   Population SNV analysis **restricts attention to "sufficiently well" covered
-   species in "sufficiently many" samples**.
+   Population SNV analysis restricts attention to "sufficiently well" covered
+   species in "sufficiently many" samples.
 
    To be specific, a given <species, sample> pair will only be kept if it has
    more than 40% horizontal genome coverage (`genome_coverage`) and 5X vertical
@@ -774,10 +877,10 @@ commands]().
 
    There are three main steps to compute and report population SNV in MIDAS2.
 
-   First, for each **relevant** genomic site, MIDAS2 determines the set of
-   alleles present across **all** relevant samples.  Specifically, for each
+   First, for each relevant genomic site, MIDAS2 determines the set of
+   alleles present across all relevant samples.  Specifically, for each
    allele (A, C, G, T), `merge_snps` subcommand (1) tallys the sample counts
-   (_sc_) of **relevant samples** containing corresponding allele (`scA:scT`),
+   (_sc_) of relevant samples containing corresponding allele (`scA:scT`),
    and (2) sums up the read counts (_rc_) of the corresponding allele across
    all the relevant samples (`rc_G:rc_T`).
 
@@ -798,7 +901,7 @@ accumulated read counts and `C` defined by accumulated sample counts.
 
 Third, MIDAS2 collects and reports the sample-by-site matrix of the
 corresponding (1) site depth and (2) allele frequency of the above calculated
-**population minor allele** for all the relevant samples. In these two
+population minor allele for all the relevant samples. In these two
 matrices, MIDAS2 encode `site_depth = 0` and `allele_frequency = -1` with
 the special meaning of missing <site, sample> pair.
 
@@ -822,12 +925,6 @@ species prevalence.
 
 
 ### Sample commands
-
-- Across-samples SNV calling using default filters.
-
-```
-midas2 merge_snps --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} --num_cores 32 ${midas_outdir}
-```
 
 - The species, samples, and sites filters, as well as the post-alignment
   filters can be customized with command-line options. For example,
@@ -921,7 +1018,7 @@ gnl|Prokka|UHGG000587_14|34360|A    0.300       0.269
 ```
 
 - `{species_id}.snps_depth.tsv.lz4`: per species site-by-sample site depth
-  matrix. **Only** accounts for the alleles matching the population major
+  matrix. Only accounts for the alleles matching the population major
   and/or minor allele.
 
 ```
@@ -947,7 +1044,7 @@ clustered from all the genomes within on species cluster. Species in the
 restricted species profile are concatenated and used to build the
 sample-specific pangenome database, to which reads are aligned using Bowtie2.
 
-Per species per centroid **copy numbers** are computed in three steps: (1) Per
+Per species per centroid copy numbers are computed in three steps: (1) Per
 centroid, read alignment metrics, e.g _mapped_reads_ and _mean_coverage_, are
 computed; (2) Per species, median read coverage of all the mapped centroids
 corresponding to the 15 universal SCGs are identified; (3) Per centroid, `copy
@@ -1383,7 +1480,7 @@ MIDAS Reference Database Target Layout and Construction Steps
 
 The input collection of genomes need to be organized in the format as
 `cleaned_genomes/<species>/<genome>/<genome>.fna`. And the table of content
-**`genomes.tsv`** file needs to be generated accordingly, with randomly
+`genomes.tsv` file needs to be generated accordingly, with randomly
 assigned six-digit `species_id`, to replace the species name. The `genome` name
 can be kept as it is.
 
@@ -1399,7 +1496,7 @@ The genome annotation for all the genomes were done by
 [Prokka](https://github.com/tseemann/prokka), and the annotated genes were kept
 under the directory of `genes_annotations/<species>/<genome>`. The rep-genome
 databases for the SNPs module analysis only included the gene annotations and
-sequences for the **representative genomes**, as specified in the TOC.
+sequences for the representative genomes, as specified in the TOC.
 
 ```
 gene_annotations/100001/genome2/genome2.fna.lz4
@@ -1429,8 +1526,8 @@ marker_genes/phyeco/temp/100001/genome2/genome2.markers.fa
 marker_genes/phyeco/temp/100001/genome2/genome2.markers.map
 ```
 
-For all the **representative genomes**, the identified marker genes were
-concatenated into monolithic **`marker_genes.fa`**, from which `hs-blastn`
+For all the representative genomes, the identified marker genes were
+concatenated into monolithic `marker_genes.fa`, from which `hs-blastn`
 index would be constructed. The indexed `marker_genes.fa` serves as the SCG
 marker databases.
 
@@ -1446,7 +1543,7 @@ marker_genes/phyeco/marker_genes.fa.sequence
 Species-level pan-genome refers to the set of non-redundant genes that
 represent the genetic diversity within one species cluster. In order to
 construct the pan-genome database for each species, the first step if to
-concatenate the annotated genes from its **all genome members** into
+concatenate the annotated genes from its all genome members into
 `pangenomes/100001/genes.ffn`. The second step, which is also the most
 time-consuming step, is to cluster the concatenated genes based on 99% percent
 identity (PID) using [`vsearch`](https://github.com/torognes/vsearch). Each
