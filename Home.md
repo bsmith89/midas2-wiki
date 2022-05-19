@@ -173,20 +173,20 @@ This is important because fundamentally there is a trade-off between:
 
 # Overview: The MIDASDBs
 
-TODO: What the difference between the two high-level DBs?
-TODO: DBs are downloaded when needed
-TODO: Users _can_ make custom DBs: link to that section
-TODO: The DB includes different parts for the different modules.
-TODO: DBs can be downloaded and shared across projects
+- TODO: What the difference between the two high-level DBs?
+- TODO: DBs are downloaded when needed
+- TODO: Users _can_ make custom DBs: link to that section
+- TODO: The DB includes different parts for the different modules.
+- TODO: DBs can be downloaded and shared across projects
 
 # Overview: Maximizing Performance
 
-TODO: running samples in parallel
-TODO: when to use extra threads in the same process?
-TODO: pre-downloading databases
-TODO: how to choose a chunksize
-TODO: mention prebuilt bowtie2 indexes
-TODO: etc.
+- TODO: running samples in parallel
+- TODO: when to use extra threads in the same process?
+- TODO: pre-downloading databases
+- TODO: how to choose a chunksize
+- TODO: mention prebuilt bowtie2 indexes
+- TODO: etc.
 
 # Overview: The MIDAS Interface
 
@@ -194,20 +194,20 @@ TODO: etc.
 
 TODO: output dir, sample name, database dir/name, species selection, etc.
 
-## Key input file locations/formats
+## Input files
 
 TODO
 
-## Key output file locations/formats
+## Output files
 
 TODO
 
 # Module: Species Selection
 
-TODO: Any special details for run_species, merge_species? Necessary flags?
-TODO: How/when to preload the marker genes database
-TODO: Mention that species selection itself happens downstream in the SNV and
-CNV modules.
+- TODO: Any special details for run_species, merge_species? Necessary flags?
+- TODO: How/when to preload the marker genes database
+- TODO: Mention that species selection itself happens downstream in the SNV and
+  CNV modules.
 
 # Module: Single-Nucleotide Variant Analysis
 
