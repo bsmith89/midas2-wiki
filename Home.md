@@ -11,6 +11,8 @@ complementary ways:
   genome
 - gene copy number variation (CNVs) across the full species pangenome
 
+TODO: Citations to all publications that we'd like people to cite.
+
 <!--
 TODO: Tried to rename MIDAS 2.0 as MIDAS2 everywhere.
 If it's MIDAS 2.0, then what's the
@@ -30,15 +32,14 @@ In addition, the philosophy and details of how MIDAS2 operates are described,
 along with instructions for more advanced usage
 (e.g. [building custom database](#advanced-building-your-own-midasdb)).
 
-# Quickstart
+# Installation
 
-1. **Install MIDAS2.**
-
-(NOTE: These instruction assume that [conda has already been installed](TODO-link-to-conda).)
+Assuming [conda has already been installed](TODO-link-to-conda),
+we recommend the following installation procedure:
 
 <!--
 # TODO: Where does midas2.yml come from?
-# TODO: Is this really the best "quick-start" installation if it requires
+# TODO: Is this really the best installation if it requires
 # tricky stuff like cpanm?
 # TODO: Why are we using pip, but just for midas2? Couldn't we have used conda?
 -->
@@ -50,7 +51,17 @@ cpanm Bio::SearchIO::hmmer --force
 pip install midas2
 ```
 
-2. **Download example data.**
+Alternative installation procedures are detailed in
+[Advanced: Installation](#advanced-installation).
+
+
+# Quickstart
+<!--
+TODO: Add links to the more completely explanations of each step
+elsewhere in the wiki.
+-->
+
+1. **Download example data.**
 
 <!--
 TODO: wget URL
@@ -71,13 +82,13 @@ tar -zxf TODO
 # Inflates into a reads/ directory with R1/R2 for each of two samples: sample1 and sample2.
 ```
 
-3. **Pre-download marker genes.**
+2. **Pre-download marker genes.**
 
 ```
 midas2 database --init --midasdb_name uhgg --midasdb_dir midasdb/uhgg
 ```
 
-4. **Identify abundant species.**
+3. **Identify abundant species.**
 
 (NOTE: This is designed only to select high-coverage species in each sample.
 _It is not intended to quantify species abundance._)
@@ -103,7 +114,7 @@ do
 done
 ```
 
-5. **Run SNVs module.**
+4. **Run SNVs module.**
 
 <!--
 TODO: Can we drop the extra flags (e.g. chunksize, select_by, etc)?
