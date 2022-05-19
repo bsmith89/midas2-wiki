@@ -524,43 +524,43 @@ species_id  median_abundance  mean_abundance  median_coverage  mean_coverage  sa
 
   - `species_marker_median_coverage.tsv`: species-by-sample _median_marker_coverge_ matrix
 
-    ```
-    species_id   SRR172902   SRR172903
-    102337       3.926       28.484
-    102506       0.951       4.983
-    ```
+```
+species_id   SRR172902   SRR172903
+102337       3.926       28.484
+102506       0.951       4.983
+```
 
   - `species_unique_fraction_covered.tsv`: species-by-sample _unique_fraction_covered_ matrix
 
-     ```
-     species_id   SRR172902   SRR172903
-     102337       1           1
-     102506       0.92        1
-     ```
+```
+species_id   SRR172902   SRR172903
+102337       1           1
+102506       0.92        1
+```
 
   - `species_marker_coverage.tsv`: species-by-sample _marker_coverage_ matrix:
 
-     ```
-     species_id   SRR172902   SRR172903
-     102337       3.926       28.484
-     102506       0.951       4.983
-     ```
+```
+species_id   SRR172902   SRR172903
+102337       3.926       28.484
+102506       0.951       4.983
+```
 
   - `species_marker_read_counts.tsv`: species-by-sample _marker_read_counts_ matrix:
 
-     ```
-     species_id   SRR172902   SRR172903
-     102337       1565        4110
-     102506       143         734
-     ```
+```
+species_id   SRR172902   SRR172903
+102337       1565        4110
+102506       143         734
+```
 
   - `species_relative_abundance.tsv`: species-by-sample _marker_relative_abundance_ matrix:
 
-     ```
-     species_id   SRR172902   SRR172903
-     102337       0.072       0.301
-     102506       0.019       0.052
-     ```
+```
+species_id   SRR172902   SRR172903
+102337       0.072       0.301
+102506       0.019       0.052
+```
 
 Having finished the species-selection step, users can now go to the SNV or CNV
 modules, depending on their scientific aims.
