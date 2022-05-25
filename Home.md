@@ -1,25 +1,20 @@
-# MIDAS2: Metagenomic Intra-Species Diversity Analysis
+# MIDAS 2.0: Metagenomic Intra-Species Diversity Analysis System 2.0
 
-Metagenomic Intra-Species Diversity Analysis
+Metagenomic Intra-Species Diversity Analysis System
 ([MIDAS](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
 workflows for
 **profiling strain-level genomic variations in shotgun metagenomic data**.
-Specifically, MIDAS2 is designed to profile strain genotypes in two
+Specifically, MIDAS 2.0 is designed to profile strain genotypes in two
 complementary ways:
 
-- single-nucleotide variants (SNVs) across polymorphic sites in a species reference
+- single-nucleotide variant (SNV) across polymorphic sites in a species reference
   genome
-- gene copy number variation (CNVs) across the full species pangenome
+- gene copy number variation (CNV) across the full species pangenome
 
 TODO: Citations to all publications that we'd like people to cite.
 
-<!--
-TODO: Tried to rename MIDAS 2.0 as MIDAS2 everywhere.
-If it's MIDAS 2.0, then what's the
-next minor version? MIDAS 2.1? MIDAS 2.0 v0.1, 2.0.2? MIDAS2 is also cleaner to my eye and
-matches the program name
--->
-MIDAS2 implements the same analyses as the original [MIDAS tool](https://github.com/snayfach/MIDAS),
+
+MIDAS 2.0 implements the same analyses as the original [MIDAS tool](https://github.com/snayfach/MIDAS),
 but re-engineered to (1) allow for multiple, alternative reference databases
 (MIDASDBs), and (2) optimize scaling to collections of thousands of samples.
 
@@ -28,7 +23,7 @@ This documentation includes instructions for [installing software](#advanced-ins
 and running the three standard modules: [species selection](#module-species-selection),
 [SNV profiling](#module-single-nucleotide-variant-analysis), and
 [CNV profiling](#module-copy-number-variant-analysis).
-In addition, the philosophy and details of how MIDAS2 operates are described,
+In addition, the philosophy and details of how MIDAS 2.0 operates are described,
 along with instructions for more advanced usage
 (e.g. [building custom database](#advanced-building-your-own-midasdb)).
 
@@ -38,17 +33,17 @@ Assuming [conda has already been installed](TODO-link-to-conda),
 we recommend the following installation procedure:
 
 <!--
-# TODO: Where does midas2.yml come from?
+# TODO: Where does MIDAS 2.0.yml come from?
 # TODO: Is this really the best installation if it requires
 # tricky stuff like cpanm?
-# TODO: Why are we using pip, but just for midas2? Couldn't we have used conda?
+# TODO: Why are we using pip, but just for MIDAS 2.0? Couldn't we have used conda?
 -->
 ```
 # Create a new conda environment with required software.
-conda env create -n midas2 -f midas2.yml
+conda env create -n MIDAS 2.0 -f MIDAS 2.0.yml
 # Temporary fix for Prokka:
 cpanm Bio::SearchIO::hmmer --force
-pip install midas2
+pip install MIDAS 2.0
 ```
 
 Alternative installation procedures are detailed in
@@ -85,7 +80,7 @@ tar -zxf TODO
 2. **Pre-download marker genes.**
 
 ```
-midas2 database --init --midasdb_name uhgg --midasdb_dir midasdb/uhgg
+MIDAS 2.0 database --init --midasdb_name uhgg --midasdb_dir midasdb/uhgg
 ```
 
 3. **Identify abundant species.**
@@ -104,7 +99,7 @@ TODO: Any reason it's just R1 and not R2 as well?
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_species \
+    MIDAS 2.0 run_species \
         --sample_name ${sample_name} \
         -1 reads/${sample_name}_R1.fastq.gz \
         --midasdb_name uhgg \
@@ -123,7 +118,7 @@ Are there defaults that can be used for this quickstart?
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_snps \
+    MIDAS 2.0 run_snps \
         --sample_name ${sample_name} \
         -1 reads/${sample_name}_R1.fastq.gz \
         --midasdb_name uhgg \
@@ -134,7 +129,7 @@ do
         --num_cores 2 \
         midas_output
 done
-# TODO: midas2 merge_snps
+# TODO: MIDAS 2.0 merge_snps
 ```
 
 The SNV results can be found in TODO,
@@ -151,7 +146,7 @@ Are there defaults that can be used for this quickstart?
 ```
 for sample_name in sample1 sample2
 do
-    midas2 run_genes \
+    MIDAS 2.0 run_genes \
         --sample_name ${sample_name} \
         -1 reads/${sample_name}_R1.fastq.gz \
         --midasdb_name uhgg \
@@ -161,25 +156,25 @@ do
         --num_cores 2 \
         midas_output
 done
-# TODO: midas2 merge_genes
+# TODO: MIDAS 2.0 merge_genes
 ```
 
 The CNV results can be found in TODO,
 summarizing TODO within and across samples for each species found to be at
 sufficient coverage.
 
-# Overview: The MIDAS2 Workflow
+# Overview: The MIDAS 2.0 Workflow
 
-MIDAS2 contains two strain-level reads-to-table analysis modules: population
+MIDAS 2.0 contains two strain-level reads-to-table analysis modules: population
 SNVs analysis (SNV module) and pan-genome CNVs analysis (CNV module).  Each
 module includes two sequential steps: single-sample analysis and across-samples
 analysis.
 
 ![
-MIDAS2 Analysis Modules
+MIDAS 2.0 Analysis Modules
 ](static/Fig.Modules.png)
 
-Before running these modules, however, the MIDAS2 workflow starts by identifying
+Before running these modules, however, the MIDAS 2.0 workflow starts by identifying
 species at high coverage in each sample (species module).
 The results of this analysis are then be used to filter the databases used
 in subsequent steps.
@@ -199,9 +194,9 @@ This is important because fundamentally there is a trade-off between:
 - TODO: The DB includes different parts for the different modules.
 - TODO: DBs can be downloaded and shared across projects
 
-MIDAS2 is a reference-based strain-level genomic variation analysis
+MIDAS 2.0 is a reference-based strain-level genomic variation analysis
 pipeline, and it also presuppose a reference database construction step has
-already taken place.  "MIDAS2 reference database (MIDASDB)" refers to a set of
+already taken place.  "MIDAS 2.0 reference database (MIDASDB)" refers to a set of
 custom files needed for the strain-level metagenomic analysis.
 
 The original MIDAS provided a default bacterial reference databases (see
@@ -216,12 +211,12 @@ vastly,
 TODO: How much?
 -->
 in particular with the addition of metagenome-assembled genomes (MAGs)
-sequenced from varied habitats. Therefore, it is necessary to update MIDAS2
+sequenced from varied habitats. Therefore, it is necessary to update MIDAS 2.0
 reference database accordingly. On the other hand, processing the large amount
-of available genome sequences poses a significant compute challenge. For MIDAS2,
+of available genome sequences poses a significant compute challenge. For MIDAS 2.0,
 instead of generating the species clusters from scratch, we take advantage
 of several published collections of prokaryotic genome databases, and build
-MIDAS2 reference databases individually.
+MIDAS 2.0 reference databases individually.
 
 
 # Overview: Maximizing Performance
@@ -238,7 +233,7 @@ MIDAS2 reference databases individually.
 TODO: Link out to e.g. StrainPhlan, GT-Pro, maybe explain briefly what the pros/cons
 of other tools are.
 
-# Overview: The MIDAS2 Interface
+# Overview: The MIDAS 2.0 Interface
 
 ## Common CLI options
 
@@ -256,7 +251,7 @@ user.
 -->
 - User-specified output directory: `midas_outdir=/path/to/root/outdir`.
   This is always passed as a mandatory positional argument to each of the
-  MIDAS2 command.
+  MIDAS 2.0 command.
 
 - Unique sample name: `sample_name=/unique/sample/identifier`.
 
@@ -270,7 +265,7 @@ R1=/path/to/forward/reads/R1.fq.gz
 R2=/path/to/reverse/reads/R2.fq.gz
 ```
 
-`${R1}` and/or `${R2}` need to be passed to MIDAS2 analysis commands via
+`${R1}` and/or `${R2}` need to be passed to MIDAS 2.0 analysis commands via
 arguments `-1` and `-2` as: `-1 ${R1} -2 ${R2}`
 
 ### Sample merge commands
@@ -290,8 +285,8 @@ A template _sample_list_ is shown here:
 
 ```
 sample_name       midas_outdir
-SRR172902         /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
-SRR172903         /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
+SRR172902         /home/ubuntu/hmp_mock/MIDAS 2.0_output_uhgg/single_sample
+SRR172903         /home/ubuntu/hmp_mock/MIDAS 2.0_output_uhgg/single_sample
 ```
 
 <!--
@@ -302,7 +297,7 @@ relative paths work? If not: it should. If so: we should use one above.
 
 ## MIDASDB
 
-For all MIDAS2 analysis, users need to choose (1) a valid precomputed MIDASDB
+For all MIDAS 2.0 analysis, users need to choose (1) a valid precomputed MIDASDB
 name (uhgg, gtdb): `my_midasdb_name=uhgg`, and (2) a valid path to local MIDASDB:
 `my_midasdb_dir=/path/to/local/midasdb/uhgg`.
 <!--
@@ -311,7 +306,7 @@ Can we switch to using an "example dir" that we also reference in the
 quickstart and also serves as a tutorial of sorts?
 -->
 
-MIDAS2 analysis can take two arguments as: `--midasdb_name
+MIDAS 2.0 analysis can take two arguments as: `--midasdb_name
 ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir}`. If the `--midasdb_dir` is
 not specified, MIDASDB will be downloaded to the current directory.
 <!--
@@ -327,7 +322,7 @@ it *need* those arguments?
 Users can set the `--num_cores` to the number of physical cores to use: e.g.
 `--num_cores 16`.
 
-And all MIDAS2 analysis can print out the full help message and exit by `-h` or
+And all MIDAS 2.0 analysis can print out the full help message and exit by `-h` or
 `--help`.
 
 ## Input files
@@ -349,7 +344,7 @@ comprehensive public microbial genome collections.
 TODO: Link to the websites for each of these.
 
 ```
-$ midas2 database --list
+$ MIDAS 2.0 database --list
 uhgg 286997 genomes from 4644 species version 1.0
 gtdb 258405 genomes from 47893 species version r202
 ```
@@ -362,7 +357,7 @@ Alternatively, we could mention them in common args, link to here, and then put
 all the details about how to use them in this section.
 TODO: Right now there's a lot of redundancy across sections.
 -->
-Most MIDAS2 commands take as an argument a path to a local mirror of the MIDASDB,
+Most MIDAS 2.0 commands take as an argument a path to a local mirror of the MIDASDB,
 as well as the name of the database.
 
 ```
@@ -388,7 +383,7 @@ TODO: Add cross-links throughout.
 -->
 
 ```
-midas2 database --init --midasdb_name uhgg --midasdb_dir midasdb
+MIDAS 2.0 database --init --midasdb_name uhgg --midasdb_dir midasdb
 ```
 
 ## Preloading all species
@@ -397,7 +392,7 @@ While it _is_ possible to download an entire MIDASDB using the following
 command:
 
 ```
-midas2 database --download --midasdb_name uhgg --midasdb_dir midasdb -s all
+MIDAS 2.0 database --download --midasdb_name uhgg --midasdb_dir midasdb -s all
 ```
 
 this requires a large amount of data transfer and storage:
@@ -428,7 +423,7 @@ species) to a plain text file named `species.list`:
 we can then run the following to preload all of the data needed for these species:
 
 ```
-midas2 database \
+MIDAS 2.0 database \
     --download --midasdb_name uhgg --midasdb_dir midasdb \
     --species_list species.list
 ```
@@ -447,7 +442,7 @@ awk '$6 > 1 {print $6}' \
 
 Now, when running `run_snps` or `run_genes` for multiple samples in parallel
 (e.g. using a workflow manager or background processes in UNIX),
-MIDAS2 will see that the necessary parts of the MIDASDB have already been
+MIDAS 2.0 will see that the necessary parts of the MIDASDB have already been
 downloaded and will not repeat that step.
 
 It is also possible for users to
@@ -474,14 +469,14 @@ species in the sample.
 A badly chosen reference may suffer both from ambiguous mapping
 of reads to two or more sequences or spurious mapping to incorrect
 sequences.
-Therefore, a typical MIDAS2 workflow starts
+Therefore, a typical MIDAS 2.0 workflow starts
 with a species selection step, which
 filters the reference database to species believed to be abundant in each
 particular sample based on profiling 15 universal single copy marker genes.
 
 
 ```
-midas2 run_species \
+MIDAS 2.0 run_species \
     --sample_name ${sample_name} \
     -1 reads/${sample_name}_R1.fastq.gz \
     --midasdb_name uhgg \
@@ -575,7 +570,7 @@ results for all the samples listed in the
 ### Sample command
 
 ```
-midas2 merge_species --samples_list ${my_sample_list} ${midas_outdir}
+MIDAS 2.0 merge_species --samples_list ${my_sample_list} ${midas_outdir}
 ```
 
 ### Output files
@@ -675,7 +670,7 @@ A subsequent call to `merge_snps` combines results from all
 samples and filters polymorphic sites based on their
 representation across samples.
 
-MIDAS2 purposely holds any filter or species selection upon the
+MIDAS 2.0 purposely holds any filter or species selection upon the
 single-sample pileup results until across-samples SNV analysis.
 
 <!--
@@ -690,7 +685,7 @@ easily customize species selection on their own.
 A typical call to `run_snps` for one sample is:
 
 ```
-midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+MIDAS 2.0 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
         --select_by median_marker_coverage,unique_fraction_covered \
         --select_threshold=2,0.5 \
@@ -701,7 +696,7 @@ After running all samples in this way, SNV calling is performed across
 samples as follows:
 
 ```
-midas2 merge_snps \
+MIDAS 2.0 merge_snps \
     --samples_list ${my_sample_list} \
     --midasdb_name ${my_midasdb_name} \
     --midasdb_dir ${my_midasdb_dir} \
@@ -710,7 +705,7 @@ midas2 merge_snps \
 ```
 
 Where `${my_sample_list}` is a sample manifest file
-[described here](https://github.com/czbiohub/MIDAS2.0/wiki/Common-Command-Line-Arguments#across-samples-analysis).
+[described here](https://github.com/czbiohub/MIDAS 2.0.0/wiki/Common-Command-Line-Arguments#across-samples-analysis).
 
 The key outputs of this command are:
 
@@ -752,12 +747,12 @@ options (default values indicated):
 - Single-sample pileup for all the species in the restricted species profile
   with paired-ends based post-alignment quality filter.
 
-With `paired_only` and proper `fragment_length`, MIDAS2 will only recruit
+With `paired_only` and proper `fragment_length`, MIDAS 2.0 will only recruit
 properly paired-ends reads for pileup. And all the post-alignment metrics will
 be computed based on a read pair, instead of a single read.
 
 ```
-midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+MIDAS 2.0 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
         --select_by median_marker_coverage,unique_fraction_covered \
         --select_threshold=2,0.5 \
@@ -769,7 +764,7 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
   species profile with paired-ends based post-alignment quality filter.
 
 In recognition of the need for single-sample variant calling, we added an
-`advanced` mode to the single-sample SNV analysis in MIDAS2. In the
+`advanced` mode to the single-sample SNV analysis in MIDAS 2.0. In the
 `advanced` mode, per-species pileup results will also report major allele and
 minor allele for all the genomic sites covered by at least two reads, upon
 which custom variant calling filter can be applied by the users. Users are
@@ -777,7 +772,7 @@ advised to use the setting `ignore_ambiguous` to avoid falsely calling
 major/minor alleles for sites with tied read counts.
 
 ```
-midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+MIDAS 2.0 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
         --select_by median_marker_coverage,unique_fraction_covered \
         --select_threshold=2,0.5 \
@@ -789,7 +784,7 @@ midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
 - Single-sample pileup for all the species in a prebuilt rep-genome database.
 
 ```
-midas2 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+MIDAS 2.0 run_snps --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
         --prebuilt_bowtie2_indexes ${midas_output}/bt2_indexes/repgenome \
         --prebuilt_bowtie2_species ${midas_output}/bt2_indexes/repgenome.species \
@@ -859,7 +854,7 @@ perform the population SNV analysis using the `merge_snps` command.
 ### Important Concepts
 
 In this section, we will introduce the species and sample filters, the genomic
-site filters, the compute of population SNV in MIDAS2, and the chunkified
+site filters, the compute of population SNV in MIDAS 2.0, and the chunkified
 pileup. Beginner users can skip this section and go straight to [Sample
 commands]().
 
@@ -896,9 +891,9 @@ commands]().
 
 4. **Population SNV Computation**
 
-   There are three main steps to compute and report population SNV in MIDAS2.
+   There are three main steps to compute and report population SNV in MIDAS 2.0.
 
-   First, for each relevant genomic site, MIDAS2 determines the set of
+   First, for each relevant genomic site, MIDAS 2.0 determines the set of
    alleles present across all relevant samples.  Specifically, for each
    allele (A, C, G, T), `merge_snps` subcommand (1) tallys the sample counts
    (_sc_) of relevant samples containing corresponding allele (`scA:scT`),
@@ -920,10 +915,10 @@ For example, the population major allele of the site
 `gnl|Prokka|UHGG000587_14|34360|A` in the above example is `A` defined by
 accumulated read counts and `C` defined by accumulated sample counts.
 
-Third, MIDAS2 collects and reports the sample-by-site matrix of the
+Third, MIDAS 2.0 collects and reports the sample-by-site matrix of the
 corresponding (1) site depth and (2) allele frequency of the above calculated
 population minor allele for all the relevant samples. In these two
-matrices, MIDAS2 encode `site_depth = 0` and `allele_frequency = -1` with
+matrices, MIDAS 2.0 encode `site_depth = 0` and `allele_frequency = -1` with
 the special meaning of missing <site, sample> pair.
 
 5. **Chunkified Pileup Implementation**
@@ -940,7 +935,7 @@ the uses of multiple CPUs, multiple chunks can be processed at the same time.
 Therefore, for large collections of samples, we recommend higher CPU counts and
 smaller chunk size to optimally balance memory and I/O usage, especially for
 highly prevalent species. Users can adjust the number of sites per chunk via
-`chunk_size` (default value = 1000000). MIDAS2 also has a `robust_chunk`
+`chunk_size` (default value = 1000000). MIDAS 2.0 also has a `robust_chunk`
 option, where assigning different chunk sizes to different species based on the
 species prevalence.
 
@@ -976,7 +971,7 @@ species prevalence.
 Now we can put all the above-mentioned filters in one `merge_snps` command:
 
 ```
-midas2 merge_snps --samples_list ${my_sample_list} \
+MIDAS 2.0 merge_snps --samples_list ${my_sample_list} \
     --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
     --genome_coverage 0.4 --genome_depth 3 --sample_counts 30 \
     --site_depth 5 --site_ratio 3 --snp_maf 0.05 \
@@ -1055,7 +1050,7 @@ Similar to the SNV module, the CNV module also proceeds in two phases: (1)
 single-sample pan-genome copy number variants calling (2) merge these results
 into a summary across all samples. The first step can be run in parallel. We
 presuppose users already follow the [database
-customization](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization)
+customization](https://github.com/czbiohub/MIDAS 2.0.0/wiki/Data-customization)
 step, and have `species_profile.tsv` ready for each sample.
 
 ## Single-Sample CNV Calling
@@ -1077,12 +1072,12 @@ numbers` are computed and gene presence/absence are further inferred.
   profile: `median_marker_coverage > 2` and `unique_fraction_covered` > 0.5.
 
 We presuppose users already [profiling the species
-coverage](https://github.com/czbiohub/MIDAS2.0/wiki/Data-customization#species-to-genotype),
+coverage](https://github.com/czbiohub/MIDAS 2.0.0/wiki/Data-customization#species-to-genotype),
 and expect `${my_midasdb_dir}/${sample_name}/species/species_profile.tsv`
 exists.
 
 ```
-midas2 run_genes --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
+MIDAS 2.0 run_genes --sample_name ${sample_name} -1 ${R1} -2 ${R1} \
         --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
         --select_by median_marker_coverage,unique_fraction_covered \
         --select_threshold=2,0.5 \
@@ -1146,12 +1141,12 @@ Take the same [`${my_sample_list}`](#across-samples-analysis):
 
 ```
 sample_name   midas_outdir
-SRR172902     /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
-SRR172903     /home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample
+SRR172902     /home/ubuntu/hmp_mock/MIDAS 2.0_output_uhgg/single_sample
+SRR172903     /home/ubuntu/hmp_mock/MIDAS 2.0_output_uhgg/single_sample
 ```
 
 `merge_genes` would expect to locate
-`/home/ubuntu/hmp_mock/midas2_output_uhgg/single_sample/SRR172903/genes/genes_summary.tsv`,
+`/home/ubuntu/hmp_mock/MIDAS 2.0_output_uhgg/single_sample/SRR172903/genes/genes_summary.tsv`,
 generated by `run_genes`.
 
 
@@ -1167,7 +1162,7 @@ gene copy number (`min_copy`).
 - Across-samples CNV analysis using default filters.
 
 ```
-midas2 merge_genes --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} --num_cores 8 ${midas_outdir}
+MIDAS 2.0 merge_genes --samples_list ${my_sample_list} --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} --num_cores 8 ${midas_outdir}
 ```
 
 By default, merged gene CNV results are reported for genes clustered at 95%
@@ -1225,20 +1220,20 @@ UHGG000587_00962    3.402439    3.099448
 
 ```
 conda config --set channel_priority flexible
-conda install -c zhaoc1 -c anaconda -c bioconda -c conda-forge -c defaults midas2
+conda install -c zhaoc1 -c anaconda -c bioconda -c conda-forge -c defaults MIDAS 2.0
 ```
 
 ### Developer Installation
 
 <!--
-TODO: I updated this to show where the midas2.yml file came from
+TODO: I updated this to show where the MIDAS 2.0.yml file came from
 as a bonus, this is how I'd suggest developers install it.
 Makes the repo editable.
 -->
 ```
-git clone https://github.com/czbiohub/MIDAS2.0.git midas2
-cd midas2
-conda env create -n midas2 -f midas2.yml
+git clone https://github.com/czbiohub/MIDAS 2.0.0.git MIDAS 2.0
+cd MIDAS 2.0
+conda env create -n MIDAS 2.0 -f MIDAS 2.0.yml
 cpanm Bio::SearchIO::hmmer --force # Temporary fix for Prokka
 # TODO: Temporary? When will it no longer be needed?
 pip install .  # Include -e flag for editable installation/development
@@ -1247,8 +1242,8 @@ pip install .  # Include -e flag for editable installation/development
 ### Docker Image
 
 ```
-docker pull zhaoc1/midas2:latest
-docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it midas2:latest
+docker pull zhaoc1/MIDAS 2.0:latest
+docker run --volume "/home/ubuntu/.aws":"/root/.aws":ro --rm -it MIDAS 2.0:latest
 # TODO: Is the above correct? What about binding the DBs and stuff?
 ```
 
@@ -1269,7 +1264,7 @@ based on the `species_prevalence.tsv` can be passed to `build_bowtie2eb` via
 database for all the species that is present in more than two samples:
 
 ```
-midas2 build_bowtie2db \
+MIDAS 2.0 build_bowtie2db \
     --midasdb_name ${my_midasdb_name} --midasdb_dir ${my_midasdb_dir} \
     --select_threshold sample_counts --select_by 2 --num_cores 8 \
     --bt2_indexes_name repgenome --bt2_indexes_dir ${midas_outdir}/bt2_indexes
@@ -1292,7 +1287,7 @@ pass the pre-built rep-genome to `run_snps` analysis (pan-genome for
 
 # Advanced: Building Your Own MIDASDB
 
-MIDAS2 users can locally build a new MIDASDB for a custom collection of
+MIDAS 2.0 users can locally build a new MIDASDB for a custom collection of
 genomes. The target layout of MIDASDB can refer to [this page](TODO).  This
 page is focused specifically on the database construction commands.
 
@@ -1302,11 +1297,11 @@ produce the TOC `genomes.tsv` as described in [the documentation](TODO)
 We have prepared a toy collections of genomes.
 
 ```
-git clone https://github.com/czbiohub/MIDAS2.0.git midas2
-cd midas2/tests/genomes
+git clone https://github.com/czbiohub/MIDAS 2.0.0.git MIDAS 2.0
+cd MIDAS 2.0/tests/genomes
 ```
 
-We will build the new MIDASDB under the directory of `midas2/tests/genomes`.
+We will build the new MIDASDB under the directory of `MIDAS 2.0/tests/genomes`.
 There are two command-line parameters that we need to pass:
 
 ```
@@ -1320,32 +1315,32 @@ First, annotate all the genomes.
 TODO: Wrap bash lines
 -->
 ```
-midas2 annotate_genome --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
-midas2 build_midasdb --generate_gene_feature --genomes all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 annotate_genome --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 build_midasdb --generate_gene_feature --genomes all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
 ```
 
 Second, infer SCGs for all the genomes and build marker database
 
 ```
-midas2 infer_markers --genomes all --midasdb_name newdb--midasdb_dir my_new_midasdb --debug --force
-midas2 build_midasdb --build_markerdb --midasdb_name newdb--midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 infer_markers --genomes all --midasdb_name newdb--midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 build_midasdb --build_markerdb --midasdb_name newdb--midasdb_dir my_new_midasdb --debug --force
 ```
 
 Third, build species pangenomes
 
 ```
-midas2 build_pangenome --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
-midas2 build_midasdb --generate_cluster_info --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 build_pangenome --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
+MIDAS 2.0 build_midasdb --generate_cluster_info --species all --midasdb_name newdb --midasdb_dir my_new_midasdb --debug --force
 ```
 
-# Advanced: MIDAS2 Implementation
+# Advanced: MIDAS 2.0 Implementation
 
 ## Output Directory Layout
 
-### MIDAS2 Results Layout
+### MIDAS 2.0 Results Layout
 
-MIDAS2 writes its outputs to a user-specified root directory, which is always
-passed as a mandatory argument to each of the MIDAS2 command. In this
+MIDAS 2.0 writes its outputs to a user-specified root directory, which is always
+passed as a mandatory argument to each of the MIDAS 2.0 command. In this
 documentation we refer to this directory as:
 
 - `midas_outdir=/path/to/results/root/directory`
@@ -1362,7 +1357,7 @@ steps operate within the directory `${midas_outdir}`.
 
 ### Single-Sample Results Layout
 
-MIDAS2 analysis usually starts with species selection which
+MIDAS 2.0 analysis usually starts with species selection which
 selects sufficiently abundant species in each sample (subcommand
 `run_species`). After completing this step, users can run either of two
 strain-level analysis: `run_snps` for single-sample read pileup (SNV module) or
@@ -1423,12 +1418,12 @@ Output                                             Producer        Meaning
 
 ## MIDASDB Directory Layout
 
-To meet the challenge of increased number of available genome sequences, MIDAS2
+To meet the challenge of increased number of available genome sequences, MIDAS 2.0
 implemented a new database infrastructure, geared to run on
 [AWS Batch](https://aws.amazon.com/batch/) and
 [S3](https://aws.amazon.com/s3/), to
 achieve [elastic scaling](https://github.com/czbiohub/pairani/wiki) for
-building MIDAS2 reference databases. To be specific, the MIDAS2 reference
+building MIDAS 2.0 reference databases. To be specific, the MIDAS 2.0 reference
 database construction step can be executed in AWS using hundreds of
 r5d.24xlarge instances over a period of a couple of days, depositing built
 products in S3.  For example, it took ~\$80,000 and a week to build the species
@@ -1439,7 +1434,7 @@ pan-genome for all 47,894 species of GTDB r202.
 
 The new database infrastructure reads in a table of contents (TOC) file,
 containing genome-to-species assignment and a choice of representative genome
-for each species cluster.  One TOC file (`genomes.tsv`) per MIDAS2 reference
+for each species cluster.  One TOC file (`genomes.tsv`) per MIDAS 2.0 reference
 database, listing the genome-to-species assignment for all genomes, with per
 genome each row. The TOC file has four columns, among which
 `genome_is_representative` specify whether the `genome` is the representative
@@ -1452,7 +1447,7 @@ GUT_GENOME138501    104351       GUT_GENOME269084      0
 GUT_GENOME269084    104351       GUT_GENOME269084      1
 ```
 
-By default, MIDAS2 inherits the representative genome assignments from
+By default, MIDAS 2.0 inherits the representative genome assignments from
 published prokaryotic genome databases. Inspired by the importance of selecting
 proper reference genome for accurate template-based SNP calling, this new
 infrastructure empowers user the flexibility to dynamically re-assign the
@@ -1467,7 +1462,7 @@ The collection of all the UHGG genomes were mirrored in
 the database construction. [Six-digit numeric species
 ids](s3://jason.shi-bucket/IGGdb2.0/alt_species_ids.tsv) were arbitrarily
 assigned. Instead of species name, these `species_id` are used as species
-identifier in all the reports generated by MIDAS2.
+identifier in all the reports generated by MIDAS 2.0.
 
 **Genome Taxonomy Database (GTDB)**:
 [GTDB R06-RS202](https://gtdb.ecogenomic.org/stats/r202) contains 45,555
@@ -1483,7 +1478,7 @@ from NCBI genomes repository using
 
 ### Database Target Layout and Construction
 
-MIDAS2 reference database (MIDASDB) primarily consist of three parts: rep-genome
+MIDAS 2.0 reference database (MIDASDB) primarily consist of three parts: rep-genome
 databases, pan-genome databases, and universal single copy genes (SGC) marker
 database. The target layout of any MIDASDB follow the same relative structure,
 based on the base directory of the database, both in the S3 bucket and locally.
@@ -1493,7 +1488,7 @@ cluster `species1` with two genomes (`genome1` and `genome2`).
 
 
 ![
-MIDAS2 Reference Database Target Layout and Construction Steps
+MIDAS 2.0 Reference Database Target Layout and Construction Steps
 ](static/Fig.DB.Layout.png)
 
 
@@ -1527,7 +1522,7 @@ gene_annotations/100001/genome2/genome2.genes.lz4
 
 ### SCG Marker Database
 
-Marker genes are defined as universal, single-copy gene families. MIDAS2 uses
+Marker genes are defined as universal, single-copy gene families. MIDAS 2.0 uses
 a subset (15) of the [PhyEco gene
 families](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0077033).
 The pre-computed HMM model of this set of 15 single copy genes (SCGs) are
@@ -1576,7 +1571,7 @@ percent identity clusters, and serves as the species pan-genome databases.
 Reads are aligned to the pan-genome databases to determine the gene content of
 strains in a sample (`midas run_genes`), and reads can optionally aggregated
 into gene clusters at any of the lower clustering thresholds across samples
-(`midas2 merge_gene`).
+(`MIDAS 2.0 merge_gene`).
 
 ```
 pangenomes/100001/centroids.ffn
@@ -1595,7 +1590,7 @@ be sure to run pip with the `-e` or `--editable` flag.
 ## Run Integration Tests
 
 ```
-bash tests/midas2_analysis.sh 8
+bash tests/MIDAS 2.0_analysis.sh 8
 ```
 
 ## Export Your Conda Environment
@@ -1609,7 +1604,7 @@ TODO: Maybe this belongs in the developer notes?
 ```
 conda update --all
 conda clean –all
-conda env export --no-builds | grep -v "^prefix:" > midas2.yml
+conda env export --no-builds | grep -v "^prefix:" > MIDAS 2.0.yml
 ```
 
 # End Matter: Glossary
@@ -1625,7 +1620,7 @@ conda env export --no-builds | grep -v "^prefix:" > midas2.yml
 - *Reference database*: The upstream UHGG, GTDB, something user supplies, etc.
   that is then pre-processed to make a specific...
 - *MIDASDB*: The pre-processed reference data in a format to be consumed by
-  the MIDAS2 modules, including marker genes, reference genomes, pangenomes,
+  the MIDAS 2.0 modules, including marker genes, reference genomes, pangenomes,
   etc.
 - *Genome collections*: TODO
 - *Bowtie2 Index*: Rather than bowtie2 database or some other ambiguous term
@@ -1636,7 +1631,7 @@ conda env export --no-builds | grep -v "^prefix:" > midas2.yml
 
 ### 0.8
 
-Rename IGGtools to MIDAS2.0.
+Rename IGGtools to MIDAS 2.0.0.
 
 ### 0.7
 
