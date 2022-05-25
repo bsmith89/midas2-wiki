@@ -2,30 +2,32 @@
 
 Metagenomic Intra-Species Diversity Analysis System
 ([MIDAS](https://genome.cshlp.org/content/26/11/1612)) is an integrated set of
-workflows for
-**profiling strain-level genomic variations in shotgun metagenomic data**.
-Specifically, MIDAS 2.0 is designed to profile strain genotypes in two
-complementary ways:
-
-- single-nucleotide variant (SNV) across polymorphic sites in a species reference
-  genome
-- gene copy number variation (CNV) across the full species pangenome
-
-TODO: Citations to all publications that we'd like people to cite.
+workflows for **profiling strain-level genomic variations in shotgun metagenomic data**.
+The original MIDAS harnesses a reference database of 5,926 species (MIDAS DB v1.2).
 
 
+MIDAS 2.0 was developed to address the computational challenges presented by increasingly large reference genome databases.
 MIDAS 2.0 implements the same analyses as the original [MIDAS tool](https://github.com/snayfach/MIDAS),
-but re-engineered to (1) allow for multiple, alternative reference databases
-(MIDASDBs), and (2) optimize scaling to collections of thousands of samples.
+but re-engineered to
+(1) host multiple MIDAS Reference Database (MIDAS DB) from public microbial genome collections, and
+(2) enable thousands of metagenomic samples to be efficiently genotyped.
 
-This documentation includes instructions for [installing software](#advanced-installation),
-[downloading one or more reference databases](#module-database-management),
-and running the three standard modules: [species selection](#module-species-selection),
-[SNV profiling](#module-single-nucleotide-variant-analysis), and
-[CNV profiling](#module-copy-number-variant-analysis).
+<!--
+TODO: Citations to all publications that we'd like people to cite.
+-->
+
+This documentation includes instructions for
+- [Installing software](#advanced-installation)
+- [Downloading one or more reference databases](#module-database-management),
+- [Abundant species detection](#module-species-selection)
+- [SNV profiling](#module-single-nucleotide-variant-analysis)
+- [CNV profiling](#module-copy-number-variant-analysis)
+
+??
 In addition, the philosophy and details of how MIDAS 2.0 operates are described,
 along with instructions for more advanced usage
 (e.g. [building custom database](#advanced-building-your-own-midasdb)).
+??
 
 # Installation
 
@@ -162,6 +164,17 @@ done
 The CNV results can be found in TODO,
 summarizing TODO within and across samples for each species found to be at
 sufficient coverage.
+
+
+
+Specifically, MIDAS was designed to profile strain genotypes in two
+complementary ways:
+
+- Single Nucleotide Variant(SNV) across polymorphic sites in a species reference
+  genome
+- gene copy number variation (CNV) across the full species pangenome
+
+
 
 # Overview: The MIDAS 2.0 Workflow
 
